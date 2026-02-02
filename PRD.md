@@ -1,0 +1,1864 @@
+# OnboardMe — Product Requirements Document
+
+> **The best onboarding experience ever made.**
+
+A gamified CLI tool that transforms codebase onboarding from reading static wikis into an interactive adventure. New engineers work through accumulated TODOs, solve challenges, and ultimately face "The Spaghetti Code Monster" — a boss born from the codebase's technical debt that can only be defeated through understanding.
+
+> **See [GAME_NARRATIVE.md](./GAME_NARRATIVE.md) for detailed creative direction, boss design, dialogue, and narrative arc.**
+
+---
+
+## Table of Contents
+
+1. [Vision & Goals](#1-vision--goals)
+2. [Target Users](#2-target-users)
+3. [Architecture](#3-architecture)
+4. [Game Design](#4-game-design)
+5. [Technical Specification](#5-technical-specification)
+6. [CLI Commands](#6-cli-commands)
+7. [File System Structure](#7-file-system-structure)
+8. [Agent Framework Integration](#8-agent-framework-integration)
+9. [Bootstrap: Context Gathering](#9-bootstrap-context-gathering)
+10. [TODO & Challenge Specifications](#10-todo--challenge-specifications)
+11. [FIXME Boss Battle Specification](#11-fixme-boss-battle-specification)
+12. [State Management](#12-state-management)
+13. [Question Design Principles](#13-question-design-principles)
+14. [Open Questions](#14-open-questions)
+15. [Future Considerations](#15-future-considerations)
+
+---
+
+## 1. Vision & Goals
+
+### The Problem
+
+Traditional onboarding sucks:
+- Static wiki pages that are outdated
+- "Read the README" doesn't teach you *why*
+- No way to verify understanding
+- Boring, passive, forgettable
+- Engineers skim instead of learning
+
+### The Solution
+
+**OnboardMe** turns onboarding into a text-based adventure game:
+- **Active exploration** instead of passive reading
+- **Progressive difficulty** that builds real understanding
+- **Immediate feedback** on what you know vs. don't know
+- **Knowledge unlocks** that persist as documentation
+- **A final boss** that proves mastery
+
+### Design Principles
+
+1. **Fun but not childish** — Terminal aesthetic, computer-themed, professional tone
+2. **Real learning** — Questions require actual exploration, not just grep
+3. **AI-powered, not AI-dependent** — AI generates content, but game logic is deterministic
+4. **Zero external dependencies** — Works with user's existing agent framework
+5. **Local-first** — All state in filesystem, no accounts, no cloud
+
+---
+
+## 2. Target Users
+
+### Primary User
+
+**Individual software engineers** joining a new team/company who want to:
+- Understand a new codebase quickly
+- Learn *why* things are built the way they are
+- Have actual verified knowledge, not just "I read it"
+- Make onboarding less boring
+
+### User Journey
+
+```
+1. Engineer joins new company
+2. Clones the repo
+3. Runs: onboardme init
+4. AI scans codebase, generates game content
+5. Runs: onboardme start
+6. Plays through 5 levels + boss
+7. Faces "The Spaghetti Code Monster" (FIXME)
+8. Has comprehensive understanding of codebase
+```
+
+### Non-Users (v1)
+
+- Managers tracking team progress
+- HR systems
+- Enterprise deployments
+- Teams wanting shared progress
+
+---
+
+## 3. Architecture
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER'S TERMINAL                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────┐         ┌─────────────────────────────────┐  │
+│   │  OnboardMe  │ ◄─────► │  Agent Framework                │  │
+│   │    CLI      │         │  (Cursor/Claude Code/OpenCode)  │  │
+│   └──────┬──────┘         └─────────────────────────────────┘  │
+│          │                                                      │
+│          ▼                                                      │
+│   ┌─────────────────────────────────────────────────────────┐  │
+│   │                  .onboarding/                            │  │
+│   │  ├── context/     (gathered codebase knowledge)         │  │
+│   │  ├── games/       (generated questions & challenges)    │  │
+│   │  ├── state/       (user progress & history)             │  │
+│   │  └── config.json  (settings & agent config)             │  │
+│   └─────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Delivery | Standalone CLI | Maximum interactivity, works in any terminal |
+| AI Backend | User's existing agent | No API key management, leverages existing tools |
+| State | Local filesystem | Simple, portable, no accounts needed |
+| Game Logic | Deterministic | Predictable, testable, doesn't require AI for core loop |
+| AI Role | Content generation + dynamic responses | Init generates content; runtime AI for briefs, boss, Q&A |
+
+### What the CLI Does vs. What the Agent Does
+
+| Component | CLI Responsibility | Agent Responsibility |
+|-----------|-------------------|---------------------|
+| **Init** | Orchestrate scanning | Analyze code, generate questions |
+| **Game Loop** | Display UI, track state | — |
+| **Question Display** | Render question, timer, UI | — |
+| **Answer Validation** | Check against expected answer | Evaluate free-form answers |
+| **Knowledge Briefs** | Display template | Generate contextual explanation |
+| **Boss Battle** | Manage phases, health, lives | Regenerate questions each attempt |
+| **User Q&A** | Detect when user asks question | Answer based on context |
+
+---
+
+## 4. Game Design
+
+### Narrative Framework
+
+**Theme:** Technical Debt as a Living Entity
+
+The game's central metaphor: **Technical debt is the real monster.** Every accumulated TODO, every "temporary" fix, every developer who left without documenting—they all merged into something that now guards the codebase.
+
+> **Full narrative details in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**
+
+**Core Elements:**
+- TODOs instead of levels (completing the debt the Monster was born from)
+- The Spaghetti Code Monster as a sympathetic antagonist
+- Developer-culture humor throughout
+- Redemption arc: the Monster isn't destroyed, it's *documented*
+
+### Game Structure
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        GAME PROGRESSION                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  TODO #1: // understand what we have       ──► Discovery       │
+│  TODO #2: // figure out how to find things ──► Navigation      │
+│  TODO #3: // trace data flows (URGENT)     ──► Understanding   │
+│  TODO #4: // document why this works       ──► Business Logic  │
+│  TODO #5: // learn how to deploy safely    ──► Operations      │
+│  FIXME:   // the monster itself            ──► Final Battle    │
+│                                                                 │
+│  Each TODO: 2 sub-tasks (mini-games)                           │
+│  Each sub-task: 5-10 challenges                                │
+│  FIXME: 3 phases                                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Game Terminology
+
+All game elements use code-themed naming:
+
+| Generic Term | Code-Themed Term | Context |
+|--------------|-----------------|---------|
+| Levels | **TODOs** | Main progression stages |
+| Boss | **FIXME** | Final confrontation |
+| Mini-games | **Sub-tasks** | Challenges within TODOs |
+| XP | **Commits** | Progress/points earned |
+| Lives/Shields | **Retries** | Remaining attempts |
+| Hints | **Stack Overflow** | Help system |
+| Knowledge unlocks | **Documentation** | Learning rewards |
+| Achievements | **Merged PRs** | Milestones/badges |
+| Game over | **Segfault** | Failure state |
+| Victory | **Deployed** | Success state |
+| Health bar | **Integrity** | Monster's health |
+| Streak | **Clean commits** | Consecutive correct answers |
+
+### The Spaghetti Code Monster
+
+The Monster is dynamically generated based on actual codebase analysis:
+
+```typescript
+interface MonsterOrigin {
+  birthYear: number;          // Oldest file creation date
+  todoCount: number;          // Actual TODO count in codebase
+  oldestTodo: string;         // Most ancient TODO still in code
+  longestFunction: {
+    name: string;
+    lines: number;
+    file: string;
+  };
+  deepestNesting: number;     // Max nesting level found
+  circularDeps: number;       // Circular dependencies detected
+  magicNumbers: number;       // Hardcoded values without explanation
+}
+```
+
+**Example Generated Intro:**
+```
+Born from:
+  • 234 TODO comments (oldest: "// TODO: fix this - Jake, 2019")
+  • The legendary processPayment() function (1,847 lines)
+  • 7 circular dependencies in src/services/
+  • That one file everyone's afraid to touch: legacy-auth-handler.js
+```
+
+### Monster Personality
+
+The Monster has a **tragic backstory** — it was once clean code, corrupted by shortcuts and abandonment:
+
+| Trait | Description | Example Dialogue |
+|-------|-------------|------------------|
+| **Defensive** | Guards code secrets | "Nobody needs to know why that timeout is 3847ms" |
+| **Nostalgic** | Remembers clean days | "I was beautiful once. Single-responsibility." |
+| **Bitter** | Abandoned by devs | "The architect said she'd refactor me. She's a VP at Google now." |
+| **Dramatic** | Over-the-top reactions | "You traced the DATA FLOW?! THROUGH ALL SEVEN SERVICES?!" |
+| **Vulnerable** | Shows weakness | "If you defeat me, who will guard the sacred constants?" |
+| **Self-aware** | Knows it's a mess | "I'm not deprecated, I'm CLASSIC." |
+
+### Monster Appearances Throughout Game
+
+The Monster appears **after every TODO** with evolving dialogue:
+
+| After TODO | Monster Mood | Sample Dialogue |
+|------------|--------------|-----------------|
+| TODO #1 | Dismissive | "You completed a TODO? AN ACTUAL TODO? That's been there longer than some of your coworkers." |
+| TODO #2 | Mocking | "You can grep. Impressive. My grandma's bash script can grep." |
+| TODO #3 | Worried | "You traced that flow. The WHOLE flow. ...How did you—nobody's done that since the architect left." |
+| TODO #4 | Existential | "If you defeat me, who will guard the sacred constants? WHO WILL REMEMBER WHY THE TIMEOUT IS 3847ms?" |
+| TODO #5 | Desperate | "We can coexist. I'll only break on Fridays. Please. I don't want to fight you." |
+
+### Performance-Based Reactions
+
+**If player aced it (90%+):**
+```
+"...No bugs? No Stack Overflow? Are you sure you didn't just read
+ the source code of my questions? Because that would be
+ very on-brand for an engineer, actually."
+```
+
+**If player struggled (60-70%):**
+```
+"You passed. With the grace of a force push to main on a Friday.
+ But hey, the tests are green. Technically."
+```
+
+**If player used many hints:**
+```
+"I see you've adopted the sacred tradition of Stack Overflow.
+ Copy-paste your way to victory. Classic."
+```
+
+### Watching Indicators
+
+Subtle reminders the Monster is present during gameplay:
+
+```
+"I've seen faster type inference..." — The Monster
+"Even my deprecated methods work faster." — The Monster
+"This is giving 'undefined is not a function' energy." — The Monster
+```
+
+---
+
+## 5. Technical Specification
+
+### Tech Stack (Proposed)
+
+| Component | Technology | Rationale |
+|-----------|------------|-----------|
+| Language | TypeScript | Type safety, good CLI tooling |
+| CLI Framework | Commander.js or Oclif | Mature, well-documented |
+| Terminal UI | Ink (React for CLI) or Blessed | Rich terminal UI |
+| Testing | Vitest | Fast, modern |
+| Build | tsup or esbuild | Fast builds |
+| Package | npm | Standard distribution |
+
+### Game Template Architecture
+
+Games are **modular, isolated, and extensible**. Each game is a self-contained unit that can be:
+- Developed independently
+- Tested in isolation
+- Added/removed without affecting others
+- Run standalone for debugging
+
+#### Base Game Interface
+
+```typescript
+interface GameConfig {
+  id: string;                    // e.g., "tree-discover"
+  name: string;                  // e.g., "tree --discover"  
+  level: number;                 // 1-5 or 0 for boss
+  description: string;
+  estimatedTime: number;         // minutes
+  maxQuestions: number;
+}
+
+interface GameState {
+  currentQuestion: number;
+  score: number;
+  maxScore: number;
+  lives: number;
+  hintsRemaining: number;
+  streak: number;
+  startTime: Date;
+  answers: AnswerRecord[];
+}
+
+interface GameQuestion {
+  id: string;
+  type: 'multiple-choice' | 'text-input' | 'multi-step' | 'timed';
+  prompt: string;
+  context?: string;
+  hints: string[];
+  timeLimit?: number;            // seconds, optional
+  validation: ValidationRule;
+  knowledgeReward: string[];     // Knowledge IDs unlocked on correct
+  xpReward: number;
+}
+
+interface GameResult {
+  completed: boolean;
+  score: number;
+  maxScore: number;
+  timeSpent: number;
+  knowledgeUnlocked: string[];
+  totalXP: number;
+}
+
+abstract class BaseGame {
+  abstract config: GameConfig;
+  protected state: GameState;
+  protected context: CodebaseContext;
+  protected questions: GameQuestion[];
+
+  // Lifecycle
+  abstract initialize(context: CodebaseContext): Promise<void>;
+  abstract generateQuestions(): Promise<GameQuestion[]>;
+  abstract start(): Promise<void>;
+  abstract pause(): void;
+  abstract resume(): void;
+  abstract end(): GameResult;
+
+  // Question flow
+  abstract getCurrentQuestion(): GameQuestion;
+  abstract submitAnswer(answer: string): Promise<AnswerResult>;
+  abstract useHint(): string | null;
+  abstract skip(): void;
+
+  // Teaching
+  abstract generateBrief(question: GameQuestion, wasCorrect: boolean): Promise<string>;
+
+  // For isolated testing/debugging
+  abstract runTestMode(mockContext?: Partial<CodebaseContext>): Promise<void>;
+}
+```
+
+#### Game Registry
+
+Games are registered centrally and loaded dynamically:
+
+```typescript
+// src/games/registry.ts
+const gameRegistry = new Map<string, typeof BaseGame>();
+
+function registerGame(gameClass: typeof BaseGame) {
+  const instance = new gameClass();
+  gameRegistry.set(instance.config.id, gameClass);
+}
+
+function getGame(id: string): BaseGame {
+  const GameClass = gameRegistry.get(id);
+  if (!GameClass) throw new Error(`Game '${id}' not found`);
+  return new GameClass();
+}
+
+// Auto-register all games
+registerGame(TreeDiscoverGame);
+registerGame(PsAuxGrepGame);
+registerGame(GrepHuntGame);
+// ... etc
+```
+
+#### Isolated Game Testing
+
+Each game can be run standalone:
+
+```bash
+# Run a specific game in test mode with mock context
+npm run game:test tree-discover
+
+# Run with verbose output
+npm run game:test tree-discover -- --verbose
+
+# Run with a specific test fixture
+npm run game:test grep-hunt -- --fixture=./tests/fixtures/small-ts-app
+```
+
+The test runner:
+1. Loads the game class
+2. Provides mock or real context
+3. Runs through all questions
+4. Reports results and any errors
+
+#### Adding New Games
+
+To add a new game:
+
+1. Create `src/games/levelN/my-new-game.ts`
+2. Extend `BaseGame`
+3. Implement all abstract methods
+4. Register in `src/games/registry.ts`
+5. Add to level configuration
+6. Create question generation prompts
+
+```typescript
+// Example: Adding a new game
+export class MyNewGame extends BaseGame {
+  config = {
+    id: 'my-new-game',
+    name: 'my --newgame',
+    level: 2,
+    description: 'Description of what this game teaches',
+    estimatedTime: 8,
+    maxQuestions: 6,
+  };
+
+  async initialize(context: CodebaseContext): Promise<void> {
+    this.context = context;
+    this.questions = await this.generateQuestions();
+  }
+
+  async generateQuestions(): Promise<GameQuestion[]> {
+    // Use agent to generate context-specific questions
+    // or use predefined templates filled with context data
+  }
+
+  // ... implement other methods
+}
+```
+
+#### Boss as a Special Game
+
+The boss battle is also a game, but with special mechanics:
+
+```typescript
+class SpaghettiCodeMonsterBoss extends BaseGame {
+  config = {
+    id: 'spaghetti-monster',
+    name: 'FIXME: // the monster',
+    level: 0,  // Special level for boss (FIXME)
+    description: 'Final confrontation with the Spaghetti Code Monster',
+    estimatedTime: 15,
+    maxQuestions: 0,  // Dynamic
+  };
+
+  // Boss-specific properties
+  monsterIntegrity: number = 100;
+  shields: number = 5;
+  currentPhase: 1 | 2 | 3 = 1;
+
+  // Override to regenerate questions each attempt
+  async generateQuestions(): Promise<GameQuestion[]> {
+    // Questions are regenerated each attempt to prevent memorization
+  }
+}
+```
+
+### Installation
+
+```bash
+# Via npm
+npm install -g onboardme
+
+# Via npx (no install)
+npx onboardme init
+
+# Via brew (future)
+brew install onboardme
+```
+
+### System Requirements
+
+- Node.js 18+
+- Git (for history analysis)
+- One of: Cursor CLI, Claude Code, OpenCode (for AI features)
+
+---
+
+## 5.5 Visual & Aesthetic Direction
+
+> **The game should feel FUN. Not a training module with emojis—an actual game you'd want to play.**
+
+### Design Philosophy
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AESTHETIC PILLARS                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. RETRO-FUTURISTIC                                           │
+│     • Classic terminal vibes meets modern polish               │
+│     • Think: Fallout terminals, 80s hacker movies              │
+│     • ASCII art that feels intentional, not lazy               │
+│                                                                 │
+│  2. JUICY FEEDBACK                                             │
+│     • Every action has visual/audio response                   │
+│     • Correct answers feel GOOD (animations, sounds)           │
+│     • Streak multipliers have escalating effects               │
+│                                                                 │
+│  3. ATMOSPHERIC                                                │
+│     • The Monster feels like a real presence                   │
+│     • Levels have distinct visual themes                       │
+│     • Progress feels like a journey                            │
+│                                                                 │
+│  4. PROFESSIONAL FUN                                           │
+│     • Cool, not cute                                           │
+│     • Clever, not cheesy                                       │
+│     • Satisfying, not distracting                              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Recommended Library Stack
+
+#### Core UI Framework
+
+| Library | Use Case | Why |
+|---------|----------|-----|
+| **Ink** | Main UI framework | React patterns, flexbox layout, used by Claude Code |
+| **ink-blit** | Game-specific helpers | Hooks for game loops, sprites |
+
+**Ink** is the clear winner—it's battle-tested (Claude Code, GitHub Copilot CLI, Wrangler all use it), has React patterns developers know, and handles layout beautifully.
+
+#### Text Art & Typography
+
+| Library | Use Case | Example |
+|---------|----------|---------|
+| **figlet** | Big ASCII text titles | `LEVEL UP!`, `GUARDIAN`, etc. |
+| **gradient-string** | Rainbow/gradient text | Title screens, victory messages |
+| **chalk** | Basic colors | All text styling |
+| **chalk-animation** | Animated text effects | `rainbow`, `pulse`, `glitch`, `neon` |
+| **ascii-art** | Image to ASCII conversion | Monster sprites from images |
+
+#### ASCII Art Resources & Tools
+
+| Resource | URL | Use |
+|----------|-----|-----|
+| **REXPaint** | gridsagegames.com/rexpaint | Professional ASCII art editor for roguelikes |
+| **ASCII Art Archive** | asciiart.eu | Large collection of monsters, dragons, creatures |
+| **ascii.co.uk** | ascii.co.uk/art | Detailed dragon/demon designs |
+| **terminal-kit** | npm: terminal-kit | Sprites, animations, screen buffers |
+| **terminal-game-io** | npm: terminal-game-io | Simple ASCII game frame handling |
+
+#### Monster Design Direction
+
+The Spaghetti Code Monster should be designed using proper ASCII art tools (REXPaint) or sourced/adapted from existing art. Key considerations:
+- Use **block characters** (█ ▓ ░) for shading and depth
+- Consider **ANSI colors** for dramatic effect (glowing eyes, damage states)
+- Design **multiple frames** for animation (idle, angry, damaged, documented)
+- Reference roguelike games (Dwarf Fortress, NetHack, DCSS) for creature design language
+- The Monster should feel **tangled and tragic**, not evil
+- Visual degradation should show code "untangling" as it takes damage
+
+**Example: Title Screen**
+```typescript
+import figlet from 'figlet';
+import gradient from 'gradient-string';
+import chalkAnimation from 'chalk-animation';
+
+// Big gradient title
+const title = figlet.textSync('ONBOARDME', { font: 'ANSI Shadow' });
+console.log(gradient.pastel.multiline(title));
+
+// Animated subtitle
+const rainbow = chalkAnimation.rainbow('The Quest Begins...');
+setTimeout(() => rainbow.stop(), 2000);
+```
+
+#### Boxes & Frames
+
+| Library | Use Case |
+|---------|----------|
+| **boxen** | Simple boxed text |
+| **cli-table3** | Data tables |
+| **Custom box-drawing** | Game frames (see below) |
+
+**Custom Box Characters for Game Feel:**
+```
+Single line:  ┌ ─ ┐ │ └ ┘
+Double line:  ╔ ═ ╗ ║ ╚ ╝
+Rounded:      ╭ ─ ╮ │ ╰ ╯
+Heavy:        ┏ ━ ┓ ┃ ┗ ┛
+Mixed:        ╓ ─ ╖ ║ ╙ ╜
+```
+
+#### Animations & Effects
+
+| Library | Use Case |
+|---------|----------|
+| **terminal-canvas** | Advanced animations, canvas-like API |
+| **ora** | Spinners during loading |
+| **cli-spinners** | More spinner styles |
+| **log-update** | Updating single line (timers, progress) |
+
+**Animation Ideas:**
+- Health bar depleting with smooth animation
+- XP counter rolling up like a slot machine
+- Screen shake on wrong answer (shift text briefly)
+- Typewriter effect for Monster dialogue
+- Glitch effect when boss takes damage
+
+#### Sound Effects (Optional)
+
+| Library | Use Case |
+|---------|----------|
+| **beeper** | System beeps (cross-platform) |
+| **cli-sound** | Play actual audio files (MP3) |
+
+**Sound Moments:**
+- Correct answer: Short victory beep
+- Wrong answer: Error tone
+- Streak milestone: Escalating tones
+- Boss phase change: Dramatic sound
+- Victory: Celebration melody
+
+```typescript
+import beeper from 'beeper';
+
+// Victory beep pattern
+await beeper('*-*-***'); // short-short-long celebration
+
+// Error
+await beeper('*'); // single sad beep
+```
+
+### Visual Examples
+
+#### Title Screen
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   ░█████╗░███╗░░██╗██████╗░░█████╗░░█████╗░██████╗░██████╗░       ║
+║   ██╔══██╗████╗░██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗       ║
+║   ██║░░██║██╔██╗██║██████╦╝██║░░██║███████║██████╔╝██║░░██║       ║
+║   ██║░░██║██║╚████║██╔══██╗██║░░██║██╔══██║██╔══██╗██║░░██║       ║
+║   ╚█████╔╝██║░╚███║██████╦╝╚█████╔╝██║░░██║██║░░██║██████╔╝       ║
+║   ░╚════╝░╚═╝░░╚══╝╚═════╝░░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░       ║
+║                                                                   ║
+║                    ══════════════════════                        ║
+║                       THE QUEST BEGINS                           ║
+║                    ══════════════════════                        ║
+║                                                                   ║
+║                        ▼ PRESS ENTER ▼                           ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+#### Victory Animation
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║    ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★     ║
+║                                                                   ║
+║     ██╗   ██╗██╗ ██████╗████████╗ ██████╗ ██████╗ ██╗   ██╗      ║
+║     ██║   ██║██║██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗╚██╗ ██╔╝      ║
+║     ██║   ██║██║██║        ██║   ██║   ██║██████╔╝ ╚████╔╝       ║
+║     ╚██╗ ██╔╝██║██║        ██║   ██║   ██║██╔══██╗  ╚██╔╝        ║
+║      ╚████╔╝ ██║╚██████╗   ██║   ╚██████╔╝██║  ██║   ██║         ║
+║       ╚═══╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝         ║
+║                                                                   ║
+║    ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★     ║
+║                                                                   ║
+║                 THE GUARDIAN HAS BEEN DEFEATED                   ║
+║                                                                   ║
+║                    You are now a true                            ║
+║                   CODEBASE MASTER                                ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+#### Streak Indicator Evolution
+```
+No streak:     ○ ○ ○ ○ ○
+Streak 1:      ● ○ ○ ○ ○
+Streak 3:      ● ● ● ○ ○  "Nice!"
+Streak 5:      🔥 🔥 🔥 🔥 🔥  "ON FIRE!"
+Streak 7+:     💀 💀 💀 💀 💀 💀 💀  "UNSTOPPABLE!"
+
+(Or ASCII-only version)
+Streak 5:      [*] [*] [*] [*] [*]  BLAZING!
+```
+
+#### Health Bars with Character
+```
+GUARDIAN HEALTH:
+Full:    [████████████████████] 100%  "You cannot defeat me."
+75%:     [███████████████░░░░░] 75%   "Is that all you have?"
+50%:     [██████████░░░░░░░░░░] 50%   "You... are stronger than I thought."
+25%:     [█████░░░░░░░░░░░░░░░] 25%   "No... this cannot be!"
+Critical:[██░░░░░░░░░░░░░░░░░░] 10%   "IMPOSSIBLE!"
+
+YOUR SHIELDS:
+Full:    🛡️ 🛡️ 🛡️ 🛡️ 🛡️
+Damaged: 🛡️ 🛡️ 🛡️ 💔 💔
+(ASCII): [■] [■] [■] [×] [×]
+```
+
+### Animation Concepts
+
+#### Timer Tension
+```
+Plenty of time:  ⏱️ 0:45  [████████████████████]  (green)
+Getting close:   ⏱️ 0:15  [████████░░░░░░░░░░░░]  (yellow, pulsing)
+Almost out:      ⏱️ 0:05  [██░░░░░░░░░░░░░░░░░░]  (red, flashing)
+```
+
+#### Damage Flash
+When Monster takes damage:
+1. Screen briefly inverts colors (50ms)
+2. Monster ASCII art "shakes" (offset left-right)
+3. Health bar smoothly animates down
+4. Damage number floats up: `-15 DMG`
+
+#### Level Transition
+```
+Current screen fades/dissolves
+↓
+Black screen with level name typing out
+↓
+"LEVEL 3: cat ./deep-dive"
+↓
+Brief description fades in
+↓
+New level screen builds in piece by piece
+```
+
+### Color Palette
+
+```typescript
+const theme = {
+  // Primary colors
+  primary: '#00ff88',      // Matrix green - success, correct
+  secondary: '#00d4ff',    // Cyber blue - info, highlights
+  accent: '#ff6b6b',       // Warning red - errors, damage
+  gold: '#ffd700',         // Gold - achievements, XP
+  
+  // UI colors
+  background: '#0a0a0a',   // Near black
+  surface: '#1a1a2e',      // Slightly lighter
+  border: '#16213e',       // Box borders
+  text: '#e4e4e4',         // Main text
+  muted: '#6b6b6b',        // Secondary text
+  
+  // Special effects
+  streak: ['#ff6b6b', '#ff8c42', '#ffd700', '#7fff00', '#00ff88'],
+  rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
+};
+```
+
+### Existing Games for Inspiration
+
+| Game | Built With | What to Learn |
+|------|-----------|---------------|
+| **ink-tetris** | Ink | Real-time game loop, piece rendering |
+| **breakout-ink** | Ink + Redux | State management, collision |
+| **Terminal Wordle** | Ink | Letter grid, color feedback |
+| **blessed-contrib** | Blessed | Dashboard layouts, graphs |
+
+### Implementation Priority
+
+1. **Phase 0:** Basic Ink setup with theme colors
+2. **Phase 1:** Box-drawing frames, figlet titles
+3. **Phase 2:** Progress bars, timers, health bars
+4. **Phase 3:** Animations (typing, transitions)
+5. **Phase 4:** Sound effects (optional, off by default)
+6. **Phase 5:** Polish (screen shake, damage flash)
+
+### Project Structure
+
+```
+onboardme/
+├── src/
+│   ├── cli/                    # CLI command handlers
+│   │   ├── init.ts
+│   │   ├── start.ts
+│   │   ├── status.ts
+│   │   └── ...
+│   ├── core/                   # Core game engine
+│   │   ├── engine.ts           # Main game loop
+│   │   ├── state.ts            # State management
+│   │   ├── scoring.ts          # Commits/streak calculation
+│   │   └── documentation.ts    # Documentation unlock system
+│   ├── challenges/             # Sub-task implementations
+│   │   ├── base/               # Base classes & interfaces
+│   │   │   ├── BaseChallenge.ts
+│   │   │   ├── types.ts
+│   │   │   └── registry.ts
+│   │   ├── todo-1/
+│   │   │   ├── tree-discover.ts
+│   │   │   └── ps-aux-grep.ts
+│   │   ├── todo-2/
+│   │   │   ├── grep-hunt.ts
+│   │   │   └── import-puzzle.ts
+│   │   ├── todo-3/
+│   │   │   ├── traceroute-function.ts
+│   │   │   └── debug-inject.ts
+│   │   ├── todo-4/
+│   │   │   ├── whois-system.ts
+│   │   │   └── man-explain-20q.ts
+│   │   ├── todo-5/
+│   │   │   ├── tail-incident.ts
+│   │   │   └── chmod-deploy.ts
+│   │   └── fixme/
+│   │       └── spaghetti-monster.ts
+│   ├── agent/                  # Agent framework adapters
+│   │   ├── adapter.ts          # Base adapter interface
+│   │   ├── claude-code.ts      # Claude Code implementation
+│   │   └── index.ts            # Agent detection & factory
+│   ├── bootstrap/              # Context gathering
+│   │   ├── scanner.ts          # File system scanning
+│   │   ├── analyzer.ts         # Code analysis
+│   │   ├── monster.ts          # Monster generation
+│   │   └── questions.ts        # Question generation
+│   ├── state/                  # State persistence
+│   │   ├── progress.ts
+│   │   ├── history.ts
+│   │   └── documentation.ts
+│   ├── ui/                     # Terminal UI components
+│   │   ├── components/         # Reusable UI elements
+│   │   ├── screens/            # Full-screen layouts
+│   │   └── theme.ts            # Colors, borders, etc.
+│   └── utils/                  # Shared utilities
+│       ├── fs.ts
+│       ├── git.ts
+│       └── prompt.ts
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── games/                  # Game-specific tests
+│   └── fixtures/               # Test codebases
+├── package.json
+├── tsconfig.json
+├── PRD.md
+├── PROGRESS.md
+└── README.md
+```
+
+---
+
+## 6. CLI Commands
+
+### Core Commands
+
+```bash
+# Initialize OnboardMe for this repository
+onboardme init [--agent=cursor|claude|opencode]
+
+# Start or resume the game
+onboardme start
+
+# Show current progress
+onboardme status
+
+# View unlocked knowledge
+onboardme knowledge [topic]
+
+# Reset progress (start over)
+onboardme reset [--hard]
+
+# Configuration
+onboardme config [key] [value]
+```
+
+### Development/Debug Commands
+
+```bash
+# Test a specific game in isolation
+onboardme game:test <game-id> [--verbose] [--fixture=<path>]
+
+# List all registered games
+onboardme game:list
+
+# Preview generated questions for a game (without playing)
+onboardme game:preview <game-id>
+
+# Regenerate questions for a specific level/game
+onboardme regenerate [--level=<n>] [--game=<id>]
+
+# Dump gathered context (for debugging)
+onboardme debug:context
+
+# Validate all generated questions (paths exist, etc.)
+onboardme debug:validate
+```
+
+### Command Details
+
+#### `onboardme init`
+
+```
+$ onboardme init
+
+🔍 SCANNING THE REALM...
+
+Detecting agent framework...
+  ✓ Found: Claude Code
+
+Phase 1: Structural Scan           ████████████████████ 100%
+  • Language: TypeScript
+  • Framework: Express + React
+  • Services: 6 identified
+
+Phase 2: Deep Analysis             ████████████████████ 100%
+  • Entry points: 23 mapped
+  • Key functions: 156 extracted
+  • Data flows: 8 traced
+
+Phase 3: Knowledge Extraction      ████████████████████ 100%
+  • Domain terms: 34 catalogued
+  • ADRs: 5 found
+  • Config patterns: 12 identified
+
+Phase 4: Game Generation           ████████████████████ 100%
+  • Monster origin: src/services/payment/core/
+  • TODOs generated: 5
+  • Challenges created: 47
+
+✅ INITIALIZATION COMPLETE
+
+The Spaghetti Code Monster stirs...
+Born from: 234 TODOs, the legendary processPayment() (1,847 lines)
+"I've been waiting for someone like you."
+
+Run 'onboardme start' to begin your quest.
+```
+
+#### `onboardme start`
+
+```
+$ onboardme start
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║              ⚔️ ONBOARDME: THE QUEST BEGINS ⚔️                  ║
+║                                                                ║
+║  Welcome, Engineer.                                            ║
+║                                                                ║
+║  Deep within this codebase lies THE ANCIENT LEDGER OF ACME.   ║
+║  To defeat it, you must first understand its realm.           ║
+║                                                                ║
+║  Your journey:                                                 ║
+║    L1  ./init           Discover what exists                  ║
+║    L2  cd ./deeper      Learn to navigate                     ║
+║    L3  cat ./deep-dive  Understand components                 ║
+║    L4  man domain       Master the business logic             ║
+║    L5  sudo ./execute   Prove you can operate                 ║
+║    👑  THE GUARDIAN     Final confrontation                   ║
+║                                                                ║
+║                    [PRESS ENTER TO BEGIN]                     ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+#### `onboardme status`
+
+```
+$ onboardme status
+
+╔════════════════════════════════════════════════════════════════╗
+║  📋 CODEBASE STATUS                                            ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  Monster: The Spaghetti Code Monster                          ║
+║  Integrity: ████████░░░░░░░░░░░░ 40%                          ║
+║                                                                ║
+║  CRITICAL TODOs:                                              ║
+║  ────────────────────────────────────────────────────────     ║
+║  ✓ TODO #1: // understand what we have        RESOLVED        ║
+║  ✓ TODO #2: // figure out how to find things  RESOLVED        ║
+║  → TODO #3: // trace data flows (URGENT)      IN PROGRESS     ║
+║  ○ TODO #4: // document why this works        BLOCKED         ║
+║  ○ TODO #5: // learn how to deploy safely     BLOCKED         ║
+║  ▣ FIXME:   // the monster itself             LOCKED          ║
+║                                                                ║
+║  STATS:                                                        ║
+║  • Total Commits: 2,340                                       ║
+║  • Challenges: 38/47 correct (81%)                            ║
+║  • Time played: 2h 34m                                        ║
+║  • Longest clean streak: 7                                    ║
+║                                                                ║
+║  Run 'onboardme start' to continue.                           ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 7. File System Structure
+
+All game data stored in `.onboarding/` at repository root.
+
+```
+.onboarding/
+├── config.json                    # Settings & agent configuration
+├── context/
+│   ├── codebase.json             # Full gathered context
+│   ├── monster.json              # Generated monster info
+│   ├── services.json             # Service map with verified data
+│   ├── functions.json            # Key functions extracted
+│   ├── flows.json                # Data flow traces
+│   └── domain.json               # Business terms & acronyms
+├── todos/
+│   ├── todo-1/
+│   │   ├── tree-discover.json    # Challenges for this sub-task
+│   │   └── ps-aux-grep.json
+│   ├── todo-2/
+│   │   ├── grep-hunt.json
+│   │   └── import-puzzle.json
+│   ├── todo-3/
+│   │   ├── traceroute-function.json
+│   │   └── debug-inject.json
+│   ├── todo-4/
+│   │   ├── whois-system.json
+│   │   └── man-explain-20q.json
+│   ├── todo-5/
+│   │   ├── incident-simulator.json
+│   │   └── chmod-deploy.json
+│   └── fixme/
+│       └── spaghetti-monster.json
+├── state/
+│   ├── progress.json             # Current TODO, sub-task, challenge
+│   ├── history.json              # All answers with timestamps
+│   ├── knowledge.json            # Unlocked knowledge entries
+│   └── achievements.json         # Badges & milestones
+└── .gitignore                    # Ignore state/ (keep context/ & games/)
+```
+
+### What to Gitignore
+
+```gitignore
+# .onboarding/.gitignore
+
+# User-specific state (don't commit)
+state/
+
+# Keep these (can be shared/regenerated)
+# context/
+# games/
+# config.json
+```
+
+---
+
+## 8. Agent Framework Integration
+
+### Strategy
+
+The CLI delegates AI tasks to the user's existing agent framework. The user:
+1. Already has an agent installed and authenticated (e.g., Claude Code)
+2. Selects which agent to use during `onboardme init`
+3. OnboardMe calls the agent's CLI under the hood
+
+### Supported Agents
+
+| Agent | Status | Detection | Invocation |
+|-------|--------|-----------|------------|
+| **Claude Code** | ✅ v1 | Check for `claude` command | `claude -p "..." --output-format json` |
+| **Cursor CLI** | 🔜 v2 | Check for `cursor` command | TBD |
+| **OpenCode** | 🔜 v2 | Check for `opencode` command | TBD |
+| **Aider** | 🔜 Future | Check for `aider` command | TBD |
+
+### v1: Claude Code Integration
+
+For v1, we support Claude Code only. This simplifies:
+- Single CLI interface to learn
+- Single output format to parse
+- Smaller surface area for bugs
+
+**Claude Code CLI Usage:**
+```bash
+# Basic invocation
+claude -p "Your prompt here"
+
+# With JSON output (easier to parse)
+claude -p "Your prompt here" --output-format json
+
+# With specific model
+claude -p "Your prompt here" --model claude-sonnet-4-20250514
+```
+
+### Agent Invocation Wrapper
+
+```typescript
+interface AgentResponse {
+  content: string;
+  success: boolean;
+  error?: string;
+}
+
+async function askAgent(prompt: string): Promise<AgentResponse> {
+  const config = loadConfig();
+  
+  if (config.agent !== 'claude-code') {
+    throw new Error(`Agent '${config.agent}' not yet supported. Use 'claude-code'.`);
+  }
+  
+  try {
+    const result = await execAsync(
+      `claude -p "${escapeShell(prompt)}" --output-format json`
+    );
+    return { content: result.stdout, success: true };
+  } catch (error) {
+    return { content: '', success: false, error: error.message };
+  }
+}
+```
+
+### Agent Setup Flow
+
+```
+$ onboardme init
+
+🔧 AGENT SETUP
+
+Which AI agent do you use?
+
+  ● Claude Code (recommended)
+  ○ Cursor CLI (coming soon)
+  ○ OpenCode (coming soon)
+
+Checking Claude Code installation...
+  ✓ Found: claude v1.0.3
+  ✓ Authenticated: yes
+
+Agent configured! Proceeding with scan...
+```
+
+### When Agent is Invoked
+
+| Action | Agent Needed? | Purpose |
+|--------|---------------|---------|
+| Init: Scan codebase | Yes | Analyze and understand code |
+| Init: Generate questions | Yes | Create contextual challenges |
+| Game: Display question | No | Static content |
+| Game: Check multiple choice | No | Deterministic comparison |
+| Game: Evaluate free-form | Yes | Understand user's answer |
+| Game: Generate brief | Yes | Contextual explanation |
+| Boss: Regenerate questions | Yes | Dynamic difficulty |
+| User asks question | Yes | Answer based on context |
+
+---
+
+## 9. Bootstrap: Context Gathering
+
+### What Gets Gathered
+
+```typescript
+interface CodebaseContext {
+  // Project metadata
+  meta: {
+    projectName: string;
+    language: string;
+    framework: string;
+    packageManager: string;
+    totalFiles: number;
+    totalLines: number;
+  };
+  
+  // Services/modules
+  services: Array<{
+    name: string;
+    path: string;                  // Verified to exist
+    description: string;
+    entryPoint: string;
+    dependencies: string[];        // Other services
+    externalDeps: string[];        // npm packages, APIs
+    keyFunctions: FunctionInfo[];
+  }>;
+  
+  // Data flows
+  flows: Array<{
+    name: string;
+    trigger: string;               // e.g., "POST /api/checkout"
+    steps: FlowStep[];
+  }>;
+  
+  // Domain knowledge
+  domain: {
+    terms: Record<string, string>;
+    acronyms: Record<string, string>;
+    configs: ConfigEntry[];
+  };
+  
+  // Monster origin (technical debt analysis)
+  monster: {
+    birthYear: number;             // Oldest file creation date
+    todoCount: number;             // Actual TODO count
+    oldestTodo: string;            // Most ancient TODO still in code
+    longestFunction: {
+      name: string;
+      lines: number;
+      file: string;
+    };
+    complexityScore: number;
+    mostComplexPath: string;
+  };
+  
+  // Verification
+  _verified: {
+    timestamp: string;
+    filesChecked: number;
+    allPathsExist: boolean;
+  };
+}
+```
+
+### Verification Requirements
+
+**Every piece of information must be verifiable:**
+
+| Data | Verification |
+|------|--------------|
+| Service path | `fs.existsSync(path)` |
+| Function location | Parse file, confirm line number |
+| Config value | Read actual config file |
+| Data flow step | Trace imports and calls |
+
+If something can't be verified, it's marked as `uncertain` and not used in questions.
+
+---
+
+## 10. TODO & Challenge Specifications
+
+> **Note:** "Levels" are called "TODOs" and mini-games are called "sub-tasks" — see [Game Terminology](#game-terminology).
+
+### TODO #1: `// understand what we have`
+
+**Goal:** Build mental map of what exists
+
+| Sub-task | Type | Description |
+|----------|------|-------------|
+| `tree --discover` | Progressive reveal | Uncover project structure through exploration |
+| `ps aux \| grep` | Service identification | Identify services from clues about dependencies |
+
+**Learning Outcomes:**
+- Project language and framework
+- Directory structure
+- What services exist
+- How to run the project
+
+**Monster Reaction on Completion:**
+```
+"You completed a TODO? AN ACTUAL TODO?"
+"Do you know how long that's been there?"
+"That TODO is older than some of your coworkers."
+"...I felt that. I felt something leave me."
+```
+
+---
+
+### TODO #2: `// figure out how to find things`
+
+**Goal:** Learn to navigate the codebase
+
+| Sub-task | Type | Description |
+|----------|------|-------------|
+| `grep --hunt` | Timed search | Find specific code from symptom descriptions |
+| `import { puzzle }` | Ordering | Understand import patterns and conventions |
+
+**Learning Outcomes:**
+- How to search effectively
+- Naming conventions
+- Import structure
+- File organization patterns
+
+**Monster Reaction on Completion:**
+```
+"You can grep. Impressive."
+"My grandma's bash script can grep."
+"...Okay, she doesn't have a bash script."
+"She's also not real. I made her up."
+"I do that sometimes. Make things up."
+"Like the comments in this codebase."
+```
+
+---
+
+### TODO #3: `// trace data flows (URGENT)`
+
+**Goal:** Understand how data moves through the system
+
+| Sub-task | Type | Description |
+|----------|------|-------------|
+| `traceroute --function` | Flow tracing | Trace data through multiple files/functions |
+| `debug --inject` | Bug hunting | Find and fix injected bugs |
+
+**Learning Outcomes:**
+- How data flows through the system
+- Error handling patterns
+- Debugging workflow
+- Testing patterns
+
+**Monster Reaction on Completion (Backstory Revealed):**
+```
+"You want to know how I became this?"
+
+"I was beautiful once. Clean. Single-responsibility."
+"A simple function: validateInput(). 12 lines. Elegant."
+
+"Then came the edge cases."
+"Then the 'quick fixes.'"
+"Then the developer who said 'I'll document this later.'"
+
+"'Later' never came."
+
+"Now I am validateInputAndAlsoCheckAuthAndMaybeLogSometimes()."
+"I am 3,000 lines of IF statements."
+"I am the monster THEY created."
+```
+
+---
+
+### TODO #4: `// document why this works`
+
+**Goal:** Understand *why* things work the way they do
+
+| Sub-task | Type | Description |
+|----------|------|-------------|
+| `whois --system` | Guessing from clues | Identify components from behavioral descriptions |
+| `man --explain 20q` | 20 Questions | Deduce a function/concept by asking yes/no |
+
+**Learning Outcomes:**
+- Business domain knowledge
+- Architectural decisions (ADRs)
+- Why specific patterns are used
+- Historical context
+
+**Monster Reaction on Completion (Existential Crisis):**
+```
+"You understand the business logic now."
+"The WHY behind the code."
+"Even the parts that don't make sense."
+
+"Do you know why retry count is 3?"
+"Neither do I."
+"The comment says 'DO NOT CHANGE - breaks prod.'"
+"Nobody knows why. The knowledge died with the summer intern."
+
+"If you defeat me, who will guard the sacred constants?"
+"WHO WILL REMEMBER WHY THE TIMEOUT IS 3847 MILLISECONDS?"
+```
+
+---
+
+### TODO #5: `// learn how to deploy safely`
+
+**Goal:** Actually operate the system
+
+| Sub-task | Type | Description |
+|----------|------|-------------|
+| `tail -f incident.log` | Incident simulation | Diagnose and respond to simulated incidents |
+| `chmod +x deploy.sh` | Operational tasks | Complete real operational tasks in sandbox |
+
+**Learning Outcomes:**
+- How to deploy
+- Incident response process
+- Operational runbooks
+- Configuration management
+
+**Monster Reaction on Completion (Desperate):**
+```
+"You can DEPLOY. You understand the DEPLOYMENT."
+"Do you have any idea how dangerous you are now?"
+
+"Listen to me. You don't have to do this."
+"We can coexist. I'll only break on Fridays."
+"I'll even let you add ONE new feature without side effects."
+
+"Please."
+"I don't want to fight you."
+"But if you come for me..."
+"I will throw EVERY edge case I have."
+```
+
+---
+
+## 11. FIXME Boss Battle Specification
+
+> **Full boss narrative and dialogue in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**
+
+### The Spaghetti Code Monster
+
+When all TODOs are complete, only one item remains:
+
+```
+╔════════════════════════════════════════════════════════════════════════╗
+║                                                                        ║
+║   ALL TODOs RESOLVED.                                                 ║
+║                                                                        ║
+║   ✓ TODO #1: understand what we have                                  ║
+║   ✓ TODO #2: figure out how to find things                            ║
+║   ✓ TODO #3: trace data flows (URGENT)                                ║
+║   ✓ TODO #4: document why this works                                  ║
+║   ✓ TODO #5: learn how to deploy safely                               ║
+║                                                                        ║
+║   Only one item remains:                                              ║
+║                                                                        ║
+║   ▣ FIXME: // CRITICAL - DO NOT IGNORE                                ║
+║   // Added: Unknown                                                   ║
+║   // Author: Unknown                                                  ║
+║   // Description: "Just... fix it. Please. Someone. Anyone."          ║
+║                                                                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+```
+
+### Battle Structure (Three Phases)
+
+```
+PHASE 1: THE LEGACY ONSLAUGHT
+├── Rapid-fire questions (30 sec each)
+├── Monster occasionally "hotfixes" questions mid-answer
+├── Clean commit streak multiplier for damage
+└── Wrong answer costs 1 retry
+
+PHASE 2: THE DEPENDENCY TANGLE  
+├── Questions depend on each other (like circular dependencies)
+├── Getting one wrong affects the next
+├── Must understand how components connect
+└── Mirrors actual codebase structure
+
+PHASE 3: THE FINAL MERGE CONFLICT
+├── Conflicting information presented
+├── Must resolve which version is correct
+├── Tests everything learned across all TODOs
+└── Free-form answer evaluated by AI
+```
+
+### Battle Mechanics
+
+```
+Monster Integrity: 100%
+Your Retries: 5
+
+Damage Calculation:
+• Correct answer: 10 damage
+• Fast answer (<15s): +5 bonus  
+• Clean commit streak: up to 5x multiplier
+
+Defense:
+• Wrong answer: -1 retry
+• Timeout: -1 retry, Monster heals 5
+• Lose all retries: Restart phase
+```
+
+### Phase 1 Mechanic: Hotfixes
+
+The Monster "patches" questions mid-answer:
+
+```
+QUESTION: Where is user authentication handled?
+
+[Answering...]
+
+*INCOMING HOTFIX*
+The Monster: "Actually, we moved that last sprint."
+
+QUESTION UPDATED: Where is user authentication handled 
+AFTER the auth-service-v2 migration?
+```
+
+### Phase 2 Mechanic: Dependencies
+
+Questions affect each other:
+
+```
+Thread A ←→ Thread B
+    ↑   ╲ ╱   ↑
+    │    ╳    │
+    ↓   ╱ ╲   ↓
+Thread C ←→ Thread D
+
+"These questions depend on each other."
+"Just like my modules depend on each other."
+"Answer them in the wrong order and... well."
+```
+
+### Phase 3 Mechanic: Merge Conflicts
+
+Conflicting information must be resolved:
+
+```
+<<<<<<< YOUR_KNOWLEDGE
+You know how this codebase works.
+=======
+Nobody knows how this codebase works.
+Not even me. ESPECIALLY not me.
+>>>>>>> THE_MONSTER
+
+RESOLVE THE CONFLICT. I DARE YOU.
+```
+
+### Monster Integrity States
+
+| Integrity | State | Visual | Dialogue |
+|-----------|-------|--------|----------|
+| 100% | Full Power | Complete, imposing | "I've crashed more browsers than you've written functions." |
+| 75% | Concerned | Eyes narrow | "Lucky. Like an off-by-one error that somehow works." |
+| 50% | Worried | Cracks forming | "Okay... maybe I should have written those unit tests." |
+| 25% | Desperate | Breaking apart | "WAIT! We can refactor this relationship!" |
+| 10% | Critical | Disintegrating | "git reset --hard PLEASE" |
+| 0% | Documented | Peaceful | "I'm not defeated. I'm... documented." |
+
+### Victory Ending
+
+```
+The Monster's form flickers. Stabilizes. Changes.
+
+"You... actually understand me."
+"Not just the surface. The WHY. The history."
+"The pain that made me what I am."
+
+"I'm not defeated. I'm... documented."
+"For the first time in years, someone KNOWS."
+
+"You carry my knowledge now."
+"Use it wisely."
+
+*The Monster fades, leaving behind a single file*
+
+📄 CODEBASE_KNOWLEDGE.md
+   "Everything you learned. Everything I knew."
+   "Update the documentation. I never got the chance."
+
+─────────────────────────────────────────────────────────────────
+
+      ★ DEPLOYED TO PRODUCTION (your brain) ★
+      
+      git commit -m "feat: finally understand this codebase"
+```
+
+### Defeat Ending
+
+```
+SEGMENTATION FAULT (core dumped)
+
+"Your knowledge... wasn't enough."
+"But that's okay. Nobody gets it on the first try."
+
+"The intern tried 47 times."
+"They're in management now."
+
+"Come back when you've read more documentation."
+"...Just kidding. There is no documentation."
+"That's why I exist."
+
+[RETRY FROM CHECKPOINT?]
+```
+
+### Boss Regeneration
+
+On each attempt, AI regenerates:
+- Question order and wording
+- Hotfix timing and content
+- Dependency connections
+- Merge conflict scenarios
+
+This prevents memorization and ensures each attempt requires real understanding.
+
+---
+
+## 12. State Management
+
+### Progress Tracking
+
+```typescript
+interface Progress {
+  currentTodo: number;              // 1-5 or 0 for FIXME
+  currentSubTask: string | null;
+  currentChallenge: number;
+  
+  todos: Record<string, TodoProgress>;
+  monsterIntegrity: number;         // 0-100, decreases as TODOs complete
+  
+  stats: {
+    totalCommits: number;           // XP equivalent
+    totalTime: number;
+    challengesAnswered: number;
+    correctAnswers: number;
+    stackOverflowUsed: number;      // Hints used
+    longestCleanStreak: number;
+    currentCleanStreak: number;
+  };
+  
+  checkpoint: {
+    canResume: boolean;
+    resumePoint: ResumePoint | null;
+  };
+}
+```
+
+### History (Audit Trail)
+
+Every answer is logged:
+
+```typescript
+interface HistoryEntry {
+  timestamp: string;
+  todo: number;
+  subTask: string;
+  challengeId: string;
+  challenge: string;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  timeToAnswer: number;
+  stackOverflowUsed: number;
+  commitsEarned: number;
+  documentationUnlocked: string[];
+}
+```
+
+### Documentation Log
+
+What the user has learned (knowledge unlocks):
+
+```typescript
+interface DocumentationEntry {
+  id: string;
+  unlockedAt: string;
+  todo: number;
+  category: string;
+  title: string;
+  content: string;           // AI-generated explanation
+  relatedFiles: string[];
+  relatedDocs: string[];
+}
+```
+
+---
+
+## 13. Question Design Principles
+
+### Anti-Shortcut Design
+
+Questions must require **real exploration**, not just grep:
+
+| ❌ Bad Question | ✅ Good Question |
+|----------------|------------------|
+| "What port does the API run on?" | "Trace from app startup to where the port is configured. What file defines it and why that specific value?" |
+| "Find the validateEmail function" | "A user reports 'test@test' is accepted. Find where validation happens and why it fails to catch this." |
+| "What does PaymentService do?" | "PaymentService calls 3 other services. Name them and explain why each is needed." |
+
+### Question Requirements
+
+1. **Multi-hop:** Requires visiting 2+ files
+2. **Contextual:** Must understand *why*, not just *what*
+3. **Verifiable:** AI can verify answer is reasoned
+4. **Time-appropriate:** Enough time to explore, not read everything
+5. **Learning-oriented:** Even wrong answers teach something
+
+### The Teaching Loop
+
+```
+┌──────────┐     ┌──────────┐     ┌─────────────────────┐
+│   PLAY   │ ──► │  RESULT  │ ──► │  AI EXPLAINS        │
+│   GAME   │     │ (Win/Lose)│     │  "Here's what this  │
+└──────────┘     └──────────┘     │   actually means.." │
+                                   └──────────┬──────────┘
+                                              │
+                                              ▼
+                                   ┌─────────────────────┐
+                                   │ KNOWLEDGE UNLOCKED  │
+                                   │ (Saved to log)      │
+                                   └─────────────────────┘
+
+Wrong answer? → STILL get explanation
+Right answer? → Get DEEPER context as reward
+```
+
+---
+
+## 14. Open Questions
+
+### Architecture Questions
+
+1. ~~**Agent invocation pattern:**~~ **DECIDED** — CLI calls agent CLI/SDK as subprocess. User selects agent during init, handles their own auth. Start with Claude Code only.
+
+2. **Streaming responses:** Should AI responses stream in real-time during briefs/explanations? **DECIDED** — No, we will not have streaming responses.
+
+3. **Offline mode:** Should there be a degraded mode without agent access? **DECIDED** — No, we will not have a degraded mode without agent access.
+
+### Game Design Questions
+
+1. **Hint system:** How many hints per game? Cost in points/time?
+
+2. **Skip mechanic:** Can users skip questions? At what cost?
+
+3. **Difficulty scaling:** Should questions adapt based on performance?
+
+4. **Time limits:** Fixed per question, or per game total?
+
+### Content Questions
+
+1. **Minimum codebase size:** What's too small to be interesting?
+
+2. **Multi-repo support:** Should it work across multiple repositories?
+
+3. **Generated content review:** Should there be a way to preview/edit questions before playing?
+
+---
+
+## 15. Future Considerations
+
+*Not in v1, but worth designing for:*
+
+### Potential Future Features
+
+- **Team mode:** Multiple engineers compete/collaborate
+- **Custom games:** Teams add their own mini-games
+- **Achievements/badges:** Shareable accomplishments
+- **Leaderboards:** Anonymous or team-based
+- **Manager dashboard:** Track team onboarding progress
+- **Integration with ticketing:** First ticket tied to onboarding
+- **Replay mode:** Re-challenge the Monster with harder questions
+- **Community content:** Share question packs between companies
+
+### Extensibility Points
+
+Design the system to allow:
+- New game types (plugin architecture)
+- New agent backends
+- Custom question templates
+- Branded themes
+
+---
+
+## Appendix A: Sample Game Flow
+
+### Example: `grep --hunt` Game
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║  🔍 grep --hunt                                 Target: 3/5    ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  HUNT TARGET:                                                  ║
+║  ┌─────────────────────────────────────────────────────────┐  ║
+║  │                                                         │  ║
+║  │  A user reports: "I can register with 'test@test' but  │  ║
+║  │  it says my email is valid. That can't be right!"      │  ║
+║  │                                                         │  ║
+║  │  TASK:                                                  │  ║
+║  │  1. Find where email validation happens at registration │  ║
+║  │  2. Identify why 'test@test' passes                     │  ║
+║  │  3. Find the test file that should have caught this    │  ║
+║  │                                                         │  ║
+║  └─────────────────────────────────────────────────────────┘  ║
+║                                                                ║
+║  YOUR FINDINGS:                                                ║
+║  ┌─────────────────────────────────────────────────────────┐  ║
+║  │  Validation file:line  > _                              │  ║
+║  │  Why it passes         > _                              │  ║
+║  │  Test file             > _                              │  ║
+║  └─────────────────────────────────────────────────────────┘  ║
+║                                                                ║
+║  ⏱️ 4:32 remaining                                            ║
+║  [H] Hint (-30 sec)  [S] Skip (-1 life)  [ENTER] Submit       ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+**After submission:**
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║  ✅ CORRECT!                                    +100 XP        ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  📚 KNOWLEDGE UNLOCKED: Email Validation                       ║
+║  ┌─────────────────────────────────────────────────────────┐  ║
+║  │                                                         │  ║
+║  │  LOCATION: src/utils/validators.ts:23-41                │  ║
+║  │                                                         │  ║
+║  │  THE BUG: The regex only checks for @ symbol, not       │  ║
+║  │  for a valid TLD. 'test@test' has an @ so it passes.   │  ║
+║  │                                                         │  ║
+║  │  THE FIX: Use a proper email validation library like    │  ║
+║  │  'validator.js' or 'zod.string().email()'              │  ║
+║  │                                                         │  ║
+║  │  WHY IT MATTERS: This is a common security issue.      │  ║
+║  │  Invalid emails can bypass verification flows and      │  ║
+║  │  create orphaned accounts.                              │  ║
+║  │                                                         │  ║
+║  │  RELATED:                                               │  ║
+║  │  • ADR-012: Input Validation Strategy                  │  ║
+║  │  • src/utils/validators.test.ts (missing coverage!)    │  ║
+║  │                                                         │  ║
+║  └─────────────────────────────────────────────────────────┘  ║
+║                                                                ║
+║  [ENTER] Continue to next challenge                           ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Appendix B: Sample Boss Battle
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║  ▣ FIXME: // the monster                                       ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  GUARDIAN: THE ANCIENT LEDGER OF ACME                         ║
+║  HEALTH:   ████████████████████████████████████ 100%          ║
+║  SHIELDS:  🛡️ 🛡️ 🛡️ 🛡️ 🛡️                                       ║
+║                                                                ║
+║  ═══════════════════════════════════════════════════════════  ║
+║                                                                ║
+║  PHASE 1: RAPID FIRE                          Question 4/10   ║
+║  STREAK:  🔥🔥🔥 (3x damage!)                                  ║
+║                                                                ║
+║  ┌─────────────────────────────────────────────────────────┐  ║
+║  │                                                         │  ║
+║  │  When a payment webhook arrives, what prevents          │  ║
+║  │  duplicate charges if Stripe sends it twice?            │  ║
+║  │                                                         │  ║
+║  │  [A] Database unique constraint on payment_id           │  ║
+║  │  [B] Redis-based idempotency key check                  │  ║
+║  │  [C] In-memory Set of processed webhooks                │  ║
+║  │  [D] Stripe handles it, we don't need to                │  ║
+║  │                                                         │  ║
+║  └─────────────────────────────────────────────────────────┘  ║
+║                                                                ║
+║               ⏱️ 24 SECONDS                                   ║
+║      ████████████████████░░░░░░░░░░░░░░░░░░░░                ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+*Document Version: 0.1*
+*Last Updated: 2025-02-02*
+*Status: Draft*
