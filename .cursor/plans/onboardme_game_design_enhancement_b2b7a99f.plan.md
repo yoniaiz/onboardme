@@ -9,8 +9,8 @@ todos:
     content: "Review TODO #1 games: npm start --challenge, flow --trace, test --stories"
     status: completed
   - id: review-todo-2
-    content: "Review TODO #2 games: grep --hunt, import { puzzle } + potential stack validation"
-    status: pending
+    content: "Review TODO #2 games: grep --hunt (enhanced), feature --locate (new)"
+    status: completed
   - id: review-todo-3
     content: "Review TODO #3 games: traceroute --function, debug --inject (testing moved to TODO #1)"
     status: pending
@@ -159,8 +159,8 @@ The emotional progression is perfect - do not change:
 | Run & Reproduce    | `npm start --challenge`  | Hands-on interaction           |
 | Breadcrumb Trail   | `flow --trace`           | Step-by-step code tracing      |
 | Behavior Discovery | `test --stories`         | Learn from test documentation  |
-| Timed Search       | `grep --hunt`            | Find under time pressure       |
-| Pattern Matching   | `import { puzzle }`      | Identify/order patterns        |
+| Bug Hunt (Mark)    | `grep --hunt`            | Run tests, find & mark bugs    |
+| Feature Planning   | `feature --locate`       | Mark where new code should go  |
 | Deduction (20Q)    | `man --explain 20q`      | Yes/no narrowing               |
 | Simulation         | `tail -f incident.log`   | React to scenarios             |
 | Clue Matching      | `whois --system`         | Match clues to answers         |
@@ -203,8 +203,9 @@ The emotional progression is perfect - do not change:
 | `test --stories`         | High      | Low          | ✓ Designed - Discovery            |
 | ~~`tree --discover`~~    | ~~Medium~~| ~~Medium~~   | ✗ Replaced by npm start           |
 | ~~`ps aux \| grep`~~     | ~~Low~~   | ~~HIGH~~     | ✗ Replaced by flow --trace        |
-| `grep --hunt`            | High      | Low          | Time pressure works well          |
-| `import { puzzle }`      | Low       | **HIGH**     | Ordering puzzles rarely fun       |
+| `grep --hunt`            | Very High | Very Low     | ✓ Enhanced - Test-driven bug hunt |
+| `feature --locate`       | Very High | Very Low     | ✓ NEW - Replaces import puzzle    |
+| ~~`import { puzzle }`~~  | ~~Low~~   | ~~**HIGH**~~ | ✗ Replaced - boring ordering      |
 | `traceroute --function`  | High      | Low          | Inherently interesting            |
 | `debug --inject`         | Very High | Very Low     | Bug hunting is engaging           |
 | `whois --system`         | Low       | **HIGH**     | Too similar to clue-matching      |
@@ -216,7 +217,7 @@ The emotional progression is perfect - do not change:
 ### 5.2 Games Needing Attention
 
 1. ~~`**ps aux | grep**`~~ - ✓ REPLACED with `flow --trace`
-2. `**import { puzzle }**` - Static ordering is not engaging
+2. ~~`**import { puzzle }**`~~ - ✓ REPLACED with `feature --locate`
 3. `**whois --system**` - Too similar to other clue-matching
 
 ---
@@ -391,7 +392,87 @@ Games adapt to project type:
 
 ---
 
-## 10. Proposed Game Flow Structure
+## 10. TODO #2 Design Decisions (COMPLETED)
+
+### 10.1 Unified "Mark in Code" Mechanic
+
+**Key Innovation:** Both TODO #2 games use the same core mechanic - player marks locations in the actual codebase with special comments.
+
+```
+// ONBOARD:BUG <hunt-id>      - For bug hunting
+// ONBOARD:FEATURE <feature-id> - For feature planning
+```
+
+**Why this works:**
+- Hands-on interaction with real codebase
+- Proves player actually explored (can't fake it)
+- More memorable than typing paths in CLI
+- Consistent mechanic across both games
+- Automatic cleanup after validation
+
+### 10.2 Bug Hunt Enhancement: Test-Driven
+
+**Key Decision:** Bug hunting starts with a failing test, not just a symptom description.
+
+**Flow:**
+1. CLI triggers/reveals a failing test
+2. Player runs tests, sees failure output
+3. Player hunts for buggy code
+4. Player marks with `// ONBOARD:BUG`
+5. CLI validates and explains
+
+**Why failing tests:**
+- Scopes the hunt (not "find bug somewhere")
+- Teaches real debugging workflow
+- Test output provides clues
+- Achievable in large codebases
+
+### 10.3 Feature Planning Game (New)
+
+**Key Decision:** Replace boring `import { puzzle }` with `feature --locate` - planning where new features should go.
+
+**Flow:**
+1. CLI presents feature request
+2. Player explores for existing patterns
+3. Player marks 2-4 locations with `// ONBOARD:FEATURE`
+4. CLI validates against reasonable locations
+5. Flexible scoring (multiple valid answers)
+
+**Why this replaces import puzzle:**
+- Real-world skill (developers do this constantly)
+- Teaches architectural thinking
+- Different pacing from bug hunt (thoughtful vs. urgent)
+- Exploratory, not mechanical
+
+### 10.4 Final TODO #2 Games (2 games)
+
+| Game | Mechanic | Duration | Learning |
+|------|----------|----------|----------|
+| `grep --hunt` | Bug Hunt (Mark) | ~12 min | Debugging workflow, test reading, navigation |
+| `feature --locate` | Feature Planning (Mark) | ~10 min | Architecture intuition, pattern recognition |
+
+**Total TODO #2 time: ~22 minutes**
+
+### 10.5 Variety Within TODO #2
+
+| Aspect | `grep --hunt` | `feature --locate` |
+|--------|---------------|-------------------|
+| **Goal** | Find existing bug | Plan new code |
+| **Pacing** | Timed, urgent | No timer, thoughtful |
+| **Validation** | Exact location | Multiple valid answers |
+| **Feeling** | Detective | Architect |
+
+### 10.6 Rejected Alternatives
+
+| Rejected | Why |
+|----------|-----|
+| `import { puzzle }` | Ordering imports is boring, low practical value |
+| Stack validation quiz | Too quiz-like, doesn't fit "mark in code" theme |
+| Navigate shortcuts | Good idea but doesn't fit the theme |
+
+---
+
+## 11. Proposed Game Flow Structure
 
 ```
 TODO #0: // understand what we're building (DESIGNED)
@@ -399,19 +480,18 @@ TODO #0: // understand what we're building (DESIGNED)
 ├── file --detective    → Project investigation & deduction
 └── connect --relations → Relationship mapping puzzle
 
-TODO #1: // experience what it does (REDESIGNED)
+TODO #1: // experience what it does (DESIGNED)
 ├── npm start --challenge → Run project, complete hands-on tasks
 ├── flow --trace          → Trace user journey through code layers
 └── test --stories        → Learn behaviors from test documentation
 
-TODO #2: // figure out how to find things
-├── grep --hunt (keep - works well)
-└── import { puzzle } (redesign candidate)
-└── [POTENTIAL] stack validation game
+TODO #2: // navigate and mark (DESIGNED)
+├── grep --hunt       → Run failing tests, find & mark bugs
+└── feature --locate  → Plan features, mark where code should go
 
-TODO #3: // trace data flows (URGENT)
-├── traceroute --function (keep - works well)
-└── debug --inject (keep - works well)
+TODO #3: // trace data flows
+├── traceroute --function (review needed)
+└── debug --inject (review needed)
 
 TODO #4: // document why this works
 ├── whois --system (redesign candidate)
@@ -429,13 +509,13 @@ FIXME: // the monster itself (keep as-is)
 
 ---
 
-## 11. Review Process
+## 12. Review Process
 
 We will review games one-by-one in this order:
 
 1. ~~TODO #0 concept (new games to design)~~ **COMPLETED**
 2. ~~TODO #1 games~~ **COMPLETED** - Redesigned: `npm start --challenge`, `flow --trace`, `test --stories`
-3. TODO #2 games: `grep --hunt`, `import { puzzle }`
+3. ~~TODO #2 games~~ **COMPLETED** - Enhanced: `grep --hunt`, NEW: `feature --locate`
 4. TODO #3 games: `traceroute --function`, `debug --inject`
 5. TODO #4 games: `whois --system`, `man --explain 20q`
 6. TODO #5 games: `tail -f incident.log`, `chmod +x deploy.sh`
@@ -451,7 +531,7 @@ For each game, we will evaluate:
 
 ---
 
-## 12. Key Files Reference
+## 13. Key Files Reference
 
 ### TODO #0 Games (DESIGNED)
 
@@ -459,21 +539,28 @@ For each game, we will evaluate:
 - [context/games/todo-0-file-detective/GAME.md](context/games/todo-0-file-detective/GAME.md)
 - [context/games/todo-0-connect-relations/GAME.md](context/games/todo-0-connect-relations/GAME.md)
 
-### TODO #1 Games (REDESIGNED)
+### TODO #1 Games (DESIGNED)
 
 - [context/games/todo-1-npm-start-challenge/GAME.md](context/games/todo-1-npm-start-challenge/GAME.md)
 - [context/games/todo-1-flow-trace/GAME.md](context/games/todo-1-flow-trace/GAME.md)
 - [context/games/todo-1-test-stories/GAME.md](context/games/todo-1-test-stories/GAME.md)
 
-### TODO #1 Games (DEPRECATED - replaced)
+### TODO #2 Games (DESIGNED)
+
+- [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md)
+- [context/games/todo-2-feature-locate/GAME.md](context/games/todo-2-feature-locate/GAME.md)
+
+### TODO #1 Games (DEPRECATED)
 
 - ~~[context/games/todo-1-tree-discover/GAME.md](context/games/todo-1-tree-discover/GAME.md)~~ → Replaced
 - ~~[context/games/todo-1-ps-aux-grep/GAME.md](context/games/todo-1-ps-aux-grep/GAME.md)~~ → Replaced
 
+### TODO #2 Games (DEPRECATED)
+
+- ~~[context/games/todo-2-import-puzzle/GAME.md](context/games/todo-2-import-puzzle/GAME.md)~~ → Replaced by feature --locate
+
 ### Existing Game Definitions (To Review)
 
-- [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md)
-- [context/games/todo-2-import-puzzle/GAME.md](context/games/todo-2-import-puzzle/GAME.md)
 - [context/games/todo-3-traceroute-function/GAME.md](context/games/todo-3-traceroute-function/GAME.md)
 - [context/games/todo-3-debug-inject/GAME.md](context/games/todo-3-debug-inject/GAME.md)
 - [context/games/todo-4-whois-system/GAME.md](context/games/todo-4-whois-system/GAME.md)
