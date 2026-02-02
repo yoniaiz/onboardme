@@ -16,6 +16,14 @@
 
 ---
 
+## Related Specifications
+
+- [RENDERING-ENGINE.md](../technical/RENDERING-ENGINE.md) — Text animation and typing speeds
+- [GLITCH-SYSTEM.md](./GLITCH-SYSTEM.md) — Visual corruption effects for boss battle
+- [LOADING-SCREENS.md](./LOADING-SCREENS.md) — Loading screen animations
+
+---
+
 ## Approved Animations
 
 | Animation | When | Priority |

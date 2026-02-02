@@ -1,5 +1,11 @@
 # UI Components
 
+> **Reusable visual elements that maintain consistency across the game.**
+
+This document specifies UI components used throughout OnboardMe.
+
+---
+
 ## Boxes & Frames
 
 | Library | Use Case |
@@ -7,6 +13,17 @@
 | **boxen** | Simple boxed text |
 | **cli-table3** | Data tables |
 | **Custom box-drawing** | Game frames (see below) |
+
+### Loading Screens
+
+OnboardMe uses custom loading screens for worldbuilding and atmosphere. See [LOADING-SCREENS.md](./LOADING-SCREENS.md) for complete specifications.
+
+**Quick reference:**
+- Initial scan: Excavating codebase with progressive reveals
+- Codebase facts: Statistics with Monster commentary
+- TODO init: Brief atmospheric loading
+- Boss battle: Maximum tension building
+- Knowledge unlock: Quick satisfying transition
 
 ### Custom Box Characters for Game Feel
 

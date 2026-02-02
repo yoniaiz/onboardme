@@ -122,10 +122,32 @@ interface MonsterOrigin {
 
 ## 3. Narrative Arc
 
+### Cold Open
+
+**Before any gameplay begins**, players encounter the Monster for the first time in a brief atmospheric introduction. This establishes the Monster's presence and personality before mechanics are explained.
+
+> **See [COLD-OPEN.md](./COLD-OPEN.md) for complete cold open specifications.**
+
+**Cold Open Script:**
+```
+*kzzzt*
+*the static resolves into something like a voice*
+"Oh."
+"A new one."
+"Welcome to the codebase."
+"I'm... well, you'll figure out what I am soon enough."
+"Everyone does. Eventually."
+"Good luck."
+*[CONNECTION ESTABLISHED]*
+```
+
+This 17-second sequence creates curiosity and intrigue before any game explanation, allowing players to meet the Monster as a character rather than a game mechanic.
+
 ### Story Beats
 
 | TODO | Monster's Emotional State | Player Relationship |
 |------|--------------------------|---------------------|
+| **Cold Open** | Mysterious, curious | First encounter |
 | **Intro** | Mysterious, ominous | Unknown threat |
 | **TODO #1** | Dismissive, mocking | "Another noob" |
 | **TODO #2** | Condescending | "Lucky guesses" |
@@ -160,6 +182,18 @@ interface MonsterOrigin {
 ### The Key Insight
 
 > "You're not defeating the Monster. You're *documenting* it. And documentation... is how technical debt dies."
+
+### Healing, Not Killing
+
+The boss battle is reframed from "combat" to "understanding":
+
+- **Not:** Damage the Monster until it dies
+- **Instead:** Reduce technical debt through understanding
+- **Visually:** Monster becomes cleaner and more organized as debt decreases
+- **Emotionally:** You're healing the codebase, not destroying it
+- **Terminology:** "Understanding" replaces "damage", "Technical Debt" replaces "HP"
+
+This aligns with the Monster's sympathetic nature—it's not evil, it's abandoned. Victory comes through comprehension, not destruction.
 
 ---
 
@@ -273,6 +307,21 @@ When a TODO is completed:
 5. **Fourth wall breaks** — Acknowledge the game/terminal
 6. **Callback humor** — Reference earlier moments
 7. **Signature entry/exit patterns** — Consistent sonic identity
+8. **Player dialogue** — Include choice moments where players respond (see below)
+
+### Player Dialogue Choices
+
+At key moments (5-7 times throughout the game), players can choose how to respond to the Monster. These choices don't affect gameplay but influence the Monster's reactions and build relationship.
+
+> **See [PLAYER-CHOICES.md](./PLAYER-CHOICES.md) for complete specifications.**
+
+**Key choice moments:**
+- After TODO #1: "Why are you really here?"
+- After TODO #3: Monster's backstory revealed
+- After TODO #4: Monster's existential crisis
+- Before Boss: "Why do you have to document me?"
+
+These moments transform the experience from interrogation to dialogue, giving players agency and emotional investment.
 
 ### Sample Dialogue by TODO
 
@@ -611,6 +660,43 @@ Lines designed to be memorable and quotable:
 
 ---
 
+## Corrupted Memory Logs
+
+**New feature:** Unlockable backstory fragments that reveal the Monster's history through discovery rather than exposition.
+
+> **See [MEMORY-LOGS.md](./MEMORY-LOGS.md) for complete specifications.**
+
+### Concept
+
+Instead of telling the Monster's backstory directly, players unlock "Corrupted Memory Logs" as rewards:
+- Real git commits from the codebase's history
+- Old code comments and abandoned TODOs
+- Fictional logs that tell the Monster's story
+- Error logs from the Monster's awakening
+
+### Unlock Triggers
+
+| Trigger | Memory | Theme |
+|---------|--------|-------|
+| Complete TODO #1 | Log #1 | The Beginning (clean architecture) |
+| Complete TODO #2 | Log #2 | First Shortcut (good intentions) |
+| Complete TODO #3 | Log #3 | Accumulation (debt grows) |
+| Complete TODO #4 | Log #4 | Abandonment (dev leaves) |
+| Complete TODO #5 | Log #5 | The Awakening (self-awareness) |
+| First perfect answer | Log #6 | Hidden Memory (secret hope) |
+| No hints used | Log #7 | Developer's Regret |
+| Find oldest TODO | Log #8 | Ancient Promise |
+
+### Narrative Benefits
+
+1. **Show, don't tell** — Players discover backstory through fragments
+2. **Emotional pacing** — Backstory revealed gradually
+3. **Player agency** — Unlocking feels earned
+4. **Replayability** — Hidden memories encourage exploration
+5. **Empathy building** — Understanding Monster's origin creates connection
+
+---
+
 ## 7. Visual Direction
 
 ### Monster ASCII Art — Minimalistic Design
@@ -717,6 +803,21 @@ The Monster uses a small, expressive design that communicates "spaghetti code" t
 ---
 
 ## 8. Boss Battle Design
+
+### Framing: Documentation, Not Destruction
+
+The boss battle is about **understanding and documenting** the Monster, not killing it:
+
+- **Goal:** Reduce Technical Debt from 100% to 0%
+- **Method:** Answer questions correctly to increase understanding
+- **Visual:** Monster becomes cleaner and more organized as you progress
+- **Outcome:** Monster is documented, not destroyed
+
+**Terminology:**
+- "Technical Debt: 75%" (not "HP: 75%")
+- "Understanding increased by 10%" (not "Dealt 10 damage")
+- "Debt accumulates" (not "Monster heals")
+- "Documented" (not "Defeated")
 
 ### The Three Phases
 

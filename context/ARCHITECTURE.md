@@ -489,7 +489,19 @@ Checking Claude Code installation...
   ✓ Authenticated: yes
 
 Agent configured! Proceeding with scan...
+
+[Codebase scanning...]
+[Analysis complete]
+
+*kzzzt*
+"Oh. A new one."
+"Welcome to the codebase."
+*[CONNECTION ESTABLISHED]*
+
+[Game introduction begins...]
 ```
+
+**Note:** The cold open (Monster's first appearance) occurs immediately after the scan completes, before any game explanation. See [COLD-OPEN.md](context/narrative/COLD-OPEN.md) for full specifications.
 
 ### When Agent is Invoked
 
@@ -503,6 +515,7 @@ Agent configured! Proceeding with scan...
 | Game: Generate brief | Yes | Contextual explanation |
 | Boss: Regenerate questions | Yes | Dynamic difficulty |
 | User asks question | Yes | Answer based on context |
+| Post-game: Suggest first task | Yes | Match TODO to player knowledge |
 
 ---
 
@@ -605,6 +618,379 @@ brew install onboardme
 - Node.js 18+
 - Git (for history analysis)
 - One of: Cursor CLI, Claude Code, OpenCode (for AI features)
+
+---
+
+## 11. Post-Game Flow: Bridging to Real Work
+
+### The "Now What?" Problem
+
+After victory, players have learned the codebase but need guidance on how to apply that knowledge. The post-game flow bridges from game completion to actual contribution.
+
+### Post-Game Sequence
+
+```
+[Victory ending]
+  ↓
+[Victory summary card]
+  ↓
+[Sharing options]
+  ↓
+[POST-GAME TASK SUGGESTION] ← New
+  ↓
+[Game complete]
+```
+
+### Task Suggestion Logic
+
+```typescript
+interface PostGameSuggestion {
+  task: {
+    type: 'TODO' | 'FIXME' | 'Bug' | 'Documentation';
+    location: string;              // File and line number
+    description: string;
+    addedDate?: string;            // When TODO was created
+    relatedTODO: number;           // Which game TODO covered this area
+  };
+  
+  reasoning: {
+    knowledgeAreas: string[];      // What player learned
+    confidence: 'high' | 'medium' | 'low';
+    explanation: string;           // Why this is a good first task
+  };
+  
+  actions: {
+    createIssue: boolean;          // Offer to create GitHub issue
+    assignToPlayer: boolean;       // Auto-assign if created
+  };
+}
+```
+
+### Suggestion Algorithm
+
+1. **Analyze player's knowledge**
+   - Which TODOs completed?
+   - Which areas explored most?
+   - What questions answered correctly?
+
+2. **Match to codebase TODOs**
+   - Find TODOs in areas player understands
+   - Prioritize by:
+     - Age (older = more impactful)
+     - Simplicity (achievable first task)
+     - Relevance (matches learned areas)
+
+3. **Present suggestion**
+   - Show 1-3 options
+   - Explain why each is appropriate
+   - Offer to create issue
+
+### Example Suggestions
+
+**Player excelled in TODO #3 (Data Flows):**
+```
+Based on your exploration, here's a good first issue:
+
+  📝 TODO in src/services/auth.js:47
+     "// TODO: add rate limiting - added 2021"
+  
+  You discovered this during TODO #3.
+  You now know the auth flow.
+  This is your chance to prove you understand.
+```
+
+**Player excelled in TODO #2 (Search/Navigation):**
+```
+Based on your exploration, here's a good first issue:
+
+  📝 TODO in src/utils/validator.js:23
+     "// TODO: extract to separate module - added 2022"
+  
+  You've shown strong code navigation skills.
+  This refactoring task matches your strengths.
+```
+
+**Player struggled but completed:**
+```
+Based on your exploration, here's a good first issue:
+
+  📝 Documentation gap in README.md
+     Missing: Setup instructions for local development
+  
+  You just went through onboarding.
+  You know what's missing better than anyone.
+```
+
+### GitHub Integration
+
+**If player chooses to create issue:**
+
+```bash
+gh issue create \
+  --title "TODO: add rate limiting to auth service" \
+  --body "Discovered during onboarding (OnboardMe game).
+
+Location: src/services/auth.js:47
+Added: 2021
+Priority: Medium
+
+Context: Auth service currently has no rate limiting, making it vulnerable to brute force attacks. Player demonstrated understanding of auth flow during onboarding.
+
+Suggested by: OnboardMe post-game analysis
+Assigned to: @new_dev" \
+  --label "good-first-issue,onboarding,technical-debt" \
+  --assignee @new_dev
+```
+
+### Opt-Out Option
+
+```
+Would you like a suggested first task? (y/n)
+  [y] Show me what I can work on
+  [n] I'll find something myself
+
+*crackle*
+
+"Fair enough. You know where to find me."
+
+*[GAME COMPLETE]*
+```
+
+### Benefits
+
+1. **Smooth transition** — From learning to doing
+2. **Confidence building** — Suggested tasks match demonstrated skills
+3. **Immediate impact** — First contribution on Day 1
+4. **Technical debt reduction** — Turns game insights into real fixes
+5. **Onboarding completion** — Clear endpoint with next steps
+
+---
+
+## 12. Victory Artifact: CODEBASE_KNOWLEDGE.md
+
+### Concept
+
+Upon defeating the Monster, the game generates a **real artifact**—a `CODEBASE_KNOWLEDGE.md` file that serves as:
+1. **Documentation** — Everything the player learned
+2. **Trophy** — Proof of completion
+3. **First contribution** — Real commit on Day 1
+4. **Living document** — Can be updated by future players
+
+### File Generation
+
+```typescript
+interface CodebaseKnowledge {
+  meta: {
+    documentedBy: string;        // Player's name
+    completionDate: Date;
+    monsterAge: number;          // Years
+    gameVersion: string;
+  };
+  
+  structure: {
+    overview: string;
+    keyDirectories: DirectoryInfo[];
+    entryPoints: string[];
+  };
+  
+  services: {
+    name: string;
+    purpose: string;
+    location: string;
+    dependencies: string[];
+  }[];
+  
+  flows: {
+    name: string;
+    description: string;
+    steps: string[];
+  }[];
+  
+  gotchas: {
+    item: string;
+    explanation: string;
+    discoveredIn: string;        // Which TODO
+  }[];
+  
+  todos: {
+    location: string;
+    priority: 'high' | 'medium' | 'low';
+    context: string;
+  }[];
+}
+```
+
+### Generated File Template
+
+```markdown
+# Codebase Knowledge
+
+> **Documentation generated by OnboardMe**  
+> Documented by: @new_dev  
+> Completion Date: 2025-02-02  
+> Monster Age: 7 years  
+> Status: The Spaghetti Code Monster has been documented.
+
+---
+
+## Overview
+
+[Generated from player's exploration]
+
+This codebase is a [Node.js/Python/etc] project that handles [primary purpose]. 
+It was created in [year] and has evolved over [X] years.
+
+---
+
+## Project Structure
+
+### Key Directories
+
+- `src/services/` — Core business logic services
+- `src/controllers/` — API endpoint handlers
+- `src/utils/` — Shared utilities (⚠️ contains legacy code)
+- `src/config/` — Configuration management
+
+### Entry Points
+
+- `src/index.js` — Main application entry
+- `src/server.js` — HTTP server setup
+
+---
+
+## Services
+
+### UserService
+**Location:** `src/services/UserService.js`  
+**Purpose:** User authentication and management  
+**Dependencies:** DatabaseService, CacheService, EmailService
+
+[More details from player's exploration...]
+
+---
+
+## Data Flows
+
+### Authentication Flow
+1. Request arrives at AuthController
+2. Middleware validates JWT token
+3. UserService verifies credentials
+4. Session created in CacheService
+5. Response returned
+
+---
+
+## Important Gotchas
+
+### The Sacred Timeout
+**Location:** `src/config/timeouts.js:15`  
+**Value:** 3847ms  
+**Why:** Nobody knows. Comment says "DO NOT CHANGE - breaks prod."  
+**Discovered:** TODO #4
+
+### The Legacy Bridge Table
+**Location:** Database schema  
+**Name:** `UserOrganizationProjectTaskLegacyBridge`  
+**Why:** Migration from old system never completed  
+**Discovered:** TODO #0
+
+---
+
+## Outstanding TODOs
+
+High-priority TODOs that need attention:
+
+1. **Add rate limiting to auth** — `src/services/auth.js:47` (Added 2021)
+2. **Refactor validator function** — `src/utils/validator.js:23` (Added 2020)
+3. **Extract legacy bridge logic** — `src/services/bridge.js:89` (Added 2019)
+
+---
+
+## Notes from The Monster
+
+*"I'm not defeated. I'm documented."*
+
+*"Everything you learned. Everything I knew."*
+
+*"Don't forget me. Update the documentation."*
+
+*"I never got the chance."*
+
+---
+
+**Slayer of the Spaghetti Monster (v1.0):** @new_dev  
+**Date Documented:** 2025-02-02  
+**Game Version:** OnboardMe v1.0
+
+*This document was generated by the OnboardMe onboarding game. Update it as you learn more.*
+```
+
+### Pull Request Generation
+
+**Automatic PR creation** (optional):
+
+```bash
+# After victory, offer to create PR
+Would you like to commit this documentation? (y/n)
+  [y] Create CODEBASE_KNOWLEDGE.md and open PR
+  [n] Save locally only
+
+# If yes:
+git checkout -b docs/onboarding-knowledge
+git add CODEBASE_KNOWLEDGE.md
+git commit -m "docs: add codebase knowledge from OnboardMe
+
+Generated by OnboardMe onboarding game.
+Documented by: @new_dev
+Monster Age: 7 years
+Completion: 2025-02-02
+
+This document captures key codebase knowledge including:
+- Project structure and entry points
+- Service architecture and dependencies
+- Data flows and important gotchas
+- Outstanding TODOs that need attention
+
+The Spaghetti Code Monster has been documented."
+
+git push origin docs/onboarding-knowledge
+
+gh pr create \
+  --title "docs: Add codebase knowledge from onboarding" \
+  --body "## Summary
+
+This PR adds comprehensive codebase documentation generated during the OnboardMe onboarding game.
+
+## Contents
+
+- Project structure overview
+- Service architecture
+- Data flow documentation
+- Important gotchas and warnings
+- Outstanding TODOs
+
+## Context
+
+Completed by: @new_dev
+Date: 2025-02-02
+Game completion: 97 minutes, 87% accuracy
+
+The Spaghetti Code Monster has been documented.
+
+---
+
+*Generated by OnboardMe v1.0*" \
+  --label "documentation,onboarding" \
+  --assignee @new_dev
+```
+
+### Benefits
+
+1. **Real contribution** — First PR on Day 1
+2. **Living documentation** — Can be updated by future players
+3. **Team value** — Useful reference for all developers
+4. **Proof of completion** — Tangible artifact in git history
+5. **Culture building** — "I documented the Monster" becomes team lore
 
 ---
 

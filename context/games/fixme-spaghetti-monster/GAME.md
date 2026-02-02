@@ -156,20 +156,74 @@ Subtle reminders the Monster is present during gameplay:
 
 ## Battle Mechanics
 
+**Core Concept:** You're not "killing" the Monster—you're **documenting** it. Each correct answer reduces technical debt and brings understanding.
+
 ```
-Monster Integrity: 100%
+Technical Debt: 100% → 0%
 Your Retries: 5
 
-Damage Calculation:
-• Correct answer: 10 damage
-• Fast answer (<15s): +5 bonus  
+Understanding Progress:
+• Correct answer: +10% understanding (reduces debt by 10)
+• Fast answer (<15s): +5% bonus understanding
 • Clean commit streak: up to 5x multiplier
 
-Defense:
+Setbacks:
 • Wrong answer: -1 retry
-• Timeout: -1 retry, Monster heals 5
+• Timeout: -1 retry, debt increases by 5%
 • Lose all retries: Restart phase
 ```
+
+### Terminology Reframe
+
+| Old Term | New Term | Why It's Better |
+|----------|----------|-----------------|
+| "Damage" | "Understanding" or "Documentation" | You're not destroying, you're comprehending |
+| "HP/Health" | "Technical Debt" | Reduce to 0, not deplete |
+| "Kill the boss" | "Document the Monster" | Aligns with sympathetic villain |
+| "Monster takes damage" | "Debt decreases" | Positive framing |
+| "Monster heals" | "Debt accumulates" | Makes sense narratively |
+
+### Visual Changes
+
+As Technical Debt decreases (100% → 0%), the Monster's appearance should change from "chaotic/tangled" to "clean/organized":
+
+**100% Debt (Full Power):**
+```
+     ╭─────────╮
+     │ { ◉ ◉ } │
+     │  ~~~~   │
+     ╰────┬────╯
+       ╱│││╲
+```
+Jagged, many tentacles, red/chaotic colors
+
+**50% Debt (Worried):**
+```
+     ╭─────────╮
+     │ { ◉ _ } │
+     │  ~~     │
+     ╰────┬────╯
+       ╱│╲
+```
+Fewer tentacles, mixed colors
+
+**10% Debt (Critical):**
+```
+     ╭  ─  ─  ╮
+     │ { - - } │
+     │         │
+     ╰ ─ ─┬─ ─╯
+```
+Clean lines, minimal tentacles, green/calm colors
+
+**0% Debt (Documented/Peaceful):**
+```
+     ╭─────────╮
+     │ { - - } │
+     │   __    │
+     ╰─────────╯
+```
+Completely clean, organized, peaceful expression
 
 ## Phase 1 Mechanic: Hotfixes
 
@@ -294,6 +348,78 @@ The Monster's form flickers. Stabilizes. Changes.
       
       git commit -m "feat: finally understand this codebase"
 ```
+
+### Victory Summary Card
+
+After the ending sequence, a shareable victory summary appears:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║  @new_dev has DOCUMENTED the Spaghetti Code Monster          ║
+║  at [company-repo]                                           ║
+║                                                              ║
+║  Monster Age: 7 years | TODOs: 847 | Score: 2,340           ║
+║  Time: 97 min | Accuracy: 87%                                ║
+║                                                              ║
+║  "I'm not defeated. I'm documented." — The Monster           ║
+║                                                              ║
+║  #OnboardMe #TechnicalDebtSlayer                             ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+> **See [VICTORY-SUMMARY.md](../../visuals/VICTORY-SUMMARY.md) for complete specifications.**
+
+### Post-Game: Real Task Suggestion
+
+After the victory summary, the game bridges to real work by suggesting a first contribution based on what the player learned during the game.
+
+```
+*gentle hum*
+
+"Now that you understand me..."
+
+*pause*
+
+"You should probably do something about it."
+
+*[SUGGESTED FIRST CONTRIBUTION]*
+
+Based on your exploration, here's a good first issue:
+
+  📝 TODO in src/services/auth.js:47
+     "// TODO: add rate limiting - added 2021"
+  
+  You discovered this during TODO #3.
+  You now know the auth flow.
+  This is your chance to prove you understand.
+
+Would you like me to create a GitHub issue? (y/n)
+  [y] Create issue and assign to you
+  [n] I'll handle it myself
+
+*crackle*
+
+"Good luck."
+
+*slrrrrp*
+
+"And remember..."
+
+*the static fades*
+
+"Update the documentation."
+
+*[CONNECTION CLOSED]*
+```
+
+**Implementation:**
+1. Analyze TODOs discovered during gameplay
+2. Match to player's demonstrated knowledge areas
+3. Suggest 1-3 appropriate first tasks
+4. Optionally create GitHub issue
+5. Bridge from game to real work
+
+This ensures the onboarding experience doesn't end with the game—it transitions smoothly into actual contribution.
 
 ## Defeat Ending
 

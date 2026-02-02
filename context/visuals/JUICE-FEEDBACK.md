@@ -98,8 +98,39 @@ When completing a game/TODO:
 | Animation | ASCII confetti or celebration |
 | Stamp | "TODO RESOLVED" with stamp effect |
 | Stats | Dramatic reveal (one by one) |
+| **Silence** | **2-5 seconds of quiet (see below)** |
 | Monster | Dialogue with typing effect |
 | Knowledge | "File appearing" animation |
+
+### Valley Moment (Critical)
+
+After stats reveal and before Monster appears, include a **valley moment** for emotional pacing:
+
+1. **Silence** (2-5 seconds depending on TODO)
+   - No dialogue
+   - No sound effects
+   - Minimal UI (just stats visible)
+   - Optional ambient presence indicator (30% chance)
+
+2. **Ambient Presence** (if triggered)
+   ```
+   *drip...*
+   ```
+   or
+   ```
+   *distant crackle*
+   ```
+   - Appears in muted corner
+   - Fades in slowly (500ms)
+   - Stays 2-3 seconds
+   - Fades out slowly (500ms)
+
+3. **Monster Entry** (after silence)
+   - Slower, more contemplative entry
+   - `*the static returns*` (1-2 seconds)
+   - Then normal Monster dialogue
+
+**Purpose:** Lets players process their accomplishment before the next peak. See [PACING-GUIDE.md](../narrative/PACING-GUIDE.md) for full specifications.
 
 ```
 ╔═══════════════════════════════════════════════════════╗
@@ -126,12 +157,21 @@ When completing a game/TODO:
 
 Subtle reminders the Monster is present during gameplay. Each indicator includes Monster sound effects for atmosphere.
 
-### Indicator Format
+### Two Types of Monster Presence
+
+| Type | Trigger | Content | Purpose |
+|------|---------|---------|---------|
+| **Watching Indicators** | Player idle 10+ seconds | Full dialogue | Encourage action |
+| **Ambient Presence** | Random during active play | Sounds only | Maintain atmosphere |
+
+### Watching Indicators (Idle 10+ seconds)
+
+**Indicator Format:**
 ```
 *[sound]* "[comment]" *[sound]*
 ```
 
-### Indicator Library
+**Indicator Library:**
 
 **Impatience (10+ seconds idle):**
 ```
@@ -173,7 +213,7 @@ Subtle reminders the Monster is present during gameplay. Each indicator includes
 *creak* "Even if you win, who maintains me after you leave?" *drip*
 ```
 
-### Display Rules
+**Display Rules:**
 - Appear after 10+ seconds of no input
 - Fade in slowly (not jarring)
 - Different message each time (no repeats until all shown)
@@ -181,7 +221,7 @@ Subtle reminders the Monster is present during gameplay. Each indicator includes
 - Sound effects displayed with italics styling
 - Monster attribution shown subtly: `— The Monster`
 
-### Visual Styling
+**Visual Styling:**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                                                             │
@@ -190,6 +230,62 @@ Subtle reminders the Monster is present during gameplay. Each indicator includes
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+### Ambient Presence (Active Play)
+
+**New feature:** Continuous atmospheric reminders during active gameplay.
+
+**Purpose:** Maintain Monster presence without interrupting flow.
+
+**Ambient Sound Library:**
+```
+*drip...*
+*distant crackle*
+*whirrrr (fading)*
+*static... barely audible*
+*creak*
+*hummmmm*
+```
+
+**Display Specifications:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   [MAIN GAME CONTENT - QUESTION, TIMER, ETC.]              │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                              *drip...*      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Visual Rules:**
+- **Placement:** Bottom-right corner
+- **Color:** Dim gray (muted, not distracting)
+- **Animation:** 
+  - Fade in: 500ms
+  - Stay: 2-3 seconds
+  - Fade out: 500ms
+- **Frequency:** Every 30-60 seconds during active play
+- **Limit:** Only one at a time
+- **Never during:** Monster dialogue, critical moments (timer < 10s), valleys
+
+**Frequency by Game Stage:**
+- Early game (TODO #1-2): 40% chance, subtle sounds
+- Mid game (TODO #3-4): 50% chance, mixed sounds
+- Late game (TODO #5, Boss): 60% chance, intense sounds
+
+**Valley-Specific Rules:**
+- During 2-5 second silence: 30% chance of one appearance
+- Reinforces Monster presence without breaking quiet moment
+
+> **Full specifications:** See [MONSTER-VOICE.md](../narrative/MONSTER-VOICE.md) section 9
 
 ---
 

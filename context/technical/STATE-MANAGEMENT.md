@@ -65,3 +65,76 @@ interface DocumentationEntry {
   relatedDocs: string[];
 }
 ```
+
+---
+
+## Behavioral Tracking
+
+**New feature:** Track player behavior patterns for dynamic Monster reactions.
+
+> **See [BEHAVIORAL-TRACKING.md](./BEHAVIORAL-TRACKING.md) for complete specifications.**
+
+```typescript
+interface BehavioralTracking {
+  hints: {
+    totalHints: number;
+    hintsPerTODO: Record<number, number>;
+    lastHintTime: Date;
+    consecutiveHints: number;
+  };
+  
+  speed: {
+    answerTimes: number[];
+    timeouts: number;
+  };
+  
+  exploration: {
+    filesOpened: Set<string>;
+    fileOpenCounts: Record<string, number>;
+    docsRevisits: number;
+  };
+  
+  accuracy: {
+    currentStreak: number;
+    wrongStreak: number;
+    totalCorrect: number;
+    totalQuestions: number;
+  };
+  
+  commands: {
+    commandsUsed: Record<string, number>;
+    totalCommands: number;
+  };
+  
+  personality: {
+    type: 'methodical' | 'aggressive' | 'balanced' | 'struggling';
+    traits: string[];
+    confidence: number;
+  };
+}
+```
+
+**Purpose:** Enable Monster to react to player patterns dynamically, creating illusion of awareness.
+
+---
+
+## Memory Logs
+
+**New feature:** Track unlocked backstory fragments.
+
+> **See [MEMORY-LOGS.md](../narrative/MEMORY-LOGS.md) for complete specifications.**
+
+```typescript
+interface MemoryLogTracking {
+  unlocked: Array<{
+    id: string;
+    theme: string;
+    unlockedAt: Date;
+    trigger: string;
+  }>;
+  total: number;
+  viewed: string[];
+}
+```
+
+**Storage:** `.onboarding/state/memory-logs.json`

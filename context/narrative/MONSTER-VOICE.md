@@ -394,6 +394,238 @@ These appear during gameplay when the player is idle or slow.
 
 ---
 
+## 9. Ambient Presence
+
+**New section:** Continuous atmospheric reminders that the Monster is always present, distinct from watching indicators.
+
+### Purpose
+
+While watching indicators appear when players are idle (10+ seconds), **ambient presence** exists during active gameplay to maintain atmosphere without interruption.
+
+### Difference from Watching Indicators
+
+| Aspect | Watching Indicators | Ambient Presence |
+|--------|---------------------|------------------|
+| **Trigger** | Player idle 10+ seconds | Random during active play |
+| **Content** | Full dialogue with sounds | Sounds only, no dialogue |
+| **Frequency** | After idle timeout | Occasional (every 30-60 seconds) |
+| **Purpose** | Encourage action | Maintain atmosphere |
+| **Intensity** | Medium (noticeable) | Low (subtle) |
+| **Location** | Center/prominent | Muted corner |
+
+### Ambient Sound Library
+
+These appear randomly during active gameplay:
+
+```
+*drip...*
+```
+
+```
+*distant crackle*
+```
+
+```
+*whirrrr (fading)*
+```
+
+```
+*static... barely audible*
+```
+
+```
+*creak*
+```
+
+```
+*hummmmm*
+```
+
+### Display Specifications
+
+**Visual styling:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   [MAIN GAME CONTENT]                                       │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                                             │
+│                                              *drip...*      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Placement:** Bottom-right corner, muted color (dim gray)
+
+**Animation:**
+1. Fade in slowly (500ms)
+2. Stay visible (2-3 seconds)
+3. Fade out slowly (500ms)
+4. Total duration: 3-4 seconds
+
+**Frequency:**
+- During active gameplay: 30-60 second intervals
+- During valleys: 30% chance of one appearance
+- Never during Monster dialogue
+- Never during critical moments (timer < 10 seconds)
+
+### Sound Selection Logic
+
+**Early game (TODO #1-2):**
+- Favor subtle sounds: `*drip...*`, `*creak*`
+- 40% chance of appearing
+
+**Mid game (TODO #3-4):**
+- Mix of subtle and processing: `*whirrrr (fading)*`, `*static...*`
+- 50% chance of appearing
+
+**Late game (TODO #5, Boss):**
+- More intense: `*distant crackle*`, `*hummmmm*`
+- 60% chance of appearing
+
+### Implementation Rules
+
+**DO:**
+- Keep sounds brief (2-3 words max)
+- Use muted visual styling
+- Fade in/out smoothly
+- Maintain consistent placement
+- Only one at a time
+
+**DON'T:**
+- Block gameplay
+- Appear during dialogue
+- Use full phrases
+- Overlap with other UI elements
+- Appear too frequently (feels spammy)
+
+### Valley-Specific Ambient Presence
+
+During valley moments (after TODO completion), ambient presence has special rules:
+
+**Timing:** During the 2-5 second silence period
+
+**Chance:** 30% (lower than active gameplay)
+
+**Purpose:** Remind players the Monster is present without breaking the quiet moment
+
+**Example valley sequence:**
+```
+[Stats displayed]
+
+[2 seconds of silence]
+
+                                              *drip...*
+
+[2 more seconds of silence]
+
+*the static returns*
+[Monster dialogue begins]
+```
+
+---
+
+## 10. Hint Usage Reactions
+
+**New section:** Monster's responses when players use hints (Stack Overflow).
+
+### Purpose
+
+Create social pressure through Monster awareness rather than mechanical punishment. Players should feel observed, not penalized.
+
+### Reaction Variations
+
+**First hint usage:**
+```
+*kzzzt*
+
+"Oh. Stack Overflow."
+
+*pause*
+
+"I'm not judging."
+
+*processing*
+
+"I'm always judging."
+
+*heh*
+
+*[COPY-PASTE DETECTED]*
+```
+
+**Second hint usage:**
+```
+*crackle*
+
+"Again?"
+
+*slrrrrp*
+
+"You know, the answer's in the code."
+
+*pause*
+
+"It always is."
+
+*kzzzt*
+```
+
+**Third hint usage:**
+```
+*whirrrr*
+
+"You and Stack Overflow are getting quite close."
+
+*heh*
+
+"Should I be worried?"
+
+*[TRADITIONAL METHODS OBSERVED]*
+```
+
+**Fourth+ hint usage:**
+```
+*kzzzt*
+
+"At this point, just admit you're copy-pasting."
+
+*slrrrrp*
+
+"We all do it."
+
+*pause*
+
+"I'm literally made of copy-pasted code."
+
+*heh*
+
+*[SOLIDARITY]*
+```
+
+### Display Rules
+
+- Appears briefly (3-5 seconds) after hint is used
+- Doesn't block gameplay
+- Fades in from bottom
+- Styled like watching indicators
+- Doesn't affect score (social pressure only)
+
+### Frequency
+
+- Always on first hint
+- 70% chance on subsequent hints (not every time)
+- Never during boss battle (too distracting)
+
+---
+
+## 11. Quick Reference Card
+
+---
+
 ## 9. Do's and Don'ts
 
 ### DO ✓
