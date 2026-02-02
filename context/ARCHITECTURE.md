@@ -2,7 +2,7 @@
 
 > **Architectural decisions, system design, and technical specifications for OnboardMe.**
 
-This document covers the high-level architecture, technical stack, file system structure, agent integration, and context gathering mechanisms.
+This document covers the high-level architecture, technical stack, file system structure, agent integration, context gathering mechanisms, and post-game flow including victory artifacts and task suggestions.
 
 ---
 
@@ -18,6 +18,9 @@ This document covers the high-level architecture, technical stack, file system s
 8. [Agent Framework Integration](#8-agent-framework-integration)
 9. [Bootstrap: Context Gathering](#9-bootstrap-context-gathering)
 10. [Installation & System Requirements](#10-installation--system-requirements)
+11. [Post-Game Flow: Bridging to Real Work](#11-post-game-flow-bridging-to-real-work)
+12. [Victory Artifact: CODEBASE_KNOWLEDGE.md](#12-victory-artifact-codebase_knowledgemd)
+13. [Enhanced Experience Features](#13-enhanced-experience-features)
 
 ---
 
@@ -266,9 +269,10 @@ class SpaghettiCodeMonsterBoss extends BaseGame {
   };
 
   // Boss-specific properties
-  monsterIntegrity: number = 100;
+  technicalDebt: number = 100;  // Not "health" - we're documenting, not killing
   shields: number = 5;
   currentPhase: 1 | 2 | 3 = 1;
+  glitchIntensity: 'none' | 'light' | 'medium' | 'heavy' | 'extreme' = 'none';
 
   // Override to regenerate questions each attempt
   async generateQuestions(): Promise<GameQuestion[]> {
@@ -293,7 +297,10 @@ onboardme/
 │   │   ├── engine.ts           # Main game loop
 │   │   ├── state.ts            # State management
 │   │   ├── scoring.ts          # Commits/streak calculation
-│   │   └── documentation.ts    # Documentation unlock system
+│   │   ├── documentation.ts    # Documentation unlock system
+│   │   ├── pacing.ts           # Emotional pacing & valleys
+│   │   ├── behavioral.ts       # Player behavior tracking
+│   │   └── rendering.ts        # Text animation & typing speeds
 │   ├── challenges/             # Sub-task implementations
 │   │   ├── base/               # Base classes & interfaces
 │   │   │   ├── BaseChallenge.ts
@@ -324,6 +331,7 @@ onboardme/
 │   │   ├── scanner.ts          # File system scanning
 │   │   ├── analyzer.ts         # Code analysis
 │   │   ├── monster.ts          # Monster generation
+│   │   └── memory-logs.ts      # Generate memory logs from git history
 │   │   └── questions.ts        # Question generation
 │   ├── state/                  # State persistence
 │   │   ├── progress.ts
@@ -331,7 +339,15 @@ onboardme/
 │   │   └── documentation.ts
 │   ├── ui/                     # Terminal UI components
 │   │   ├── components/         # Reusable UI elements
+│   │   │   ├── dialogue-choice.tsx  # Player choice prompts
+│   │   │   └── memory-log.tsx       # Memory fragment display
 │   │   ├── screens/            # Full-screen layouts
+│   │   │   ├── cold-open.tsx   # Atmospheric introduction
+│   │   │   ├── loading.tsx     # Worldbuilding loading screens
+│   │   │   └── victory.tsx     # Victory summary card
+│   │   ├── animations/         # Animation helpers
+│   │   │   ├── glitch.ts       # Visual corruption effects
+│   │   │   └── typewriter.ts   # Variable typing speeds
 │   │   └── theme.ts            # Colors, borders, etc.
 │   └── utils/                  # Shared utilities
 │       ├── fs.ts
@@ -509,13 +525,16 @@ Agent configured! Proceeding with scan...
 |--------|---------------|---------|
 | Init: Scan codebase | Yes | Analyze and understand code |
 | Init: Generate questions | Yes | Create contextual challenges |
+| Init: Generate memory logs | Yes | Create backstory from git history |
 | Game: Display question | No | Static content |
 | Game: Check multiple choice | No | Deterministic comparison |
 | Game: Evaluate free-form | Yes | Understand user's answer |
 | Game: Generate brief | Yes | Contextual explanation |
+| Game: Track behavior | No | Pattern detection (local) |
 | Boss: Regenerate questions | Yes | Dynamic difficulty |
 | User asks question | Yes | Answer based on context |
 | Post-game: Suggest first task | Yes | Match TODO to player knowledge |
+| Post-game: Generate artifact | Yes | Create CODEBASE_KNOWLEDGE.md content |
 
 ---
 
@@ -994,6 +1013,58 @@ The Spaghetti Code Monster has been documented.
 
 ---
 
-*Document Version: 0.1*
+## 13. Enhanced Experience Features
+
+The architecture supports several enhanced features that transform the experience from "quiz" to "interactive thriller":
+
+### Emotional Architecture
+- **Cold open system** — Atmospheric introduction before gameplay (see section on init flow)
+- **Pacing engine** — Manages valleys between peaks with configurable silence durations
+- **Ambient presence** — Continuous subtle Monster sounds during active play
+- **Loading screens** — Worldbuilding sequences with Monster commentary
+
+### Player Agency
+- **Dialogue choice system** — 4 key moments where players respond to Monster
+- **Command-based questions** — Players run actual dev tools (grep, git blame) as weapons
+- **Behavioral tracking** — Monster reacts to hint usage, speed, exploration patterns
+
+### Discovery & Learning
+- **Memory log system** — 8 unlockable backstory fragments from git history
+- **Spaced repetition** — Concepts revisited across TODOs for retention
+- **Learning spiral** — Each TODO builds on previous knowledge
+
+### Visual & Rendering
+- **Variable typing speeds** — Text speed reflects Monster's emotional state (5-100ms/char)
+- **Glitch system** — Progressive visual corruption during boss battle
+- **Rendering engine** — Sophisticated text animation with pauses and effects
+
+### Real-World Impact
+- **Victory artifact** — Generates CODEBASE_KNOWLEDGE.md documenting everything learned
+- **Task suggestion** — Post-game recommendation for first contribution
+- **PR generation** — Option to create PR with documentation on Day 1
+- **Shareable victory** — Victory card with stats for team channels
+
+> **Complete feature specifications:** See [IMPROVEMENTS-SUMMARY.md](../IMPROVEMENTS-SUMMARY.md)
+
+### Related Design Documents
+
+**Narrative:**
+- [COLD-OPEN.md](./narrative/COLD-OPEN.md)
+- [PACING-GUIDE.md](./narrative/PACING-GUIDE.md)
+- [PLAYER-CHOICES.md](./narrative/PLAYER-CHOICES.md)
+- [MEMORY-LOGS.md](./narrative/MEMORY-LOGS.md)
+
+**Visual:**
+- [LOADING-SCREENS.md](./visuals/LOADING-SCREENS.md)
+- [VICTORY-SUMMARY.md](./visuals/VICTORY-SUMMARY.md)
+- [GLITCH-SYSTEM.md](./visuals/GLITCH-SYSTEM.md)
+
+**Technical:**
+- [RENDERING-ENGINE.md](./technical/RENDERING-ENGINE.md)
+- [BEHAVIORAL-TRACKING.md](./technical/BEHAVIORAL-TRACKING.md)
+
+---
+
+*Document Version: 0.2*
 *Last Updated: 2025-02-02*
-*Status: Draft*
+*Status: Design Complete - Ready for Implementation*

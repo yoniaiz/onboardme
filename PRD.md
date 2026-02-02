@@ -55,6 +55,9 @@ Traditional onboarding sucks:
 3. **AI-powered, not AI-dependent** — AI generates content, but game logic is deterministic
 4. **Zero external dependencies** — Works with user's existing agent framework
 5. **Local-first** — All state in filesystem, no accounts, no cloud
+6. **Emotional architecture** — Deliberate pacing with valleys between peaks
+7. **Player agency** — Two-way relationship through dialogue choices
+8. **Discovery over exposition** — Backstory revealed through gameplay
 
 ---
 
@@ -76,9 +79,16 @@ Traditional onboarding sucks:
 3. Runs: onboardme init
 4. AI scans codebase, generates game content
 5. Runs: onboardme start
-6. Plays through 3 TODOs + boss (~97 min)
-7. Faces "The Spaghetti Code Monster" (FIXME)
-8. Has comprehensive understanding of codebase
+6. Experiences cold open (Monster's first appearance)
+7. Plays through 5 TODOs (~90-120 min)
+   - Unlocks memory logs revealing Monster's backstory
+   - Makes dialogue choices that shape relationship
+   - Uses actual dev tools (grep, git blame) as weapons
+8. Faces "The Spaghetti Code Monster" (FIXME boss battle)
+9. Documents the Monster (victory = understanding, not destruction)
+10. Receives shareable victory summary
+11. Gets suggested first contribution based on learned areas
+12. Commits CODEBASE_KNOWLEDGE.md as first real contribution
 ```
 
 ### Non-Users (v1)
@@ -125,17 +135,48 @@ The game's central metaphor: **Technical debt is the real monster.** Every accum
 
 ### Game Structure
 
-The game consists of 3 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2-3 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
+The game consists of 5 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2-3 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
 
-**Total: 8 games + boss battle (~97 minutes)**
+**Total: 8 games + boss battle (~90-120 minutes)**
 
 > **See [Game Progression Diagram](./context/visuals/EXAMPLES.md#game-progression-diagram) for visual overview.**
+
+### Key Experience Features
+
+**Emotional Pacing:**
+- **Cold open** — Atmospheric 17-second Monster introduction before gameplay
+- **Quiet moments** — 2-5 second valleys after each TODO completion for emotional processing
+- **Ambient presence** — Continuous subtle Monster sounds during active play
+- **Loading as worldbuilding** — Atmospheric loading screens with Monster commentary
+
+**Player Agency:**
+- **Dialogue choices** — 4 key moments where players respond to Monster
+- **Command-based questions** — Use actual dev tools (grep, git blame) as weapons
+- **Personality tracking** — Monster reacts to player's behavior patterns
+
+**Discovery & Learning:**
+- **Memory logs** — 8 unlockable backstory fragments revealing Monster's origin
+- **Spaced repetition** — Concepts revisited across TODOs for better retention
+- **Behavioral reactions** — Monster comments on hint usage, speed, exploration depth
+
+**Real-World Impact:**
+- **Victory artifact** — Generate CODEBASE_KNOWLEDGE.md documenting everything learned
+- **First contribution** — Option to create PR with documentation on Day 1
+- **Task suggestion** — Post-game recommendation for first real task based on demonstrated skills
+- **Shareable victory** — Victory card with stats for team channels
+
+> **Complete feature specifications:** See [IMPROVEMENTS-SUMMARY.md](./IMPROVEMENTS-SUMMARY.md) for all implemented enhancements.
 
 ### Game Terminology
 
 > **See [TERMINOLOGY.md](./context/narrative/TERMINOLOGY.md) for complete game terminology mapping.**
 
 All game elements use code-themed naming (TODOs instead of levels, FIXME instead of boss, Commits instead of XP, etc.). The Monster appears after each TODO with evolving dialogue and reacts to player performance.
+
+**Key Terminology Changes:**
+- "Damage" → "Understanding" or "Documentation" (you're healing, not killing)
+- "HP/Health" → "Technical Debt" (reduce to 0%, not deplete)
+- "Kill the boss" → "Document the Monster" (aligns with sympathetic villain)
 
 > **For complete Monster personality, dialogue, and appearance details, see [fixme-spaghetti-monster/GAME.md](./context/games/fixme-spaghetti-monster/GAME.md).**
 
@@ -166,6 +207,12 @@ Games are modular, isolated, and extensible. Each game extends `BaseGame` and ca
 
 The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy Feedback**, **Atmospheric**, and **Professional Fun**. The game uses terminal-based UI with ASCII art, animations, and a carefully designed color palette.
 
+**Enhanced Visual Systems:**
+- **Variable typing speeds** — Text speed reflects Monster's emotional state (5-100ms/char)
+- **Glitch system** — Progressive visual corruption during boss battle
+- **Loading screens** — Atmospheric worldbuilding with Monster commentary
+- **Pacing valleys** — Visual quiet moments between intense challenges
+
 > **Complete visual design documentation:** See [context/visuals/](./context/visuals/) for:
 > - [Design Philosophy](./context/visuals/DESIGN-PHILOSOPHY.md) - Aesthetic pillars and design principles
 > - [Typography](./context/visuals/TYPOGRAPHY.md) - Text art libraries and ASCII resources
@@ -173,6 +220,13 @@ The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy 
 > - [Animations](./context/visuals/ANIMATIONS.md) - Transitions, effects, damage flash
 > - [Colors](./context/visuals/COLORS.md) - Color palette and theme
 > - [Examples](./context/visuals/EXAMPLES.md) - Visual examples and sound effects
+> - **[Loading Screens](./context/visuals/LOADING-SCREENS.md)** - Worldbuilding loading sequences
+> - **[Victory Summary](./context/visuals/VICTORY-SUMMARY.md)** - Shareable victory card
+> - **[Glitch System](./context/visuals/GLITCH-SYSTEM.md)** - Visual corruption effects
+
+> **Technical specifications:**
+> - **[Rendering Engine](./context/technical/RENDERING-ENGINE.md)** - Text animation and typing speeds
+> - **[Behavioral Tracking](./context/technical/BEHAVIORAL-TRACKING.md)** - Player pattern detection
 
 > **Library stack and implementation priority:** See [LIBRARIES.md](./context/technical/LIBRARIES.md).
 
@@ -187,6 +241,7 @@ onboardme init [--agent=cursor|claude|opencode]  # Initialize OnboardMe
 onboardme start                                   # Start or resume the game
 onboardme status                                  # Show current progress
 onboardme knowledge [topic]                      # View unlocked knowledge
+onboardme memories                                # View unlocked memory logs
 onboardme reset [--hard]                         # Reset progress
 onboardme config [key] [value]                    # Configuration
 ```
@@ -344,10 +399,19 @@ When all TODOs are complete, only one item remains: the FIXME boss battle.
 3. **THE FINAL MERGE CONFLICT** - Resolve conflicting information, free-form evaluation
 
 **Battle Mechanics:**
-- Monster Integrity starts at 100%, decreases with correct answers
+- **Technical Debt** starts at 100%, decreases with correct answers (not "damage" - you're documenting, not destroying)
 - Player has 5 retries (shields)
-- Damage scales with speed and clean commit streaks
-- Wrong answers cost retries; timeouts heal the Monster
+- Understanding scales with speed and clean commit streaks
+- Wrong answers cost retries; timeouts increase debt
+- **Visual glitches** escalate as debt decreases (progressive corruption)
+- **Monster becomes cleaner** as you document it (not more broken)
+
+**Victory Ending:**
+- Monster is **documented**, not destroyed (redemption arc)
+- Generates **CODEBASE_KNOWLEDGE.md** artifact
+- **Shareable victory summary** with stats and Monster's last words
+- **Post-game task suggestion** for first real contribution
+- Option to create PR with documentation
 
 **See:** [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md) for complete battle specification, mechanics, and endings.
 
@@ -355,12 +419,15 @@ When all TODOs are complete, only one item remains: the FIXME boss battle.
 
 ## 12. State Management
 
-The system tracks progress, history, and unlocked documentation in local filesystem storage. All state is stored in `.onboarding/state/` (gitignored).
+The system tracks progress, history, unlocked documentation, behavioral patterns, and memory logs in local filesystem storage. All state is stored in `.onboarding/state/` (gitignored).
 
 > **Complete state management documentation:** See [STATE-MANAGEMENT.md](./context/technical/STATE-MANAGEMENT.md) for:
 > - Progress tracking interface
 > - History/audit trail structure
 > - Documentation log schema
+> - **Behavioral tracking** (hint usage, speed, exploration, accuracy patterns)
+> - **Memory log tracking** (unlocked backstory fragments)
+> - **Player personality inference** (methodical, aggressive, balanced, struggling)
 
 ---
 
@@ -368,11 +435,18 @@ The system tracks progress, history, and unlocked documentation in local filesys
 
 Questions must require **real exploration**, not just grep. They should be multi-hop (requiring 2+ files), contextual (understanding *why*), verifiable by AI, time-appropriate, and learning-oriented.
 
+**Enhanced Question Types:**
+- **Command-based questions** — Players run actual dev tools (grep, git blame, tests) as "weapons"
+- **Spaced repetition** — Concepts revisited across TODOs for better retention
+- **Learning spiral** — Each TODO builds on previous knowledge
+
 > **Complete question design documentation:** See [QUESTION-DESIGN.md](./context/technical/QUESTION-DESIGN.md) for:
 > - Anti-shortcut design principles
 > - Good vs bad question examples
 > - Question requirements
 > - The teaching loop
+> - **Command-based question specifications** (IDE as weapon mechanic)
+> - **Learning spiral system** (spaced repetition)
 
 ---
 
@@ -414,12 +488,13 @@ Questions must require **real exploration**, not just grep. They should be multi
 
 - **Team mode:** Multiple engineers compete/collaborate
 - **Custom games:** Teams add their own mini-games
-- **Achievements/badges:** Shareable accomplishments
-- **Leaderboards:** Anonymous or team-based
+- **Leaderboards:** Team-based victory summaries (already have individual shareable cards ✅)
 - **Manager dashboard:** Track team onboarding progress
-- **Integration with ticketing:** First ticket tied to onboarding
+- **Integration with ticketing:** First ticket tied to onboarding (partially implemented via task suggestion ✅)
 - **Replay mode:** Re-challenge the Monster with harder questions
 - **Community content:** Share question packs between companies
+- **Automatic file watcher:** Detect command execution for IDE-as-weapon questions
+- **Slack/Discord integration:** Auto-post victory summaries to team channels
 
 ### Extensibility Points
 
@@ -431,6 +506,47 @@ Design the system to allow:
 
 ---
 
-*Document Version: 0.1*
+## 16. Recent Improvements (2025-02-02)
+
+Based on comprehensive Creative Director reviews, 16 major enhancements were implemented to transform the experience from "quiz with Monster skin" to "interactive thriller":
+
+**Priority 0 (Critical):**
+- ✅ Cold open introduction (atmospheric 17-second Monster reveal)
+- ✅ Quiet moments / pacing valleys (2-5 second silence between peaks)
+- ✅ Ambient Monster presence (continuous subtle sounds)
+- ✅ Loading screens as worldbuilding (Monster commentary)
+
+**Priority 1 (High Impact):**
+- ✅ IDE as weapon mechanic (command-based questions)
+- ✅ Reframe damage as healing/refactoring (sympathetic villain)
+- ✅ Learning spiral / spaced repetition (concept reinforcement)
+- ✅ Player dialogue choices (4 key relationship moments)
+- ✅ Shareable victory summary (social proof)
+- ✅ Post-game task suggestion (bridge to real work)
+
+**Priority 2 (Polish):**
+- ✅ Variable typing speeds (emotional text rendering)
+- ✅ Visual glitch system (progressive corruption)
+- ✅ Behavioral tracking (reactive Monster)
+- ✅ Hint usage reactions (social pressure)
+- ✅ Memory logs / corrupted memories (discoverable backstory)
+- ✅ Real artifact: CODEBASE_KNOWLEDGE.md (first contribution)
+
+> **Complete improvement documentation:** See [IMPROVEMENTS-SUMMARY.md](./IMPROVEMENTS-SUMMARY.md)
+
+**New Design Documents (9):**
+- [COLD-OPEN.md](./context/narrative/COLD-OPEN.md)
+- [PACING-GUIDE.md](./context/narrative/PACING-GUIDE.md)
+- [PLAYER-CHOICES.md](./context/narrative/PLAYER-CHOICES.md)
+- [MEMORY-LOGS.md](./context/narrative/MEMORY-LOGS.md)
+- [LOADING-SCREENS.md](./context/visuals/LOADING-SCREENS.md)
+- [VICTORY-SUMMARY.md](./context/visuals/VICTORY-SUMMARY.md)
+- [GLITCH-SYSTEM.md](./context/visuals/GLITCH-SYSTEM.md)
+- [RENDERING-ENGINE.md](./context/technical/RENDERING-ENGINE.md)
+- [BEHAVIORAL-TRACKING.md](./context/technical/BEHAVIORAL-TRACKING.md)
+
+---
+
+*Document Version: 0.2*
 *Last Updated: 2025-02-02*
-*Status: Draft*
+*Status: Design Complete - Ready for Implementation*
