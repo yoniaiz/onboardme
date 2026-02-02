@@ -4,7 +4,7 @@
 
 A gamified CLI tool that transforms codebase onboarding from reading static wikis into an interactive adventure. New engineers work through accumulated TODOs, solve challenges, and ultimately face "The Spaghetti Code Monster" — a boss born from the codebase's technical debt that can only be defeated through understanding.
 
-> **See [GAME_NARRATIVE.md](./GAME_NARRATIVE.md) for detailed creative direction, boss design, dialogue, and narrative arc.**
+> **See [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md) for detailed creative direction, boss design, dialogue, and narrative arc.**
 
 ---
 
@@ -115,7 +115,7 @@ Key architectural principles:
 
 The game's central metaphor: **Technical debt is the real monster.** Every accumulated TODO, every "temporary" fix, every developer who left without documenting—they all merged into something that now guards the codebase.
 
-> **Full narrative details in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**
+> **Full narrative details in [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md)**
 
 **Core Elements:**
 - TODOs instead of levels (completing the debt the Monster was born from)
@@ -146,107 +146,11 @@ The game's central metaphor: **Technical debt is the real monster.** Every accum
 
 ### Game Terminology
 
-All game elements use code-themed naming:
+> **See [TERMINOLOGY.md](./context/narrative/TERMINOLOGY.md) for complete game terminology mapping.**
 
-| Generic Term | Code-Themed Term | Context |
-|--------------|-----------------|---------|
-| Levels | **TODOs** | Main progression stages |
-| Boss | **FIXME** | Final confrontation |
-| Mini-games | **Sub-tasks** | Challenges within TODOs |
-| XP | **Commits** | Progress/points earned |
-| Lives/Shields | **Retries** | Remaining attempts |
-| Hints | **Stack Overflow** | Help system |
-| Knowledge unlocks | **Documentation** | Learning rewards |
-| Achievements | **Merged PRs** | Milestones/badges |
-| Game over | **Segfault** | Failure state |
-| Victory | **Deployed** | Success state |
-| Health bar | **Integrity** | Monster's health |
-| Streak | **Clean commits** | Consecutive correct answers |
+All game elements use code-themed naming (TODOs instead of levels, FIXME instead of boss, Commits instead of XP, etc.). The Monster appears after each TODO with evolving dialogue and reacts to player performance.
 
-### The Spaghetti Code Monster
-
-The Monster is dynamically generated based on actual codebase analysis:
-
-```typescript
-interface MonsterOrigin {
-  birthYear: number;          // Oldest file creation date
-  todoCount: number;          // Actual TODO count in codebase
-  oldestTodo: string;         // Most ancient TODO still in code
-  longestFunction: {
-    name: string;
-    lines: number;
-    file: string;
-  };
-  deepestNesting: number;     // Max nesting level found
-  circularDeps: number;       // Circular dependencies detected
-  magicNumbers: number;       // Hardcoded values without explanation
-}
-```
-
-**Example Generated Intro:**
-```
-Born from:
-  • 234 TODO comments (oldest: "// TODO: fix this - Jake, 2019")
-  • The legendary processPayment() function (1,847 lines)
-  • 7 circular dependencies in src/services/
-  • That one file everyone's afraid to touch: legacy-auth-handler.js
-```
-
-### Monster Personality
-
-The Monster has a **tragic backstory** — it was once clean code, corrupted by shortcuts and abandonment:
-
-| Trait | Description | Example Dialogue |
-|-------|-------------|------------------|
-| **Defensive** | Guards code secrets | "Nobody needs to know why that timeout is 3847ms" |
-| **Nostalgic** | Remembers clean days | "I was beautiful once. Single-responsibility." |
-| **Bitter** | Abandoned by devs | "The architect said she'd refactor me. She's a VP at Google now." |
-| **Dramatic** | Over-the-top reactions | "You traced the DATA FLOW?! THROUGH ALL SEVEN SERVICES?!" |
-| **Vulnerable** | Shows weakness | "If you defeat me, who will guard the sacred constants?" |
-| **Self-aware** | Knows it's a mess | "I'm not deprecated, I'm CLASSIC." |
-
-### Monster Appearances Throughout Game
-
-The Monster appears **after every TODO** with evolving dialogue:
-
-| After TODO | Monster Mood | Sample Dialogue |
-|------------|--------------|-----------------|
-| TODO #1 | Dismissive | "You completed a TODO? AN ACTUAL TODO? That's been there longer than some of your coworkers." |
-| TODO #2 | Mocking | "You can grep. Impressive. My grandma's bash script can grep." |
-| TODO #3 | Worried | "You traced that flow. The WHOLE flow. ...How did you—nobody's done that since the architect left." |
-| TODO #4 | Existential | "If you defeat me, who will guard the sacred constants? WHO WILL REMEMBER WHY THE TIMEOUT IS 3847ms?" |
-| TODO #5 | Desperate | "We can coexist. I'll only break on Fridays. Please. I don't want to fight you." |
-
-### Performance-Based Reactions
-
-**If player aced it (90%+):**
-```
-"...No bugs? No Stack Overflow? Are you sure you didn't just read
- the source code of my questions? Because that would be
- very on-brand for an engineer, actually."
-```
-
-**If player struggled (60-70%):**
-```
-"You passed. With the grace of a force push to main on a Friday.
- But hey, the tests are green. Technically."
-```
-
-**If player used many hints:**
-```
-"I see you've adopted the sacred tradition of Stack Overflow.
- Copy-paste your way to victory. Classic."
-```
-
-### Watching Indicators
-
-Subtle reminders the Monster is present during gameplay:
-
-```
-"I've seen faster type inference..." — The Monster
-"Even my deprecated methods work faster." — The Monster
-"This is giving 'undefined is not a function' energy." — The Monster
-```
+> **For complete Monster personality, dialogue, and appearance details, see [fixme-spaghetti-monster/GAME.md](./context/games/fixme-spaghetti-monster/GAME.md).**
 
 ---
 
@@ -273,292 +177,17 @@ Games are modular, isolated, and extensible. Each game extends `BaseGame` and ca
 > **The game should feel FUN. Not a training module with emojis—an actual game you'd want to play.**  
 > **Game-specific visuals:** See individual `GAME-VISUALS.md` files in `context/games/` for visual design notes for each game.
 
-### Design Philosophy
+The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy Feedback**, **Atmospheric**, and **Professional Fun**. The game uses terminal-based UI with ASCII art, animations, and a carefully designed color palette.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    AESTHETIC PILLARS                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  1. RETRO-FUTURISTIC                                           │
-│     • Classic terminal vibes meets modern polish               │
-│     • Think: Fallout terminals, 80s hacker movies              │
-│     • ASCII art that feels intentional, not lazy               │
-│                                                                 │
-│  2. JUICY FEEDBACK                                             │
-│     • Every action has visual/audio response                   │
-│     • Correct answers feel GOOD (animations, sounds)           │
-│     • Streak multipliers have escalating effects               │
-│                                                                 │
-│  3. ATMOSPHERIC                                                │
-│     • The Monster feels like a real presence                   │
-│     • Levels have distinct visual themes                       │
-│     • Progress feels like a journey                            │
-│                                                                 │
-│  4. PROFESSIONAL FUN                                           │
-│     • Cool, not cute                                           │
-│     • Clever, not cheesy                                       │
-│     • Satisfying, not distracting                              │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+> **Complete visual design documentation:** See [context/visuals/](./context/visuals/) for:
+> - [Design Philosophy](./context/visuals/DESIGN-PHILOSOPHY.md) - Aesthetic pillars and design principles
+> - [Typography](./context/visuals/TYPOGRAPHY.md) - Text art libraries and ASCII resources
+> - [UI Components](./context/visuals/UI-COMPONENTS.md) - Boxes, progress bars, health bars, timers
+> - [Animations](./context/visuals/ANIMATIONS.md) - Transitions, effects, damage flash
+> - [Colors](./context/visuals/COLORS.md) - Color palette and theme
+> - [Examples](./context/visuals/EXAMPLES.md) - Visual examples and sound effects
 
-### Recommended Library Stack
-
-#### Core UI Framework
-
-| Library | Use Case | Why |
-|---------|----------|-----|
-| **Ink** | Main UI framework | React patterns, flexbox layout, used by Claude Code |
-| **ink-blit** | Game-specific helpers | Hooks for game loops, sprites |
-
-**Ink** is the clear winner—it's battle-tested (Claude Code, GitHub Copilot CLI, Wrangler all use it), has React patterns developers know, and handles layout beautifully.
-
-#### Text Art & Typography
-
-| Library | Use Case | Example |
-|---------|----------|---------|
-| **figlet** | Big ASCII text titles | `LEVEL UP!`, `GUARDIAN`, etc. |
-| **gradient-string** | Rainbow/gradient text | Title screens, victory messages |
-| **chalk** | Basic colors | All text styling |
-| **chalk-animation** | Animated text effects | `rainbow`, `pulse`, `glitch`, `neon` |
-| **ascii-art** | Image to ASCII conversion | Monster sprites from images |
-
-#### ASCII Art Resources & Tools
-
-| Resource | URL | Use |
-|----------|-----|-----|
-| **REXPaint** | gridsagegames.com/rexpaint | Professional ASCII art editor for roguelikes |
-| **ASCII Art Archive** | asciiart.eu | Large collection of monsters, dragons, creatures |
-| **ascii.co.uk** | ascii.co.uk/art | Detailed dragon/demon designs |
-| **terminal-kit** | npm: terminal-kit | Sprites, animations, screen buffers |
-| **terminal-game-io** | npm: terminal-game-io | Simple ASCII game frame handling |
-
-#### Monster Design Direction
-
-The Spaghetti Code Monster should be designed using proper ASCII art tools (REXPaint) or sourced/adapted from existing art. Key considerations:
-- Use **block characters** (█ ▓ ░) for shading and depth
-- Consider **ANSI colors** for dramatic effect (glowing eyes, damage states)
-- Design **multiple frames** for animation (idle, angry, damaged, documented)
-- Reference roguelike games (Dwarf Fortress, NetHack, DCSS) for creature design language
-- The Monster should feel **tangled and tragic**, not evil
-- Visual degradation should show code "untangling" as it takes damage
-
-**Example: Title Screen**
-```typescript
-import figlet from 'figlet';
-import gradient from 'gradient-string';
-import chalkAnimation from 'chalk-animation';
-
-// Big gradient title
-const title = figlet.textSync('ONBOARDME', { font: 'ANSI Shadow' });
-console.log(gradient.pastel.multiline(title));
-
-// Animated subtitle
-const rainbow = chalkAnimation.rainbow('The Quest Begins...');
-setTimeout(() => rainbow.stop(), 2000);
-```
-
-#### Boxes & Frames
-
-| Library | Use Case |
-|---------|----------|
-| **boxen** | Simple boxed text |
-| **cli-table3** | Data tables |
-| **Custom box-drawing** | Game frames (see below) |
-
-**Custom Box Characters for Game Feel:**
-```
-Single line:  ┌ ─ ┐ │ └ ┘
-Double line:  ╔ ═ ╗ ║ ╚ ╝
-Rounded:      ╭ ─ ╮ │ ╰ ╯
-Heavy:        ┏ ━ ┓ ┃ ┗ ┛
-Mixed:        ╓ ─ ╖ ║ ╙ ╜
-```
-
-#### Animations & Effects
-
-| Library | Use Case |
-|---------|----------|
-| **terminal-canvas** | Advanced animations, canvas-like API |
-| **ora** | Spinners during loading |
-| **cli-spinners** | More spinner styles |
-| **log-update** | Updating single line (timers, progress) |
-
-**Animation Ideas:**
-- Health bar depleting with smooth animation
-- XP counter rolling up like a slot machine
-- Screen shake on wrong answer (shift text briefly)
-- Typewriter effect for Monster dialogue
-- Glitch effect when boss takes damage
-
-#### Sound Effects (Optional)
-
-| Library | Use Case |
-|---------|----------|
-| **beeper** | System beeps (cross-platform) |
-| **cli-sound** | Play actual audio files (MP3) |
-
-**Sound Moments:**
-- Correct answer: Short victory beep
-- Wrong answer: Error tone
-- Streak milestone: Escalating tones
-- Boss phase change: Dramatic sound
-- Victory: Celebration melody
-
-```typescript
-import beeper from 'beeper';
-
-// Victory beep pattern
-await beeper('*-*-***'); // short-short-long celebration
-
-// Error
-await beeper('*'); // single sad beep
-```
-
-### Visual Examples
-
-#### Title Screen
-```
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║   ░█████╗░███╗░░██╗██████╗░░█████╗░░█████╗░██████╗░██████╗░       ║
-║   ██╔══██╗████╗░██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗       ║
-║   ██║░░██║██╔██╗██║██████╦╝██║░░██║███████║██████╔╝██║░░██║       ║
-║   ██║░░██║██║╚████║██╔══██╗██║░░██║██╔══██║██╔══██╗██║░░██║       ║
-║   ╚█████╔╝██║░╚███║██████╦╝╚█████╔╝██║░░██║██║░░██║██████╔╝       ║
-║   ░╚════╝░╚═╝░░╚══╝╚═════╝░░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░       ║
-║                                                                   ║
-║                    ══════════════════════                        ║
-║                       THE QUEST BEGINS                           ║
-║                    ══════════════════════                        ║
-║                                                                   ║
-║                        ▼ PRESS ENTER ▼                           ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
-```
-
-#### Victory Animation
-```
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║    ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★     ║
-║                                                                   ║
-║     ██╗   ██╗██╗ ██████╗████████╗ ██████╗ ██████╗ ██╗   ██╗      ║
-║     ██║   ██║██║██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗╚██╗ ██╔╝      ║
-║     ██║   ██║██║██║        ██║   ██║   ██║██████╔╝ ╚████╔╝       ║
-║     ╚██╗ ██╔╝██║██║        ██║   ██║   ██║██╔══██╗  ╚██╔╝        ║
-║      ╚████╔╝ ██║╚██████╗   ██║   ╚██████╔╝██║  ██║   ██║         ║
-║       ╚═══╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝         ║
-║                                                                   ║
-║    ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★     ║
-║                                                                   ║
-║                 THE GUARDIAN HAS BEEN DEFEATED                   ║
-║                                                                   ║
-║                    You are now a true                            ║
-║                   CODEBASE MASTER                                ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
-```
-
-#### Streak Indicator Evolution
-```
-No streak:     ○ ○ ○ ○ ○
-Streak 1:      ● ○ ○ ○ ○
-Streak 3:      ● ● ● ○ ○  "Nice!"
-Streak 5:      🔥 🔥 🔥 🔥 🔥  "ON FIRE!"
-Streak 7+:     💀 💀 💀 💀 💀 💀 💀  "UNSTOPPABLE!"
-
-(Or ASCII-only version)
-Streak 5:      [*] [*] [*] [*] [*]  BLAZING!
-```
-
-#### Health Bars with Character
-```
-GUARDIAN HEALTH:
-Full:    [████████████████████] 100%  "You cannot defeat me."
-75%:     [███████████████░░░░░] 75%   "Is that all you have?"
-50%:     [██████████░░░░░░░░░░] 50%   "You... are stronger than I thought."
-25%:     [█████░░░░░░░░░░░░░░░] 25%   "No... this cannot be!"
-Critical:[██░░░░░░░░░░░░░░░░░░] 10%   "IMPOSSIBLE!"
-
-YOUR SHIELDS:
-Full:    🛡️ 🛡️ 🛡️ 🛡️ 🛡️
-Damaged: 🛡️ 🛡️ 🛡️ 💔 💔
-(ASCII): [■] [■] [■] [×] [×]
-```
-
-### Animation Concepts
-
-#### Timer Tension
-```
-Plenty of time:  ⏱️ 0:45  [████████████████████]  (green)
-Getting close:   ⏱️ 0:15  [████████░░░░░░░░░░░░]  (yellow, pulsing)
-Almost out:      ⏱️ 0:05  [██░░░░░░░░░░░░░░░░░░]  (red, flashing)
-```
-
-#### Damage Flash
-When Monster takes damage:
-1. Screen briefly inverts colors (50ms)
-2. Monster ASCII art "shakes" (offset left-right)
-3. Health bar smoothly animates down
-4. Damage number floats up: `-15 DMG`
-
-#### Level Transition
-```
-Current screen fades/dissolves
-↓
-Black screen with level name typing out
-↓
-"LEVEL 3: cat ./deep-dive"
-↓
-Brief description fades in
-↓
-New level screen builds in piece by piece
-```
-
-### Color Palette
-
-```typescript
-const theme = {
-  // Primary colors
-  primary: '#00ff88',      // Matrix green - success, correct
-  secondary: '#00d4ff',    // Cyber blue - info, highlights
-  accent: '#ff6b6b',       // Warning red - errors, damage
-  gold: '#ffd700',         // Gold - achievements, XP
-  
-  // UI colors
-  background: '#0a0a0a',   // Near black
-  surface: '#1a1a2e',      // Slightly lighter
-  border: '#16213e',       // Box borders
-  text: '#e4e4e4',         // Main text
-  muted: '#6b6b6b',        // Secondary text
-  
-  // Special effects
-  streak: ['#ff6b6b', '#ff8c42', '#ffd700', '#7fff00', '#00ff88'],
-  rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
-};
-```
-
-### Existing Games for Inspiration
-
-| Game | Built With | What to Learn |
-|------|-----------|---------------|
-| **ink-tetris** | Ink | Real-time game loop, piece rendering |
-| **breakout-ink** | Ink + Redux | State management, collision |
-| **Terminal Wordle** | Ink | Letter grid, color feedback |
-| **blessed-contrib** | Blessed | Dashboard layouts, graphs |
-
-### Implementation Priority
-
-1. **Phase 0:** Basic Ink setup with theme colors
-2. **Phase 1:** Box-drawing frames, figlet titles
-3. **Phase 2:** Progress bars, timers, health bars
-4. **Phase 3:** Animations (typing, transitions)
-5. **Phase 4:** Sound effects (optional, off by default)
-6. **Phase 5:** Polish (screen shake, damage flash)
-
-> **Project structure details:** See [ARCHITECTURE.md](./context/ARCHITECTURE.md#6-project-structure).
+> **Library stack and implementation priority:** See [LIBRARIES.md](./context/technical/LIBRARIES.md).
 
 ---
 
@@ -567,145 +196,26 @@ const theme = {
 ### Core Commands
 
 ```bash
-# Initialize OnboardMe for this repository
-onboardme init [--agent=cursor|claude|opencode]
-
-# Start or resume the game
-onboardme start
-
-# Show current progress
-onboardme status
-
-# View unlocked knowledge
-onboardme knowledge [topic]
-
-# Reset progress (start over)
-onboardme reset [--hard]
-
-# Configuration
-onboardme config [key] [value]
+onboardme init [--agent=cursor|claude|opencode]  # Initialize OnboardMe
+onboardme start                                   # Start or resume the game
+onboardme status                                  # Show current progress
+onboardme knowledge [topic]                      # View unlocked knowledge
+onboardme reset [--hard]                         # Reset progress
+onboardme config [key] [value]                    # Configuration
 ```
 
 ### Development/Debug Commands
 
 ```bash
-# Test a specific game in isolation
-onboardme game:test <game-id> [--verbose] [--fixture=<path>]
-
-# List all registered games
-onboardme game:list
-
-# Preview generated questions for a game (without playing)
-onboardme game:preview <game-id>
-
-# Regenerate questions for a specific level/game
-onboardme regenerate [--level=<n>] [--game=<id>]
-
-# Dump gathered context (for debugging)
-onboardme debug:context
-
-# Validate all generated questions (paths exist, etc.)
-onboardme debug:validate
+onboardme game:test <game-id> [--verbose] [--fixture=<path>]  # Test a specific game
+onboardme game:list                                            # List all registered games
+onboardme game:preview <game-id>                              # Preview generated questions
+onboardme regenerate [--level=<n>] [--game=<id>]              # Regenerate questions
+onboardme debug:context                                        # Dump gathered context
+onboardme debug:validate                                       # Validate all questions
 ```
 
-### Command Details
-
-#### `onboardme init`
-
-```
-$ onboardme init
-
-🔍 SCANNING THE REALM...
-
-Detecting agent framework...
-  ✓ Found: Claude Code
-
-Phase 1: Structural Scan           ████████████████████ 100%
-  • Language: TypeScript
-  • Framework: Express + React
-  • Services: 6 identified
-
-Phase 2: Deep Analysis             ████████████████████ 100%
-  • Entry points: 23 mapped
-  • Key functions: 156 extracted
-  • Data flows: 8 traced
-
-Phase 3: Knowledge Extraction      ████████████████████ 100%
-  • Domain terms: 34 catalogued
-  • ADRs: 5 found
-  • Config patterns: 12 identified
-
-Phase 4: Game Generation           ████████████████████ 100%
-  • Monster origin: src/services/payment/core/
-  • TODOs generated: 5
-  • Challenges created: 47
-
-✅ INITIALIZATION COMPLETE
-
-The Spaghetti Code Monster stirs...
-Born from: 234 TODOs, the legendary processPayment() (1,847 lines)
-"I've been waiting for someone like you."
-
-Run 'onboardme start' to begin your quest.
-```
-
-#### `onboardme start`
-
-```
-$ onboardme start
-
-╔════════════════════════════════════════════════════════════════╗
-║                                                                ║
-║              ⚔️ ONBOARDME: THE QUEST BEGINS ⚔️                  ║
-║                                                                ║
-║  Welcome, Engineer.                                            ║
-║                                                                ║
-║  Deep within this codebase lies THE ANCIENT LEDGER OF ACME.   ║
-║  To defeat it, you must first understand its realm.           ║
-║                                                                ║
-║  Your journey:                                                 ║
-║    L1  ./init           Discover what exists                  ║
-║    L2  cd ./deeper      Learn to navigate                     ║
-║    L3  cat ./deep-dive  Understand components                 ║
-║    L4  man domain       Master the business logic             ║
-║    L5  sudo ./execute   Prove you can operate                 ║
-║    👑  THE GUARDIAN     Final confrontation                   ║
-║                                                                ║
-║                    [PRESS ENTER TO BEGIN]                     ║
-║                                                                ║
-╚════════════════════════════════════════════════════════════════╝
-```
-
-#### `onboardme status`
-
-```
-$ onboardme status
-
-╔════════════════════════════════════════════════════════════════╗
-║  📋 CODEBASE STATUS                                            ║
-╠════════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  Monster: The Spaghetti Code Monster                          ║
-║  Integrity: ████████░░░░░░░░░░░░ 40%                          ║
-║                                                                ║
-║  CRITICAL TODOs:                                              ║
-║  ────────────────────────────────────────────────────────     ║
-║  ✓ TODO #1: // understand what we have        RESOLVED        ║
-║  ✓ TODO #2: // figure out how to find things  RESOLVED        ║
-║  → TODO #3: // trace data flows (URGENT)      IN PROGRESS     ║
-║  ○ TODO #4: // document why this works        BLOCKED         ║
-║  ○ TODO #5: // learn how to deploy safely     BLOCKED         ║
-║  ▣ FIXME:   // the monster itself             LOCKED          ║
-║                                                                ║
-║  STATS:                                                        ║
-║  • Total Commits: 2,340                                       ║
-║  • Challenges: 38/47 correct (81%)                            ║
-║  • Time played: 2h 34m                                        ║
-║  • Longest clean streak: 7                                    ║
-║                                                                ║
-║  Run 'onboardme start' to continue.                           ║
-╚════════════════════════════════════════════════════════════════╝
-```
+> **Complete CLI command documentation:** See [CLI-COMMANDS.md](./context/technical/CLI-COMMANDS.md) for full command details, examples, and output formats.
 
 ---
 
@@ -860,7 +370,7 @@ FIXME: // the monster itself
 
 ## 11. FIXME Boss Battle Specification
 
-> **Full boss narrative and dialogue in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**  
+> **Full boss narrative and dialogue in [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md)**  
 > **Detailed boss battle specification:** [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
 
 ### The Spaghetti Code Monster
@@ -907,112 +417,24 @@ When all TODOs are complete, only one item remains:
 
 ## 12. State Management
 
-### Progress Tracking
+The system tracks progress, history, and unlocked documentation in local filesystem storage. All state is stored in `.onboarding/state/` (gitignored).
 
-```typescript
-interface Progress {
-  currentTodo: number;              // 1-5 or 0 for FIXME
-  currentSubTask: string | null;
-  currentChallenge: number;
-  
-  todos: Record<string, TodoProgress>;
-  monsterIntegrity: number;         // 0-100, decreases as TODOs complete
-  
-  stats: {
-    totalCommits: number;           // XP equivalent
-    totalTime: number;
-    challengesAnswered: number;
-    correctAnswers: number;
-    stackOverflowUsed: number;      // Hints used
-    longestCleanStreak: number;
-    currentCleanStreak: number;
-  };
-  
-  checkpoint: {
-    canResume: boolean;
-    resumePoint: ResumePoint | null;
-  };
-}
-```
-
-### History (Audit Trail)
-
-Every answer is logged:
-
-```typescript
-interface HistoryEntry {
-  timestamp: string;
-  todo: number;
-  subTask: string;
-  challengeId: string;
-  challenge: string;
-  userAnswer: string;
-  correctAnswer: string;
-  isCorrect: boolean;
-  timeToAnswer: number;
-  stackOverflowUsed: number;
-  commitsEarned: number;
-  documentationUnlocked: string[];
-}
-```
-
-### Documentation Log
-
-What the user has learned (knowledge unlocks):
-
-```typescript
-interface DocumentationEntry {
-  id: string;
-  unlockedAt: string;
-  todo: number;
-  category: string;
-  title: string;
-  content: string;           // AI-generated explanation
-  relatedFiles: string[];
-  relatedDocs: string[];
-}
-```
+> **Complete state management documentation:** See [STATE-MANAGEMENT.md](./context/technical/STATE-MANAGEMENT.md) for:
+> - Progress tracking interface
+> - History/audit trail structure
+> - Documentation log schema
 
 ---
 
 ## 13. Question Design Principles
 
-### Anti-Shortcut Design
+Questions must require **real exploration**, not just grep. They should be multi-hop (requiring 2+ files), contextual (understanding *why*), verifiable by AI, time-appropriate, and learning-oriented.
 
-Questions must require **real exploration**, not just grep:
-
-| ❌ Bad Question | ✅ Good Question |
-|----------------|------------------|
-| "What port does the API run on?" | "Trace from app startup to where the port is configured. What file defines it and why that specific value?" |
-| "Find the validateEmail function" | "A user reports 'test@test' is accepted. Find where validation happens and why it fails to catch this." |
-| "What does PaymentService do?" | "PaymentService calls 3 other services. Name them and explain why each is needed." |
-
-### Question Requirements
-
-1. **Multi-hop:** Requires visiting 2+ files
-2. **Contextual:** Must understand *why*, not just *what*
-3. **Verifiable:** AI can verify answer is reasoned
-4. **Time-appropriate:** Enough time to explore, not read everything
-5. **Learning-oriented:** Even wrong answers teach something
-
-### The Teaching Loop
-
-```
-┌──────────┐     ┌──────────┐     ┌─────────────────────┐
-│   PLAY   │ ──► │  RESULT  │ ──► │  AI EXPLAINS        │
-│   GAME   │     │ (Win/Lose)│     │  "Here's what this  │
-└──────────┘     └──────────┘     │   actually means.." │
-                                   └──────────┬──────────┘
-                                              │
-                                              ▼
-                                   ┌─────────────────────┐
-                                   │ KNOWLEDGE UNLOCKED  │
-                                   │ (Saved to log)      │
-                                   └─────────────────────┘
-
-Wrong answer? → STILL get explanation
-Right answer? → Get DEEPER context as reward
-```
+> **Complete question design documentation:** See [QUESTION-DESIGN.md](./context/technical/QUESTION-DESIGN.md) for:
+> - Anti-shortcut design principles
+> - Good vs bad question examples
+> - Question requirements
+> - The teaching loop
 
 ---
 
@@ -1070,14 +492,6 @@ Design the system to allow:
 - Branded themes
 
 ---
-
-## Appendix A: Sample Game Flow
-
-> **Full game flows:** See individual game folders in `context/games/` for detailed game flows and examples.
-
-### Example: `grep --hunt` Game
-
-> **See:** [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md) for complete game specification.
 
 ```
 ╔════════════════════════════════════════════════════════════════╗
@@ -1141,43 +555,6 @@ Design the system to allow:
 ╚════════════════════════════════════════════════════════════════╝
 ```
 
----
-
-## Appendix B: Sample Boss Battle
-
-> **Full boss battle specification:** See [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md) and [context/games/fixme-spaghetti-monster/GAME-VISUALS.md](context/games/fixme-spaghetti-monster/GAME-VISUALS.md) for complete details.
-
-```
-╔════════════════════════════════════════════════════════════════╗
-║  ▣ FIXME: // the monster                                       ║
-╠════════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  GUARDIAN: THE ANCIENT LEDGER OF ACME                         ║
-║  HEALTH:   ████████████████████████████████████ 100%          ║
-║  SHIELDS:  🛡️ 🛡️ 🛡️ 🛡️ 🛡️                                       ║
-║                                                                ║
-║  ═══════════════════════════════════════════════════════════  ║
-║                                                                ║
-║  PHASE 1: RAPID FIRE                          Question 4/10   ║
-║  STREAK:  🔥🔥🔥 (3x damage!)                                  ║
-║                                                                ║
-║  ┌─────────────────────────────────────────────────────────┐  ║
-║  │                                                         │  ║
-║  │  When a payment webhook arrives, what prevents          │  ║
-║  │  duplicate charges if Stripe sends it twice?            │  ║
-║  │                                                         │  ║
-║  │  [A] Database unique constraint on payment_id           │  ║
-║  │  [B] Redis-based idempotency key check                  │  ║
-║  │  [C] In-memory Set of processed webhooks                │  ║
-║  │  [D] Stripe handles it, we don't need to                │  ║
-║  │                                                         │  ║
-║  └─────────────────────────────────────────────────────────┘  ║
-║                                                                ║
-║               ⏱️ 24 SECONDS                                   ║
-║      ████████████████████░░░░░░░░░░░░░░░░░░░░                ║
-║                                                                ║
-╚════════════════════════════════════════════════════════════════╝
-```
 
 ---
 

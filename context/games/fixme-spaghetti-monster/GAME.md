@@ -32,6 +32,60 @@ The Monster has a tragic backstory — it was once clean code, corrupted by shor
 - **Vulnerable:** Shows weakness
 - **Self-aware:** Knows it's a mess
 
+### Monster Personality Traits
+
+| Trait | Description | Example Dialogue |
+|-------|-------------|------------------|
+| **Defensive** | Guards code secrets | "Nobody needs to know why that timeout is 3847ms" |
+| **Nostalgic** | Remembers clean days | "I was beautiful once. Single-responsibility." |
+| **Bitter** | Abandoned by devs | "The architect said she'd refactor me. She's a VP at Google now." |
+| **Dramatic** | Over-the-top reactions | "You traced the DATA FLOW?! THROUGH ALL SEVEN SERVICES?!" |
+| **Vulnerable** | Shows weakness | "If you defeat me, who will guard the sacred constants?" |
+| **Self-aware** | Knows it's a mess | "I'm not deprecated, I'm CLASSIC." |
+
+### Monster Appearances Throughout Game
+
+The Monster appears **after every TODO** with evolving dialogue:
+
+| After TODO | Monster Mood | Sample Dialogue |
+|------------|--------------|-----------------|
+| TODO #1 | Dismissive | "You completed a TODO? AN ACTUAL TODO? That's been there longer than some of your coworkers." |
+| TODO #2 | Mocking | "You can grep. Impressive. My grandma's bash script can grep." |
+| TODO #3 | Worried | "You traced that flow. The WHOLE flow. ...How did you—nobody's done that since the architect left." |
+| TODO #4 | Existential | "If you defeat me, who will guard the sacred constants? WHO WILL REMEMBER WHY THE TIMEOUT IS 3847ms?" |
+| TODO #5 | Desperate | "We can coexist. I'll only break on Fridays. Please. I don't want to fight you." |
+
+### Performance-Based Reactions
+
+**If player aced it (90%+):**
+```
+"...No bugs? No Stack Overflow? Are you sure you didn't just read
+ the source code of my questions? Because that would be
+ very on-brand for an engineer, actually."
+```
+
+**If player struggled (60-70%):**
+```
+"You passed. With the grace of a force push to main on a Friday.
+ But hey, the tests are green. Technically."
+```
+
+**If player used many hints:**
+```
+"I see you've adopted the sacred tradition of Stack Overflow.
+ Copy-paste your way to victory. Classic."
+```
+
+### Watching Indicators
+
+Subtle reminders the Monster is present during gameplay:
+
+```
+"I've seen faster type inference..." — The Monster
+"Even my deprecated methods work faster." — The Monster
+"This is giving 'undefined is not a function' energy." — The Monster
+```
+
 ## Battle Structure (Three Phases)
 
 ### PHASE 1: THE LEGACY ONSLAUGHT
@@ -159,7 +213,3 @@ On each attempt, AI regenerates:
 - Merge conflict scenarios
 
 This prevents memorization and ensures each attempt requires real understanding.
-
-## Monster Appearances Throughout Game
-
-The Monster appears after every TODO with evolving dialogue. See the PRD for details on reactions after each TODO completion.
