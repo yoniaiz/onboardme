@@ -198,15 +198,21 @@ Validation adapts to detected architecture:
 
 ## Monster Reaction on Completion
 
-After completing both TODO #2 games:
+After completing TODO #2 (last task before boss):
 
 ```
-"You can grep. Impressive."
-"My grandma's bash script can grep."
-"...Okay, she doesn't have a bash script."
-"She's also not real. I made her up."
-"I do that sometimes. Make things up."
-"Like the comments in this codebase."
+"You know where the bugs live."
+"You know where new code should go."
+"You're thinking like... like someone who BELONGS here."
+
+*static crackles*
+
+"Fine. You want to understand this codebase?"
+"Then come understand ME."
+"I AM this codebase."
+"Every shortcut. Every 'temporary' fix. Every forgotten TODO."
+
+"Let's finish this."
 ```
 
 ## Visual Reference
