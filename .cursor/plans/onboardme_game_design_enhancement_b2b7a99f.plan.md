@@ -6,13 +6,13 @@ todos:
     content: "Design and review TODO #0 product context games together"
     status: completed
   - id: review-todo-1
-    content: "Review TODO #1 games: tree --discover, ps aux | grep"
-    status: pending
+    content: "Review TODO #1 games: npm start --challenge, flow --trace, test --stories"
+    status: completed
   - id: review-todo-2
     content: "Review TODO #2 games: grep --hunt, import { puzzle } + potential stack validation"
     status: pending
   - id: review-todo-3
-    content: "Review TODO #3 games: traceroute --function, debug --inject + potential testing game"
+    content: "Review TODO #3 games: traceroute --function, debug --inject (testing moved to TODO #1)"
     status: pending
   - id: review-todo-4
     content: "Review TODO #4 games: whois --system, man --explain 20q"
@@ -77,16 +77,16 @@ The #1 factor for "game feel" - every interaction needs satisfying feedback.
 
 ## 2. Critical Gaps Identified
 
-### 2.1 Missing Product/Business Layer (Major Gap)
+### 2.1 Missing Product/Business Layer (Major Gap) - PARTIALLY ADDRESSED
 
 Current flow is ~90% technical, ~10% business. Should be closer to 65/35.
 
 Missing elements:
 
-- User personas and journeys
-- Feature understanding before code location
+- User personas and journeys → **Addressed: TODO #1 `npm start --challenge` and `flow --trace`**
+- Feature understanding before code location → **Addressed: TODO #1 hands-on exploration**
 - Business metrics/KPIs context
-- Product flows (signup → purchase → retention)
+- Product flows (signup → purchase → retention) → **Addressed: TODO #1 `flow --trace`**
 - Domain terminology definitions
 
 ### 2.2 Technology Validation Absent
@@ -103,10 +103,10 @@ Games teach WHERE things are but never verify if developer KNOWS the technologie
 - No explicit microservices/monolith understanding
 - ADRs mentioned but not explored interactively
 
-### 2.4 Testing Philosophy Barely Touched
+### 2.4 Testing Philosophy Barely Touched - ADDRESSED
 
-- Testing patterns mentioned but no dedicated game
-- Missing: test coverage expectations, unit vs integration vs E2E, CI/CD pipeline
+- Testing patterns mentioned but no dedicated game → **Addressed: TODO #1 `test --stories`**
+- ~~Missing: test coverage expectations, unit vs integration vs E2E, CI/CD pipeline~~ → **Now covered**
 
 ---
 
@@ -129,13 +129,14 @@ One sub-task confirming familiarity with the stack.
 - Language feature understanding
 - Library API familiarity
 
-### Priority 3: Add Testing Game to TODO #3 or #5
+### Priority 3: Add Testing Game ~~to TODO #3 or #5~~ ✓ DONE (TODO #1)
 
-Testing is too important to omit.
+Testing is too important to omit. **Addressed by `test --stories` in TODO #1.**
 
-- Test coverage expectations
-- Testing philosophy (unit/integration/E2E)
-- How to run tests, where they live
+- ✓ Test coverage expectations
+- ✓ Testing philosophy (tests as documentation)
+- ✓ How to run tests, where they live
+- ✓ Expected behaviors from test descriptions
 
 ### Priority 4: Keep Monster Arc Intact
 
@@ -150,17 +151,22 @@ The emotional progression is perfect - do not change:
 ### 4.1 Current Mechanics in Use
 
 
-| Mechanic           | Game                    | Description              |
-| ------------------ | ----------------------- | ------------------------ |
-| Progressive Reveal | `tree --discover`       | Uncover step by step     |
-| Timed Search       | `grep --hunt`           | Find under time pressure |
-| Pattern Matching   | `import { puzzle }`     | Identify/order patterns  |
-| Deduction (20Q)    | `man --explain 20q`     | Yes/no narrowing         |
-| Simulation         | `tail -f incident.log`  | React to scenarios       |
-| Clue Matching      | `ps aux                 | grep`,` whois`           |
-| Flow Tracing       | `traceroute --function` | Follow data paths        |
-| Bug Hunting        | `debug --inject`        | Find and fix issues      |
-| Execution          | `chmod +x deploy.sh`    | Perform tasks            |
+| Mechanic           | Game                     | Description                    |
+| ------------------ | ------------------------ | ------------------------------ |
+| Timed Hunt         | `docs --speedread`       | Find facts under time pressure |
+| Evidence Deduction | `file --detective`       | Investigate and deduce         |
+| Relationship Map   | `connect --relations`    | Visual puzzle building         |
+| Run & Reproduce    | `npm start --challenge`  | Hands-on interaction           |
+| Breadcrumb Trail   | `flow --trace`           | Step-by-step code tracing      |
+| Behavior Discovery | `test --stories`         | Learn from test documentation  |
+| Timed Search       | `grep --hunt`            | Find under time pressure       |
+| Pattern Matching   | `import { puzzle }`      | Identify/order patterns        |
+| Deduction (20Q)    | `man --explain 20q`      | Yes/no narrowing               |
+| Simulation         | `tail -f incident.log`   | React to scenarios             |
+| Clue Matching      | `whois --system`         | Match clues to answers         |
+| Flow Tracing       | `traceroute --function`  | Follow data paths              |
+| Bug Hunting        | `debug --inject`         | Find and fix issues            |
+| Execution          | `chmod +x deploy.sh`     | Perform tasks                  |
 
 
 ### 4.2 Potential New Mechanics to Consider
@@ -187,23 +193,29 @@ The emotional progression is perfect - do not change:
 ### 5.1 Risk Assessment
 
 
-| Game                    | Novelty   | Boredom Risk | Issue                             |
-| ----------------------- | --------- | ------------ | --------------------------------- |
-| `tree --discover`       | Medium    | Medium       | Reveal mechanics can feel passive |
-| `ps aux                 | grep`     | Low          | **HIGH**                          |
-| `grep --hunt`           | High      | Low          | Time pressure works well          |
-| `import { puzzle }`     | Low       | **HIGH**     | Ordering puzzles rarely fun       |
-| `traceroute --function` | High      | Low          | Inherently interesting            |
-| `debug --inject`        | Very High | Very Low     | Bug hunting is engaging           |
-| `whois --system`        | Low       | **HIGH**     | Similar to ps aux grep            |
-| `man --explain 20q`     | High      | Low          | Interactive, player-driven        |
-| `tail -f incident`      | Very High | Very Low     | Reactive, exciting                |
-| `chmod +x deploy`       | Medium    | Medium       | Depends on task variety           |
+| Game                     | Novelty   | Boredom Risk | Status/Issue                      |
+| ------------------------ | --------- | ------------ | --------------------------------- |
+| `docs --speedread`       | High      | Low          | ✓ Designed - Timed hunt           |
+| `file --detective`       | High      | Low          | ✓ Designed - Investigation        |
+| `connect --relations`    | High      | Low          | ✓ Designed - Visual puzzle        |
+| `npm start --challenge`  | Very High | Very Low     | ✓ Designed - Hands-on             |
+| `flow --trace`           | High      | Low          | ✓ Designed - Breadcrumb UX        |
+| `test --stories`         | High      | Low          | ✓ Designed - Discovery            |
+| ~~`tree --discover`~~    | ~~Medium~~| ~~Medium~~   | ✗ Replaced by npm start           |
+| ~~`ps aux \| grep`~~     | ~~Low~~   | ~~HIGH~~     | ✗ Replaced by flow --trace        |
+| `grep --hunt`            | High      | Low          | Time pressure works well          |
+| `import { puzzle }`      | Low       | **HIGH**     | Ordering puzzles rarely fun       |
+| `traceroute --function`  | High      | Low          | Inherently interesting            |
+| `debug --inject`         | Very High | Very Low     | Bug hunting is engaging           |
+| `whois --system`         | Low       | **HIGH**     | Too similar to clue-matching      |
+| `man --explain 20q`      | High      | Low          | Interactive, player-driven        |
+| `tail -f incident`       | Very High | Very Low     | Reactive, exciting                |
+| `chmod +x deploy`        | Medium    | Medium       | Depends on task variety           |
 
 
 ### 5.2 Games Needing Attention
 
-1. `**ps aux | grep**` - Needs redesign or significant enhancement
+1. ~~`**ps aux | grep**`~~ - ✓ REPLACED with `flow --trace`
 2. `**import { puzzle }**` - Static ordering is not engaging
 3. `**whois --system**` - Too similar to other clue-matching
 
@@ -270,6 +282,7 @@ Rhythm should alternate between:
 **Key Decision:** Games do NOT show file contents in the terminal. Instead, the CLI provides challenges and validates answers, while players explore the actual codebase in their IDE.
 
 **Reasoning:**
+
 - Teaches real codebase navigation skills
 - More practical than artificial containment
 - Simpler to build (no file rendering in terminal)
@@ -280,6 +293,7 @@ Rhythm should alternate between:
 **Key Decision:** No hints that reveal WHERE to look (e.g., "Check README.md").
 
 **Reasoning:**
+
 - Hints defeat the learning goal of knowing where information lives
 - Players should figure out location on their own
 - Learning happens through failure + feedback instead
@@ -287,28 +301,33 @@ Rhythm should alternate between:
 
 ### 8.3 Final TODO #0 Games (3 games)
 
-| Game | Mechanic | Duration | Learning |
-|------|----------|----------|----------|
-| `docs --speedread` | Timed hunt | ~5 min | Setup commands, project basics, where docs live |
-| `file --detective` | Evidence investigation | ~7 min | Project type, tech stack, how to assess codebases |
-| `connect --relations` | Relationship mapping | ~8 min | How pieces connect, domain model |
+
+| Game                  | Mechanic               | Duration | Learning                                          |
+| --------------------- | ---------------------- | -------- | ------------------------------------------------- |
+| `docs --speedread`    | Timed hunt             | ~5 min   | Setup commands, project basics, where docs live   |
+| `file --detective`    | Evidence investigation | ~7 min   | Project type, tech stack, how to assess codebases |
+| `connect --relations` | Relationship mapping   | ~8 min   | How pieces connect, domain model                  |
+
 
 **Total TODO #0 time: ~20 minutes**
 
 ### 8.4 Rejected Alternatives
 
-| Rejected Idea | Why Rejected |
-|---------------|--------------|
-| Show README in CLI | Doesn't teach real navigation skills |
-| User journey simulation | Can't assume project has UI to interact with |
+
+| Rejected Idea           | Why Rejected                                     |
+| ----------------------- | ------------------------------------------------ |
+| Show README in CLI      | Doesn't teach real navigation skills             |
+| User journey simulation | Can't assume project has UI to interact with     |
 | Domain terminology quiz | Where would terminology come from? Too quiz-like |
-| Stakeholder interview | Where would this info come from? Only have code |
-| `blocks --discover` | Too quiz-like, unclear gameplay |
-| `surface --explore` | Too quiz-like, unclear gameplay |
+| Stakeholder interview   | Where would this info come from? Only have code  |
+| `blocks --discover`     | Too quiz-like, unclear gameplay                  |
+| `surface --explore`     | Too quiz-like, unclear gameplay                  |
+
 
 ### 8.5 Adaptability
 
 Games adapt to project type:
+
 - Backend API → models, services, endpoints
 - Frontend → components, pages, routes
 - CLI → commands, subcommands, flags
@@ -316,17 +335,74 @@ Games adapt to project type:
 
 ---
 
-## 9. Proposed Game Flow Structure
+## 9. TODO #1 Design Decisions (COMPLETED)
+
+### 9.1 Differentiation from TODO #0
+
+**Key Insight:** TODO #0 covers high-level "what is this project?" but doesn't cover:
+- Business logic and user flows
+- Actually running and experiencing the product
+- Understanding expected behaviors
+
+**Decision:** TODO #1 focuses on **user flows and product behavior** - what users can DO with this product.
+
+### 9.2 Learning Progression
+
+| TODO #0 | TODO #1 |
+|---------|---------|
+| "What IS this project?" | "What does it DO?" |
+| Structure, tech stack | Flows, features, behaviors |
+| Reading code/docs | Running and tracing |
+| Dry intro | Hands-on experience |
+
+### 9.3 Testing Game Placement
+
+**Key Decision:** Testing game (`test --stories`) moved to TODO #1 instead of TODO #3 or #5.
+
+**Reasoning:**
+- Tests document expected behaviors - perfect for learning what the product SHOULD do
+- Fits naturally after running the product (verify what you saw)
+- Teaches tests-as-documentation early (valuable skill)
+
+### 9.4 Final TODO #1 Games (3 games)
+
+| Game | Mechanic | Duration | Learning |
+|------|----------|----------|----------|
+| `npm start --challenge` | Run & Reproduce | ~15 min | How to run, what it looks like, main features |
+| `flow --trace` | Breadcrumb Trail | ~12 min | How code flows, architecture layers, key files |
+| `test --stories` | Behavior Discovery | ~12 min | Expected behaviors, edge cases, tests as docs |
+
+**Total TODO #1 time: ~40 minutes**
+
+### 9.5 Rejected Original Games
+
+| Original Game | Why Replaced |
+|---------------|--------------|
+| `tree --discover` | Too passive, overlapped with TODO #0 structure discovery |
+| `ps aux \| grep` | HIGH boredom risk, too similar to clue-matching |
+
+### 9.6 Key Design Principles Applied
+
+- **Hands-on over reading:** Player actually runs the project
+- **Structured challenges:** Not vague "explore" - specific tasks to complete
+- **Explicit teaching:** Tell player to look at tests (don't expect discovery)
+- **Breadcrumb UX:** Step-by-step tracing with visual progress
+- **Different pacing:** Mix of calm exploration and systematic investigation
+
+---
+
+## 10. Proposed Game Flow Structure
 
 ```
-TODO #0: // understand what we're building (NEW - DESIGNED)
+TODO #0: // understand what we're building (DESIGNED)
 ├── docs --speedread    → Timed document fact hunt
 ├── file --detective    → Project investigation & deduction
 └── connect --relations → Relationship mapping puzzle
 
-TODO #1: // understand what we have
-├── tree --discover (review needed)
-└── ps aux | grep (redesign candidate)
+TODO #1: // experience what it does (REDESIGNED)
+├── npm start --challenge → Run project, complete hands-on tasks
+├── flow --trace          → Trace user journey through code layers
+└── test --stories        → Learn behaviors from test documentation
 
 TODO #2: // figure out how to find things
 ├── grep --hunt (keep - works well)
@@ -336,7 +412,6 @@ TODO #2: // figure out how to find things
 TODO #3: // trace data flows (URGENT)
 ├── traceroute --function (keep - works well)
 └── debug --inject (keep - works well)
-└── [POTENTIAL] testing game here
 
 TODO #4: // document why this works
 ├── whois --system (redesign candidate)
@@ -345,7 +420,6 @@ TODO #4: // document why this works
 TODO #5: // learn how to deploy safely
 ├── tail -f incident.log (keep - works well)
 └── chmod +x deploy.sh (review needed)
-└── [POTENTIAL] testing game here
 
 FIXME: // the monster itself (keep as-is)
 ├── Phase 1: Legacy Onslaught
@@ -355,12 +429,12 @@ FIXME: // the monster itself (keep as-is)
 
 ---
 
-## 10. Review Process
+## 11. Review Process
 
 We will review games one-by-one in this order:
 
 1. ~~TODO #0 concept (new games to design)~~ **COMPLETED**
-2. TODO #1 games: `tree --discover`, `ps aux | grep`
+2. ~~TODO #1 games~~ **COMPLETED** - Redesigned: `npm start --challenge`, `flow --trace`, `test --stories`
 3. TODO #2 games: `grep --hunt`, `import { puzzle }`
 4. TODO #3 games: `traceroute --function`, `debug --inject`
 5. TODO #4 games: `whois --system`, `man --explain 20q`
@@ -377,18 +451,27 @@ For each game, we will evaluate:
 
 ---
 
-## 11. Key Files Reference
+## 12. Key Files Reference
 
-### TODO #0 Games (NEW)
+### TODO #0 Games (DESIGNED)
 
 - [context/games/todo-0-docs-speedread/GAME.md](context/games/todo-0-docs-speedread/GAME.md)
 - [context/games/todo-0-file-detective/GAME.md](context/games/todo-0-file-detective/GAME.md)
 - [context/games/todo-0-connect-relations/GAME.md](context/games/todo-0-connect-relations/GAME.md)
 
-### Existing Game Definitions
+### TODO #1 Games (REDESIGNED)
 
-- [context/games/todo-1-tree-discover/GAME.md](context/games/todo-1-tree-discover/GAME.md)
-- [context/games/todo-1-ps-aux-grep/GAME.md](context/games/todo-1-ps-aux-grep/GAME.md)
+- [context/games/todo-1-npm-start-challenge/GAME.md](context/games/todo-1-npm-start-challenge/GAME.md)
+- [context/games/todo-1-flow-trace/GAME.md](context/games/todo-1-flow-trace/GAME.md)
+- [context/games/todo-1-test-stories/GAME.md](context/games/todo-1-test-stories/GAME.md)
+
+### TODO #1 Games (DEPRECATED - replaced)
+
+- ~~[context/games/todo-1-tree-discover/GAME.md](context/games/todo-1-tree-discover/GAME.md)~~ → Replaced
+- ~~[context/games/todo-1-ps-aux-grep/GAME.md](context/games/todo-1-ps-aux-grep/GAME.md)~~ → Replaced
+
+### Existing Game Definitions (To Review)
+
 - [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md)
 - [context/games/todo-2-import-puzzle/GAME.md](context/games/todo-2-import-puzzle/GAME.md)
 - [context/games/todo-3-traceroute-function/GAME.md](context/games/todo-3-traceroute-function/GAME.md)
@@ -399,7 +482,7 @@ For each game, we will evaluate:
 - [context/games/todo-5-chmod-deploy/GAME.md](context/games/todo-5-chmod-deploy/GAME.md)
 - [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md)
 
-Core documentation:
+### Core Documentation
 
 - [PRD.md](PRD.md)
 - [context/narrative/GAME-NARRATIVE.md](context/narrative/GAME-NARRATIVE.md)
