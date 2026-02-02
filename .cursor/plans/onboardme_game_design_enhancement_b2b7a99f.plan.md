@@ -11,18 +11,12 @@ todos:
   - id: review-todo-2
     content: "Review TODO #2 games: grep --hunt (enhanced), feature --locate (new)"
     status: completed
-  - id: review-todo-3
-    content: "Review TODO #3 games: traceroute --function, debug --inject (testing moved to TODO #1)"
-    status: pending
-  - id: review-todo-4
-    content: "Review TODO #4 games: whois --system, man --explain 20q"
-    status: pending
-  - id: review-todo-5
-    content: "Review TODO #5 games: tail -f incident.log, chmod +x deploy.sh"
-    status: pending
+  - id: review-todo-3-5
+    content: "Review TODO #3-5 games - CUT (redundant/can't generate content)"
+    status: completed
   - id: review-boss
-    content: Review FIXME boss battle phases
-    status: pending
+    content: Review FIXME boss battle - Updated Monster arc for 3 TODOs
+    status: completed
   - id: implement-juice
     content: Implement juice/feedback specs across all games
     status: pending
@@ -83,10 +77,10 @@ Current flow is ~90% technical, ~10% business. Should be closer to 65/35.
 
 Missing elements:
 
-- User personas and journeys → **Addressed: TODO #1 `npm start --challenge` and `flow --trace`**
+- User personas and journeys → **Addressed: TODO #1 `npm start --challenge` and `flow --trace**`
 - Feature understanding before code location → **Addressed: TODO #1 hands-on exploration**
 - Business metrics/KPIs context
-- Product flows (signup → purchase → retention) → **Addressed: TODO #1 `flow --trace`**
+- Product flows (signup → purchase → retention) → **Addressed: TODO #1 `flow --trace**`
 - Domain terminology definitions
 
 ### 2.2 Technology Validation Absent
@@ -105,7 +99,7 @@ Games teach WHERE things are but never verify if developer KNOWS the technologie
 
 ### 2.4 Testing Philosophy Barely Touched - ADDRESSED
 
-- Testing patterns mentioned but no dedicated game → **Addressed: TODO #1 `test --stories`**
+- Testing patterns mentioned but no dedicated game → **Addressed: TODO #1 `test --stories**`
 - ~~Missing: test coverage expectations, unit vs integration vs E2E, CI/CD pipeline~~ → **Now covered**
 
 ---
@@ -138,6 +132,13 @@ Testing is too important to omit. **Addressed by `test --stories` in TODO #1.**
 - ✓ How to run tests, where they live
 - ✓ Expected behaviors from test descriptions
 
+### Priority 5: Cut Games We Can't Generate Content For ✓ DONE
+
+**Critical filter added:** Can we reliably extract content from the codebase?
+
+- ✗ TODO #3-5 cut - relied on ADRs, incident logs, historical context that doesn't exist in most codebases
+- ✓ Final journey: TODO #0-2 + Boss covers core onboarding with extractable data
+
 ### Priority 4: Keep Monster Arc Intact
 
 The emotional progression is perfect - do not change:
@@ -151,22 +152,22 @@ The emotional progression is perfect - do not change:
 ### 4.1 Current Mechanics in Use
 
 
-| Mechanic           | Game                     | Description                    |
-| ------------------ | ------------------------ | ------------------------------ |
-| Timed Hunt         | `docs --speedread`       | Find facts under time pressure |
-| Evidence Deduction | `file --detective`       | Investigate and deduce         |
-| Relationship Map   | `connect --relations`    | Visual puzzle building         |
-| Run & Reproduce    | `npm start --challenge`  | Hands-on interaction           |
-| Breadcrumb Trail   | `flow --trace`           | Step-by-step code tracing      |
-| Behavior Discovery | `test --stories`         | Learn from test documentation  |
-| Bug Hunt (Mark)    | `grep --hunt`            | Run tests, find & mark bugs    |
-| Feature Planning   | `feature --locate`       | Mark where new code should go  |
-| Deduction (20Q)    | `man --explain 20q`      | Yes/no narrowing               |
-| Simulation         | `tail -f incident.log`   | React to scenarios             |
-| Clue Matching      | `whois --system`         | Match clues to answers         |
-| Flow Tracing       | `traceroute --function`  | Follow data paths              |
-| Bug Hunting        | `debug --inject`         | Find and fix issues            |
-| Execution          | `chmod +x deploy.sh`     | Perform tasks                  |
+| Mechanic           | Game                    | Description                    |
+| ------------------ | ----------------------- | ------------------------------ |
+| Timed Hunt         | `docs --speedread`      | Find facts under time pressure |
+| Evidence Deduction | `file --detective`      | Investigate and deduce         |
+| Relationship Map   | `connect --relations`   | Visual puzzle building         |
+| Run & Reproduce    | `npm start --challenge` | Hands-on interaction           |
+| Breadcrumb Trail   | `flow --trace`          | Step-by-step code tracing      |
+| Behavior Discovery | `test --stories`        | Learn from test documentation  |
+| Bug Hunt (Mark)    | `grep --hunt`           | Run tests, find & mark bugs    |
+| Feature Planning   | `feature --locate`      | Mark where new code should go  |
+| Deduction (20Q)    | `man --explain 20q`     | Yes/no narrowing               |
+| Simulation         | `tail -f incident.log`  | React to scenarios             |
+| Clue Matching      | `whois --system`        | Match clues to answers         |
+| Flow Tracing       | `traceroute --function` | Follow data paths              |
+| Bug Hunting        | `debug --inject`        | Find and fix issues            |
+| Execution          | `chmod +x deploy.sh`    | Perform tasks                  |
 
 
 ### 4.2 Potential New Mechanics to Consider
@@ -193,32 +194,33 @@ The emotional progression is perfect - do not change:
 ### 5.1 Risk Assessment
 
 
-| Game                     | Novelty   | Boredom Risk | Status/Issue                      |
-| ------------------------ | --------- | ------------ | --------------------------------- |
-| `docs --speedread`       | High      | Low          | ✓ Designed - Timed hunt           |
-| `file --detective`       | High      | Low          | ✓ Designed - Investigation        |
-| `connect --relations`    | High      | Low          | ✓ Designed - Visual puzzle        |
-| `npm start --challenge`  | Very High | Very Low     | ✓ Designed - Hands-on             |
-| `flow --trace`           | High      | Low          | ✓ Designed - Breadcrumb UX        |
-| `test --stories`         | High      | Low          | ✓ Designed - Discovery            |
-| ~~`tree --discover`~~    | ~~Medium~~| ~~Medium~~   | ✗ Replaced by npm start           |
-| ~~`ps aux \| grep`~~     | ~~Low~~   | ~~HIGH~~     | ✗ Replaced by flow --trace        |
-| `grep --hunt`            | Very High | Very Low     | ✓ Enhanced - Test-driven bug hunt |
-| `feature --locate`       | Very High | Very Low     | ✓ NEW - Replaces import puzzle    |
-| ~~`import { puzzle }`~~  | ~~Low~~   | ~~**HIGH**~~ | ✗ Replaced - boring ordering      |
-| `traceroute --function`  | High      | Low          | Inherently interesting            |
-| `debug --inject`         | Very High | Very Low     | Bug hunting is engaging           |
-| `whois --system`         | Low       | **HIGH**     | Too similar to clue-matching      |
-| `man --explain 20q`      | High      | Low          | Interactive, player-driven        |
-| `tail -f incident`       | Very High | Very Low     | Reactive, exciting                |
-| `chmod +x deploy`        | Medium    | Medium       | Depends on task variety           |
+| Game                    | Novelty    | Boredom Risk | Status/Issue                      |
+| ----------------------- | ---------- | ------------ | --------------------------------- |
+| `docs --speedread`      | High       | Low          | ✓ Designed - Timed hunt           |
+| `file --detective`      | High       | Low          | ✓ Designed - Investigation        |
+| `connect --relations`   | High       | Low          | ✓ Designed - Visual puzzle        |
+| `npm start --challenge` | Very High  | Very Low     | ✓ Designed - Hands-on             |
+| `flow --trace`          | High       | Low          | ✓ Designed - Breadcrumb UX        |
+| `test --stories`        | High       | Low          | ✓ Designed - Discovery            |
+| ~~`tree --discover`~~   | ~~Medium~~ | ~~Medium~~   | ✗ Replaced by npm start           |
+| ~~`ps aux | grep`~~     | ~~Low~~    | ~~HIGH~~     | ✗ Replaced by flow --trace        |
+| `grep --hunt`           | Very High  | Very Low     | ✓ Enhanced - Test-driven bug hunt |
+| `feature --locate`      | Very High  | Very Low     | ✓ NEW - Replaces import puzzle    |
+| ~~`import { puzzle }`~~ | ~~Low~~    | ~~**HIGH**~~ | ✗ Replaced - boring ordering      |
+| ~~`traceroute --function`~~ | ~~High~~   | ~~Low~~      | ✗ CUT - Redundant with flow --trace |
+| ~~`debug --inject`~~        | ~~High~~   | ~~Low~~      | ✗ CUT - Redundant with grep --hunt  |
+| ~~`whois --system`~~        | ~~Low~~    | ~~HIGH~~     | ✗ CUT - Can't generate content      |
+| ~~`man --explain 20q`~~     | ~~High~~   | ~~Low~~      | ✗ CUT - Can't generate content      |
+| ~~`tail -f incident`~~      | ~~High~~   | ~~Low~~      | ✗ CUT - Can't generate content      |
+| ~~`chmod +x deploy`~~       | ~~Medium~~ | ~~Medium~~   | ✗ CUT - Can't generate content      |
 
 
-### 5.2 Games Needing Attention
+### 5.2 Games Needing Attention (RESOLVED)
 
-1. ~~`**ps aux | grep**`~~ - ✓ REPLACED with `flow --trace`
-2. ~~`**import { puzzle }**`~~ - ✓ REPLACED with `feature --locate`
-3. `**whois --system**` - Too similar to other clue-matching
+1. ~~`ps aux | grep`~~ - ✓ REPLACED with `flow --trace`
+2. ~~`import { puzzle }`~~ - ✓ REPLACED with `feature --locate`
+3. ~~`whois --system`~~ - ✓ CUT (can't generate content)
+4. ~~TODO #3-5 games~~ - ✓ CUT (redundant or can't generate content)
 
 ---
 
@@ -341,6 +343,7 @@ Games adapt to project type:
 ### 9.1 Differentiation from TODO #0
 
 **Key Insight:** TODO #0 covers high-level "what is this project?" but doesn't cover:
+
 - Business logic and user flows
 - Actually running and experiencing the product
 - Understanding expected behaviors
@@ -349,38 +352,45 @@ Games adapt to project type:
 
 ### 9.2 Learning Progression
 
-| TODO #0 | TODO #1 |
-|---------|---------|
-| "What IS this project?" | "What does it DO?" |
-| Structure, tech stack | Flows, features, behaviors |
-| Reading code/docs | Running and tracing |
-| Dry intro | Hands-on experience |
+
+| TODO #0                 | TODO #1                    |
+| ----------------------- | -------------------------- |
+| "What IS this project?" | "What does it DO?"         |
+| Structure, tech stack   | Flows, features, behaviors |
+| Reading code/docs       | Running and tracing        |
+| Dry intro               | Hands-on experience        |
+
 
 ### 9.3 Testing Game Placement
 
 **Key Decision:** Testing game (`test --stories`) moved to TODO #1 instead of TODO #3 or #5.
 
 **Reasoning:**
+
 - Tests document expected behaviors - perfect for learning what the product SHOULD do
 - Fits naturally after running the product (verify what you saw)
 - Teaches tests-as-documentation early (valuable skill)
 
 ### 9.4 Final TODO #1 Games (3 games)
 
-| Game | Mechanic | Duration | Learning |
-|------|----------|----------|----------|
-| `npm start --challenge` | Run & Reproduce | ~15 min | How to run, what it looks like, main features |
-| `flow --trace` | Breadcrumb Trail | ~12 min | How code flows, architecture layers, key files |
-| `test --stories` | Behavior Discovery | ~12 min | Expected behaviors, edge cases, tests as docs |
+
+| Game                    | Mechanic           | Duration | Learning                                       |
+| ----------------------- | ------------------ | -------- | ---------------------------------------------- |
+| `npm start --challenge` | Run & Reproduce    | ~15 min  | How to run, what it looks like, main features  |
+| `flow --trace`          | Breadcrumb Trail   | ~12 min  | How code flows, architecture layers, key files |
+| `test --stories`        | Behavior Discovery | ~12 min  | Expected behaviors, edge cases, tests as docs  |
+
 
 **Total TODO #1 time: ~40 minutes**
 
 ### 9.5 Rejected Original Games
 
-| Original Game | Why Replaced |
-|---------------|--------------|
+
+| Original Game     | Why Replaced                                             |
+| ----------------- | -------------------------------------------------------- |
 | `tree --discover` | Too passive, overlapped with TODO #0 structure discovery |
-| `ps aux \| grep` | HIGH boredom risk, too similar to clue-matching |
+| `ps aux | grep`   | HIGH boredom risk, too similar to clue-matching          |
+
 
 ### 9.6 Key Design Principles Applied
 
@@ -404,6 +414,7 @@ Games adapt to project type:
 ```
 
 **Why this works:**
+
 - Hands-on interaction with real codebase
 - Proves player actually explored (can't fake it)
 - More memorable than typing paths in CLI
@@ -415,6 +426,7 @@ Games adapt to project type:
 **Key Decision:** Bug hunting starts with a failing test, not just a symptom description.
 
 **Flow:**
+
 1. CLI triggers/reveals a failing test
 2. Player runs tests, sees failure output
 3. Player hunts for buggy code
@@ -422,6 +434,7 @@ Games adapt to project type:
 5. CLI validates and explains
 
 **Why failing tests:**
+
 - Scopes the hunt (not "find bug somewhere")
 - Teaches real debugging workflow
 - Test output provides clues
@@ -432,6 +445,7 @@ Games adapt to project type:
 **Key Decision:** Replace boring `import { puzzle }` with `feature --locate` - planning where new features should go.
 
 **Flow:**
+
 1. CLI presents feature request
 2. Player explores for existing patterns
 3. Player marks 2-4 locations with `// ONBOARD:FEATURE`
@@ -439,6 +453,7 @@ Games adapt to project type:
 5. Flexible scoring (multiple valid answers)
 
 **Why this replaces import puzzle:**
+
 - Real-world skill (developers do this constantly)
 - Teaches architectural thinking
 - Different pacing from bug hunt (thoughtful vs. urgent)
@@ -446,92 +461,124 @@ Games adapt to project type:
 
 ### 10.4 Final TODO #2 Games (2 games)
 
-| Game | Mechanic | Duration | Learning |
-|------|----------|----------|----------|
-| `grep --hunt` | Bug Hunt (Mark) | ~12 min | Debugging workflow, test reading, navigation |
-| `feature --locate` | Feature Planning (Mark) | ~10 min | Architecture intuition, pattern recognition |
+
+| Game               | Mechanic                | Duration | Learning                                     |
+| ------------------ | ----------------------- | -------- | -------------------------------------------- |
+| `grep --hunt`      | Bug Hunt (Mark)         | ~12 min  | Debugging workflow, test reading, navigation |
+| `feature --locate` | Feature Planning (Mark) | ~10 min  | Architecture intuition, pattern recognition  |
+
 
 **Total TODO #2 time: ~22 minutes**
 
 ### 10.5 Variety Within TODO #2
 
-| Aspect | `grep --hunt` | `feature --locate` |
-|--------|---------------|-------------------|
-| **Goal** | Find existing bug | Plan new code |
-| **Pacing** | Timed, urgent | No timer, thoughtful |
-| **Validation** | Exact location | Multiple valid answers |
-| **Feeling** | Detective | Architect |
+
+| Aspect         | `grep --hunt`     | `feature --locate`     |
+| -------------- | ----------------- | ---------------------- |
+| **Goal**       | Find existing bug | Plan new code          |
+| **Pacing**     | Timed, urgent     | No timer, thoughtful   |
+| **Validation** | Exact location    | Multiple valid answers |
+| **Feeling**    | Detective         | Architect              |
+
 
 ### 10.6 Rejected Alternatives
 
-| Rejected | Why |
-|----------|-----|
-| `import { puzzle }` | Ordering imports is boring, low practical value |
+
+| Rejected              | Why                                             |
+| --------------------- | ----------------------------------------------- |
+| `import { puzzle }`   | Ordering imports is boring, low practical value |
 | Stack validation quiz | Too quiz-like, doesn't fit "mark in code" theme |
-| Navigate shortcuts | Good idea but doesn't fit the theme |
+| Navigate shortcuts    | Good idea but doesn't fit the theme             |
+
 
 ---
 
-## 11. Proposed Game Flow Structure
+## 11. Boss Battle Design Decisions (COMPLETED)
+
+### 11.1 Monster Emotional Arc (Updated for 3 TODOs)
+
+| After | Mood | Arc Purpose |
+|-------|------|-------------|
+| TODO #0 | Dismissive | "Anyone can read docs" |
+| TODO #1 | Annoyed | "You got it running... unusual" |
+| TODO #2 | Worried | "You're thinking like this codebase" |
+| Boss Start | Defensive | Final confrontation |
+
+### 11.2 Three-Phase Battle Structure (Kept)
+
+| Phase | Mechanic | Tests |
+|-------|----------|-------|
+| Phase 1: Legacy Onslaught | Rapid-fire questions (30s each) | Knowledge from TODO #0-2 |
+| Phase 2: Dependency Tangle | Connected questions | Understanding of how pieces connect |
+| Phase 3: Final Merge Conflict | Synthesis/harder questions | Deep comprehension |
+
+### 11.3 Content Generation for Boss
+
+Questions must come from what player learned:
+- Project structure, tech stack (TODO #0)
+- Running, flows, behaviors (TODO #1)
+- Navigation, bug hunting, feature planning (TODO #2)
+
+---
+
+## 12. Final Game Flow Structure
 
 ```
-TODO #0: // understand what we're building (DESIGNED)
+TODO #0: // understand what we're building (~20 min)
 ├── docs --speedread    → Timed document fact hunt
 ├── file --detective    → Project investigation & deduction
 └── connect --relations → Relationship mapping puzzle
 
-TODO #1: // experience what it does (DESIGNED)
+TODO #1: // experience what it does (~40 min)
 ├── npm start --challenge → Run project, complete hands-on tasks
 ├── flow --trace          → Trace user journey through code layers
 └── test --stories        → Learn behaviors from test documentation
 
-TODO #2: // navigate and mark (DESIGNED)
+TODO #2: // navigate and mark (~22 min)
 ├── grep --hunt       → Run failing tests, find & mark bugs
 └── feature --locate  → Plan features, mark where code should go
 
-TODO #3: // trace data flows
-├── traceroute --function (review needed)
-└── debug --inject (review needed)
+FIXME: // the monster itself (~15 min)
+├── Phase 1: Legacy Onslaught (rapid-fire questions)
+├── Phase 2: Dependency Tangle (connected questions)
+└── Phase 3: Final Merge Conflict (synthesis)
 
-TODO #4: // document why this works
-├── whois --system (redesign candidate)
-└── man --explain 20q (keep - works well)
-
-TODO #5: // learn how to deploy safely
-├── tail -f incident.log (keep - works well)
-└── chmod +x deploy.sh (review needed)
-
-FIXME: // the monster itself (keep as-is)
-├── Phase 1: Legacy Onslaught
-├── Phase 2: Dependency Tangle
-└── Phase 3: Final Merge Conflict
+TOTAL: ~97 min (8 games + boss battle)
 ```
+
+### Why TODO #3-5 Were Cut
+
+| Original TODO | Games | Why Cut |
+|---------------|-------|---------|
+| TODO #3 | `traceroute --function`, `debug --inject` | Redundant with `flow --trace` and `grep --hunt` |
+| TODO #4 | `whois --system`, `man --explain 20q` | Can't generate content - ADRs/decisions not in code |
+| TODO #5 | `tail -f incident.log`, `chmod +x deploy.sh` | Can't generate content - incident logs don't exist in codebase |
+
+**Key Insight:** We can only build games from information reliably extractable from the codebase. TODO #0-2 cover the core onboarding needs with real, extractable data.
 
 ---
 
-## 12. Review Process
+## 13. Review Process (COMPLETED)
 
-We will review games one-by-one in this order:
+| Stage | Status | Outcome |
+|-------|--------|---------|
+| TODO #0 | ✅ COMPLETED | NEW: `docs --speedread`, `file --detective`, `connect --relations` |
+| TODO #1 | ✅ COMPLETED | REDESIGNED: `npm start --challenge`, `flow --trace`, `test --stories` |
+| TODO #2 | ✅ COMPLETED | ENHANCED: `grep --hunt`, NEW: `feature --locate` |
+| TODO #3-5 | ✅ CUT | Redundant or can't generate content from codebase |
+| FIXME Boss | ✅ COMPLETED | Updated Monster arc for 3-TODO journey |
 
-1. ~~TODO #0 concept (new games to design)~~ **COMPLETED**
-2. ~~TODO #1 games~~ **COMPLETED** - Redesigned: `npm start --challenge`, `flow --trace`, `test --stories`
-3. ~~TODO #2 games~~ **COMPLETED** - Enhanced: `grep --hunt`, NEW: `feature --locate`
-4. TODO #3 games: `traceroute --function`, `debug --inject`
-5. TODO #4 games: `whois --system`, `man --explain 20q`
-6. TODO #5 games: `tail -f incident.log`, `chmod +x deploy.sh`
-7. FIXME boss battle (review phases)
-
-For each game, we will evaluate:
+### Evaluation Criteria Used
 
 - Does it follow flow state principles?
 - Does it satisfy SDT needs (competence, autonomy, relatedness)?
 - Is the mechanic engaging or repetitive?
-- What juice/feedback should it have?
+- **Can we generate content from the codebase?** (critical filter)
 - Should it be kept, enhanced, or redesigned?
 
 ---
 
-## 13. Key Files Reference
+## 14. Key Files Reference
 
 ### TODO #0 Games (DESIGNED)
 
@@ -559,15 +606,18 @@ For each game, we will evaluate:
 
 - ~~[context/games/todo-2-import-puzzle/GAME.md](context/games/todo-2-import-puzzle/GAME.md)~~ → Replaced by feature --locate
 
-### Existing Game Definitions (To Review)
+### FIXME Boss Battle (UPDATED)
 
-- [context/games/todo-3-traceroute-function/GAME.md](context/games/todo-3-traceroute-function/GAME.md)
-- [context/games/todo-3-debug-inject/GAME.md](context/games/todo-3-debug-inject/GAME.md)
-- [context/games/todo-4-whois-system/GAME.md](context/games/todo-4-whois-system/GAME.md)
-- [context/games/todo-4-man-explain-20q/GAME.md](context/games/todo-4-man-explain-20q/GAME.md)
-- [context/games/todo-5-tail-incident/GAME.md](context/games/todo-5-tail-incident/GAME.md)
-- [context/games/todo-5-chmod-deploy/GAME.md](context/games/todo-5-chmod-deploy/GAME.md)
 - [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md)
+
+### TODO #3-5 Games (DEPRECATED - CUT)
+
+- ~~[context/games/todo-3-traceroute-function/GAME.md](context/games/todo-3-traceroute-function/GAME.md)~~ → Redundant with flow --trace
+- ~~[context/games/todo-3-debug-inject/GAME.md](context/games/todo-3-debug-inject/GAME.md)~~ → Redundant with grep --hunt
+- ~~[context/games/todo-4-whois-system/GAME.md](context/games/todo-4-whois-system/GAME.md)~~ → Can't generate content
+- ~~[context/games/todo-4-man-explain-20q/GAME.md](context/games/todo-4-man-explain-20q/GAME.md)~~ → Can't generate content
+- ~~[context/games/todo-5-tail-incident/GAME.md](context/games/todo-5-tail-incident/GAME.md)~~ → Can't generate content
+- ~~[context/games/todo-5-chmod-deploy/GAME.md](context/games/todo-5-chmod-deploy/GAME.md)~~ → Can't generate content
 
 ### Core Documentation
 

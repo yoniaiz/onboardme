@@ -49,11 +49,11 @@ The Monster appears **after every TODO** with evolving dialogue:
 
 | After TODO | Monster Mood | Sample Dialogue |
 |------------|--------------|-----------------|
-| TODO #1 | Dismissive | "You completed a TODO? AN ACTUAL TODO? That's been there longer than some of your coworkers." |
-| TODO #2 | Mocking | "You can grep. Impressive. My grandma's bash script can grep." |
-| TODO #3 | Worried | "You traced that flow. The WHOLE flow. ...How did you—nobody's done that since the architect left." |
-| TODO #4 | Existential | "If you defeat me, who will guard the sacred constants? WHO WILL REMEMBER WHY THE TIMEOUT IS 3847ms?" |
-| TODO #5 | Desperate | "We can coexist. I'll only break on Fridays. Please. I don't want to fight you." |
+| TODO #0 | Dismissive | "You read the docs. You figured out it's a Node project. Groundbreaking. Even the interns get that far." |
+| TODO #1 | Annoyed | "You got it running. On the FIRST try. And you traced the flows. ...That's unusual. Most people give up after the third npm error." |
+| TODO #2 | Worried | "You found the bug. You know where features go. You're starting to THINK like this codebase. That's... that's not supposed to happen this fast." |
+
+Note: Individual game files contain specific Monster reactions for each sub-task completion. The reactions above are the emotional arc summary.
 
 ### Performance-Based Reactions
 

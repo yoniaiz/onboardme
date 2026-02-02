@@ -76,7 +76,7 @@ Traditional onboarding sucks:
 3. Runs: onboardme init
 4. AI scans codebase, generates game content
 5. Runs: onboardme start
-6. Plays through 5 levels + boss
+6. Plays through 3 TODOs + boss (~97 min)
 7. Faces "The Spaghetti Code Monster" (FIXME)
 8. Has comprehensive understanding of codebase
 ```
@@ -125,7 +125,9 @@ The game's central metaphor: **Technical debt is the real monster.** Every accum
 
 ### Game Structure
 
-The game consists of 5 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
+The game consists of 3 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2-3 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
+
+**Total: 8 games + boss battle (~97 minutes)**
 
 > **See [Game Progression Diagram](./context/visuals/EXAMPLES.md#game-progression-diagram) for visual overview.**
 
@@ -259,97 +261,67 @@ All gathered information is **verified** against the actual codebase—paths mus
 ### Game Flow Overview
 
 ```
-TODO #1: // understand what we have
-├── tree --discover        → [context/games/todo-1-tree-discover/](context/games/todo-1-tree-discover/)
-└── ps aux | grep          → [context/games/todo-1-ps-aux-grep/](context/games/todo-1-ps-aux-grep/)
+TODO #0: // understand what we're building (~20 min)
+├── docs --speedread       → Timed document fact hunt
+├── file --detective       → Project investigation & deduction
+└── connect --relations    → Relationship mapping puzzle
 
-TODO #2: // figure out how to find things
-├── grep --hunt            → [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/)
-└── import { puzzle }      → [context/games/todo-2-import-puzzle/](context/games/todo-2-import-puzzle/)
+TODO #1: // experience what it does (~40 min)
+├── npm start --challenge  → Run project, complete hands-on tasks
+├── flow --trace           → Trace user journey through code layers
+└── test --stories         → Learn behaviors from test documentation
 
-TODO #3: // trace data flows (URGENT)
-├── traceroute --function  → [context/games/todo-3-traceroute-function/](context/games/todo-3-traceroute-function/)
-└── debug --inject         → [context/games/todo-3-debug-inject/](context/games/todo-3-debug-inject/)
+TODO #2: // navigate and mark (~22 min)
+├── grep --hunt            → Run failing tests, find & mark bugs
+└── feature --locate       → Plan features, mark where code should go
 
-TODO #4: // document why this works
-├── whois --system         → [context/games/todo-4-whois-system/](context/games/todo-4-whois-system/)
-└── man --explain 20q      → [context/games/todo-4-man-explain-20q/](context/games/todo-4-man-explain-20q/)
-
-TODO #5: // learn how to deploy safely
-├── tail -f incident.log   → [context/games/todo-5-tail-incident/](context/games/todo-5-tail-incident/)
-└── chmod +x deploy.sh      → [context/games/todo-5-chmod-deploy/](context/games/todo-5-chmod-deploy/)
-
-FIXME: // the monster itself
-└── The Spaghetti Monster   → [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
+FIXME: // the monster itself (~15 min)
+└── The Spaghetti Monster  → [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
 ```
 
-### TODO #1: `// understand what we have`
+> **Detailed game specifications:** Each game has its own folder in `context/games/` with `GAME.md` (game details) and `GAME-VISUALS.md` (visual design).
 
-**Goal:** Build mental map of what exists
+### TODO #0: `// understand what we're building`
+
+**Goal:** Build mental map of the project - structure, tech stack, how pieces connect
 
 **Sub-tasks:**
-- `tree --discover` - Progressive reveal of project structure
-- `ps aux | grep` - Service identification from dependencies
+- `docs --speedread` - Timed hunt for facts in docs (README, package.json, etc.)
+- `file --detective` - Investigate codebase to deduce project type and tech stack
+- `connect --relations` - Map relationships between key building blocks
 
-**Flow:** Players explore the codebase structure and identify services, building foundational knowledge.
+**Flow:** Players explore documentation and file structure, building foundational knowledge of what the project IS.
 
-**See:** [context/games/todo-1-tree-discover/](context/games/todo-1-tree-discover/) | [context/games/todo-1-ps-aux-grep/](context/games/todo-1-ps-aux-grep/)
+**See:** [context/games/todo-0-docs-speedread/](context/games/todo-0-docs-speedread/) | [context/games/todo-0-file-detective/](context/games/todo-0-file-detective/) | [context/games/todo-0-connect-relations/](context/games/todo-0-connect-relations/)
 
 ---
 
-### TODO #2: `// figure out how to find things`
+### TODO #1: `// experience what it does`
 
-**Goal:** Learn to navigate the codebase
+**Goal:** Learn what the product DOES - run it, trace flows, understand behaviors
 
 **Sub-tasks:**
-- `grep --hunt` - Timed search from symptom descriptions
-- `import { puzzle }` - Import pattern understanding
+- `npm start --challenge` - Actually run the project and complete hands-on tasks
+- `flow --trace` - Trace a user journey through code layers (breadcrumb trail)
+- `test --stories` - Learn expected behaviors from test files (tests as documentation)
 
-**Flow:** Players learn effective search strategies and understand codebase organization patterns.
+**Flow:** Players get hands-on experience running the project, tracing user flows, and discovering behaviors through tests.
 
-**See:** [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/) | [context/games/todo-2-import-puzzle/](context/games/todo-2-import-puzzle/)
+**See:** [context/games/todo-1-npm-start-challenge/](context/games/todo-1-npm-start-challenge/) | [context/games/todo-1-flow-trace/](context/games/todo-1-flow-trace/) | [context/games/todo-1-test-stories/](context/games/todo-1-test-stories/)
 
 ---
 
-### TODO #3: `// trace data flows (URGENT)`
+### TODO #2: `// navigate and mark`
 
-**Goal:** Understand how data moves through the system
-
-**Sub-tasks:**
-- `traceroute --function` - Flow tracing across files/functions
-- `debug --inject` - Bug hunting and fixing
-
-**Flow:** Players trace data flows and debug issues, understanding system architecture deeply.
-
-**See:** [context/games/todo-3-traceroute-function/](context/games/todo-3-traceroute-function/) | [context/games/todo-3-debug-inject/](context/games/todo-3-debug-inject/)
-
----
-
-### TODO #4: `// document why this works`
-
-**Goal:** Understand *why* things work the way they do
+**Goal:** Learn to navigate, find bugs, and plan features using "mark in code" mechanics
 
 **Sub-tasks:**
-- `whois --system` - Component identification from clues
-- `man --explain 20q` - Deduction through yes/no questions
+- `grep --hunt` - Run failing tests, hunt for bugs, mark location with `// ONBOARD:BUG`
+- `feature --locate` - Given a feature request, mark where new code should go with `// ONBOARD:FEATURE`
 
-**Flow:** Players learn business domain knowledge and architectural decisions, understanding the "why" behind the code.
+**Flow:** Players learn practical debugging workflows and architectural thinking by marking actual locations in the codebase.
 
-**See:** [context/games/todo-4-whois-system/](context/games/todo-4-whois-system/) | [context/games/todo-4-man-explain-20q/](context/games/todo-4-man-explain-20q/)
-
----
-
-### TODO #5: `// learn how to deploy safely`
-
-**Goal:** Actually operate the system
-
-**Sub-tasks:**
-- `tail -f incident.log` - Incident simulation and response
-- `chmod +x deploy.sh` - Operational tasks in sandbox
-
-**Flow:** Players practice operational skills including deployment and incident response.
-
-**See:** [context/games/todo-5-tail-incident/](context/games/todo-5-tail-incident/) | [context/games/todo-5-chmod-deploy/](context/games/todo-5-chmod-deploy/)
+**See:** [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/) | [context/games/todo-2-feature-locate/](context/games/todo-2-feature-locate/)
 
 ---
 
