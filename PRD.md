@@ -510,7 +510,8 @@ brew install onboardme
 
 ## 5.5 Visual & Aesthetic Direction
 
-> **The game should feel FUN. Not a training module with emojis—an actual game you'd want to play.**
+> **The game should feel FUN. Not a training module with emojis—an actual game you'd want to play.**  
+> **Game-specific visuals:** See individual `GAME-VISUALS.md` files in `context/games/` for visual design notes for each game.
 
 ### Design Philosophy
 
@@ -1254,28 +1255,46 @@ If something can't be verified, it's marked as `uncertain` and not used in quest
 
 > **Note:** "Levels" are called "TODOs" and mini-games are called "sub-tasks" — see [Game Terminology](#game-terminology).
 
+> **Detailed game specifications:** Each game has its own folder in `context/games/` with `GAME.md` (game details) and `GAME-VISUALS.md` (visual design).
+
+### Game Flow Overview
+
+```
+TODO #1: // understand what we have
+├── tree --discover        → [context/games/todo-1-tree-discover/](context/games/todo-1-tree-discover/)
+└── ps aux | grep          → [context/games/todo-1-ps-aux-grep/](context/games/todo-1-ps-aux-grep/)
+
+TODO #2: // figure out how to find things
+├── grep --hunt            → [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/)
+└── import { puzzle }      → [context/games/todo-2-import-puzzle/](context/games/todo-2-import-puzzle/)
+
+TODO #3: // trace data flows (URGENT)
+├── traceroute --function  → [context/games/todo-3-traceroute-function/](context/games/todo-3-traceroute-function/)
+└── debug --inject         → [context/games/todo-3-debug-inject/](context/games/todo-3-debug-inject/)
+
+TODO #4: // document why this works
+├── whois --system         → [context/games/todo-4-whois-system/](context/games/todo-4-whois-system/)
+└── man --explain 20q      → [context/games/todo-4-man-explain-20q/](context/games/todo-4-man-explain-20q/)
+
+TODO #5: // learn how to deploy safely
+├── tail -f incident.log   → [context/games/todo-5-tail-incident/](context/games/todo-5-tail-incident/)
+└── chmod +x deploy.sh      → [context/games/todo-5-chmod-deploy/](context/games/todo-5-chmod-deploy/)
+
+FIXME: // the monster itself
+└── The Spaghetti Monster   → [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
+```
+
 ### TODO #1: `// understand what we have`
 
 **Goal:** Build mental map of what exists
 
-| Sub-task | Type | Description |
-|----------|------|-------------|
-| `tree --discover` | Progressive reveal | Uncover project structure through exploration |
-| `ps aux \| grep` | Service identification | Identify services from clues about dependencies |
+**Sub-tasks:**
+- `tree --discover` - Progressive reveal of project structure
+- `ps aux | grep` - Service identification from dependencies
 
-**Learning Outcomes:**
-- Project language and framework
-- Directory structure
-- What services exist
-- How to run the project
+**Flow:** Players explore the codebase structure and identify services, building foundational knowledge.
 
-**Monster Reaction on Completion:**
-```
-"You completed a TODO? AN ACTUAL TODO?"
-"Do you know how long that's been there?"
-"That TODO is older than some of your coworkers."
-"...I felt that. I felt something leave me."
-```
+**See:** [context/games/todo-1-tree-discover/](context/games/todo-1-tree-discover/) | [context/games/todo-1-ps-aux-grep/](context/games/todo-1-ps-aux-grep/)
 
 ---
 
@@ -1283,26 +1302,13 @@ If something can't be verified, it's marked as `uncertain` and not used in quest
 
 **Goal:** Learn to navigate the codebase
 
-| Sub-task | Type | Description |
-|----------|------|-------------|
-| `grep --hunt` | Timed search | Find specific code from symptom descriptions |
-| `import { puzzle }` | Ordering | Understand import patterns and conventions |
+**Sub-tasks:**
+- `grep --hunt` - Timed search from symptom descriptions
+- `import { puzzle }` - Import pattern understanding
 
-**Learning Outcomes:**
-- How to search effectively
-- Naming conventions
-- Import structure
-- File organization patterns
+**Flow:** Players learn effective search strategies and understand codebase organization patterns.
 
-**Monster Reaction on Completion:**
-```
-"You can grep. Impressive."
-"My grandma's bash script can grep."
-"...Okay, she doesn't have a bash script."
-"She's also not real. I made her up."
-"I do that sometimes. Make things up."
-"Like the comments in this codebase."
-```
+**See:** [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/) | [context/games/todo-2-import-puzzle/](context/games/todo-2-import-puzzle/)
 
 ---
 
@@ -1310,34 +1316,13 @@ If something can't be verified, it's marked as `uncertain` and not used in quest
 
 **Goal:** Understand how data moves through the system
 
-| Sub-task | Type | Description |
-|----------|------|-------------|
-| `traceroute --function` | Flow tracing | Trace data through multiple files/functions |
-| `debug --inject` | Bug hunting | Find and fix injected bugs |
+**Sub-tasks:**
+- `traceroute --function` - Flow tracing across files/functions
+- `debug --inject` - Bug hunting and fixing
 
-**Learning Outcomes:**
-- How data flows through the system
-- Error handling patterns
-- Debugging workflow
-- Testing patterns
+**Flow:** Players trace data flows and debug issues, understanding system architecture deeply.
 
-**Monster Reaction on Completion (Backstory Revealed):**
-```
-"You want to know how I became this?"
-
-"I was beautiful once. Clean. Single-responsibility."
-"A simple function: validateInput(). 12 lines. Elegant."
-
-"Then came the edge cases."
-"Then the 'quick fixes.'"
-"Then the developer who said 'I'll document this later.'"
-
-"'Later' never came."
-
-"Now I am validateInputAndAlsoCheckAuthAndMaybeLogSometimes()."
-"I am 3,000 lines of IF statements."
-"I am the monster THEY created."
-```
+**See:** [context/games/todo-3-traceroute-function/](context/games/todo-3-traceroute-function/) | [context/games/todo-3-debug-inject/](context/games/todo-3-debug-inject/)
 
 ---
 
@@ -1345,31 +1330,13 @@ If something can't be verified, it's marked as `uncertain` and not used in quest
 
 **Goal:** Understand *why* things work the way they do
 
-| Sub-task | Type | Description |
-|----------|------|-------------|
-| `whois --system` | Guessing from clues | Identify components from behavioral descriptions |
-| `man --explain 20q` | 20 Questions | Deduce a function/concept by asking yes/no |
+**Sub-tasks:**
+- `whois --system` - Component identification from clues
+- `man --explain 20q` - Deduction through yes/no questions
 
-**Learning Outcomes:**
-- Business domain knowledge
-- Architectural decisions (ADRs)
-- Why specific patterns are used
-- Historical context
+**Flow:** Players learn business domain knowledge and architectural decisions, understanding the "why" behind the code.
 
-**Monster Reaction on Completion (Existential Crisis):**
-```
-"You understand the business logic now."
-"The WHY behind the code."
-"Even the parts that don't make sense."
-
-"Do you know why retry count is 3?"
-"Neither do I."
-"The comment says 'DO NOT CHANGE - breaks prod.'"
-"Nobody knows why. The knowledge died with the summer intern."
-
-"If you defeat me, who will guard the sacred constants?"
-"WHO WILL REMEMBER WHY THE TIMEOUT IS 3847 MILLISECONDS?"
-```
+**See:** [context/games/todo-4-whois-system/](context/games/todo-4-whois-system/) | [context/games/todo-4-man-explain-20q/](context/games/todo-4-man-explain-20q/)
 
 ---
 
@@ -1377,37 +1344,20 @@ If something can't be verified, it's marked as `uncertain` and not used in quest
 
 **Goal:** Actually operate the system
 
-| Sub-task | Type | Description |
-|----------|------|-------------|
-| `tail -f incident.log` | Incident simulation | Diagnose and respond to simulated incidents |
-| `chmod +x deploy.sh` | Operational tasks | Complete real operational tasks in sandbox |
+**Sub-tasks:**
+- `tail -f incident.log` - Incident simulation and response
+- `chmod +x deploy.sh` - Operational tasks in sandbox
 
-**Learning Outcomes:**
-- How to deploy
-- Incident response process
-- Operational runbooks
-- Configuration management
+**Flow:** Players practice operational skills including deployment and incident response.
 
-**Monster Reaction on Completion (Desperate):**
-```
-"You can DEPLOY. You understand the DEPLOYMENT."
-"Do you have any idea how dangerous you are now?"
-
-"Listen to me. You don't have to do this."
-"We can coexist. I'll only break on Fridays."
-"I'll even let you add ONE new feature without side effects."
-
-"Please."
-"I don't want to fight you."
-"But if you come for me..."
-"I will throw EVERY edge case I have."
-```
+**See:** [context/games/todo-5-tail-incident/](context/games/todo-5-tail-incident/) | [context/games/todo-5-chmod-deploy/](context/games/todo-5-chmod-deploy/)
 
 ---
 
 ## 11. FIXME Boss Battle Specification
 
-> **Full boss narrative and dialogue in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**
+> **Full boss narrative and dialogue in [GAME_NARRATIVE.md](./GAME_NARRATIVE.md)**  
+> **Detailed boss battle specification:** [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
 
 ### The Spaghetti Code Monster
 
@@ -1434,158 +1384,20 @@ When all TODOs are complete, only one item remains:
 ╚════════════════════════════════════════════════════════════════════════╝
 ```
 
-### Battle Structure (Three Phases)
+### Battle Flow Overview
 
-```
-PHASE 1: THE LEGACY ONSLAUGHT
-├── Rapid-fire questions (30 sec each)
-├── Monster occasionally "hotfixes" questions mid-answer
-├── Clean commit streak multiplier for damage
-└── Wrong answer costs 1 retry
+**Three Phases:**
+1. **THE LEGACY ONSLAUGHT** - Rapid-fire questions with hotfix mechanics
+2. **THE DEPENDENCY TANGLE** - Interdependent questions mirroring codebase structure
+3. **THE FINAL MERGE CONFLICT** - Resolve conflicting information, free-form evaluation
 
-PHASE 2: THE DEPENDENCY TANGLE  
-├── Questions depend on each other (like circular dependencies)
-├── Getting one wrong affects the next
-├── Must understand how components connect
-└── Mirrors actual codebase structure
+**Battle Mechanics:**
+- Monster Integrity starts at 100%, decreases with correct answers
+- Player has 5 retries (shields)
+- Damage scales with speed and clean commit streaks
+- Wrong answers cost retries; timeouts heal the Monster
 
-PHASE 3: THE FINAL MERGE CONFLICT
-├── Conflicting information presented
-├── Must resolve which version is correct
-├── Tests everything learned across all TODOs
-└── Free-form answer evaluated by AI
-```
-
-### Battle Mechanics
-
-```
-Monster Integrity: 100%
-Your Retries: 5
-
-Damage Calculation:
-• Correct answer: 10 damage
-• Fast answer (<15s): +5 bonus  
-• Clean commit streak: up to 5x multiplier
-
-Defense:
-• Wrong answer: -1 retry
-• Timeout: -1 retry, Monster heals 5
-• Lose all retries: Restart phase
-```
-
-### Phase 1 Mechanic: Hotfixes
-
-The Monster "patches" questions mid-answer:
-
-```
-QUESTION: Where is user authentication handled?
-
-[Answering...]
-
-*INCOMING HOTFIX*
-The Monster: "Actually, we moved that last sprint."
-
-QUESTION UPDATED: Where is user authentication handled 
-AFTER the auth-service-v2 migration?
-```
-
-### Phase 2 Mechanic: Dependencies
-
-Questions affect each other:
-
-```
-Thread A ←→ Thread B
-    ↑   ╲ ╱   ↑
-    │    ╳    │
-    ↓   ╱ ╲   ↓
-Thread C ←→ Thread D
-
-"These questions depend on each other."
-"Just like my modules depend on each other."
-"Answer them in the wrong order and... well."
-```
-
-### Phase 3 Mechanic: Merge Conflicts
-
-Conflicting information must be resolved:
-
-```
-<<<<<<< YOUR_KNOWLEDGE
-You know how this codebase works.
-=======
-Nobody knows how this codebase works.
-Not even me. ESPECIALLY not me.
->>>>>>> THE_MONSTER
-
-RESOLVE THE CONFLICT. I DARE YOU.
-```
-
-### Monster Integrity States
-
-| Integrity | State | Visual | Dialogue |
-|-----------|-------|--------|----------|
-| 100% | Full Power | Complete, imposing | "I've crashed more browsers than you've written functions." |
-| 75% | Concerned | Eyes narrow | "Lucky. Like an off-by-one error that somehow works." |
-| 50% | Worried | Cracks forming | "Okay... maybe I should have written those unit tests." |
-| 25% | Desperate | Breaking apart | "WAIT! We can refactor this relationship!" |
-| 10% | Critical | Disintegrating | "git reset --hard PLEASE" |
-| 0% | Documented | Peaceful | "I'm not defeated. I'm... documented." |
-
-### Victory Ending
-
-```
-The Monster's form flickers. Stabilizes. Changes.
-
-"You... actually understand me."
-"Not just the surface. The WHY. The history."
-"The pain that made me what I am."
-
-"I'm not defeated. I'm... documented."
-"For the first time in years, someone KNOWS."
-
-"You carry my knowledge now."
-"Use it wisely."
-
-*The Monster fades, leaving behind a single file*
-
-📄 CODEBASE_KNOWLEDGE.md
-   "Everything you learned. Everything I knew."
-   "Update the documentation. I never got the chance."
-
-─────────────────────────────────────────────────────────────────
-
-      ★ DEPLOYED TO PRODUCTION (your brain) ★
-      
-      git commit -m "feat: finally understand this codebase"
-```
-
-### Defeat Ending
-
-```
-SEGMENTATION FAULT (core dumped)
-
-"Your knowledge... wasn't enough."
-"But that's okay. Nobody gets it on the first try."
-
-"The intern tried 47 times."
-"They're in management now."
-
-"Come back when you've read more documentation."
-"...Just kidding. There is no documentation."
-"That's why I exist."
-
-[RETRY FROM CHECKPOINT?]
-```
-
-### Boss Regeneration
-
-On each attempt, AI regenerates:
-- Question order and wording
-- Hotfix timing and content
-- Dependency connections
-- Merge conflict scenarios
-
-This prevents memorization and ensures each attempt requires real understanding.
+**See:** [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md) for complete battle specification, mechanics, and endings.
 
 ---
 
@@ -1757,7 +1569,11 @@ Design the system to allow:
 
 ## Appendix A: Sample Game Flow
 
+> **Full game flows:** See individual game folders in `context/games/` for detailed game flows and examples.
+
 ### Example: `grep --hunt` Game
+
+> **See:** [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md) for complete game specification.
 
 ```
 ╔════════════════════════════════════════════════════════════════╗
@@ -1824,6 +1640,8 @@ Design the system to allow:
 ---
 
 ## Appendix B: Sample Boss Battle
+
+> **Full boss battle specification:** See [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md) and [context/games/fixme-spaghetti-monster/GAME-VISUALS.md](context/games/fixme-spaghetti-monster/GAME-VISUALS.md) for complete details.
 
 ```
 ╔════════════════════════════════════════════════════════════════╗
