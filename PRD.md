@@ -125,24 +125,9 @@ The game's central metaphor: **Technical debt is the real monster.** Every accum
 
 ### Game Structure
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        GAME PROGRESSION                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  TODO #1: // understand what we have       ──► Discovery       │
-│  TODO #2: // figure out how to find things ──► Navigation      │
-│  TODO #3: // trace data flows (URGENT)     ──► Understanding   │
-│  TODO #4: // document why this works       ──► Business Logic  │
-│  TODO #5: // learn how to deploy safely    ──► Operations      │
-│  FIXME:   // the monster itself            ──► Final Battle    │
-│                                                                 │
-│  Each TODO: 2 sub-tasks (mini-games)                           │
-│  Each sub-task: 5-10 challenges                                │
-│  FIXME: 3 phases                                               │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+The game consists of 5 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
+
+> **See [Game Progression Diagram](./context/visuals/EXAMPLES.md#game-progression-diagram) for visual overview.**
 
 ### Game Terminology
 
@@ -375,28 +360,9 @@ FIXME: // the monster itself
 
 ### The Spaghetti Code Monster
 
-When all TODOs are complete, only one item remains:
+When all TODOs are complete, only one item remains: the FIXME boss battle.
 
-```
-╔════════════════════════════════════════════════════════════════════════╗
-║                                                                        ║
-║   ALL TODOs RESOLVED.                                                 ║
-║                                                                        ║
-║   ✓ TODO #1: understand what we have                                  ║
-║   ✓ TODO #2: figure out how to find things                            ║
-║   ✓ TODO #3: trace data flows (URGENT)                                ║
-║   ✓ TODO #4: document why this works                                  ║
-║   ✓ TODO #5: learn how to deploy safely                               ║
-║                                                                        ║
-║   Only one item remains:                                              ║
-║                                                                        ║
-║   ▣ FIXME: // CRITICAL - DO NOT IGNORE                                ║
-║   // Added: Unknown                                                   ║
-║   // Author: Unknown                                                  ║
-║   // Description: "Just... fix it. Please. Someone. Anyone."          ║
-║                                                                        ║
-╚════════════════════════════════════════════════════════════════════════╝
-```
+> **See [Boss Battle Intro Screen](./context/visuals/EXAMPLES.md#boss-battle-intro-screen) for visual example.**
 
 ### Battle Flow Overview
 
@@ -490,71 +456,6 @@ Design the system to allow:
 - New agent backends
 - Custom question templates
 - Branded themes
-
----
-
-```
-╔════════════════════════════════════════════════════════════════╗
-║  🔍 grep --hunt                                 Target: 3/5    ║
-╠════════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  HUNT TARGET:                                                  ║
-║  ┌─────────────────────────────────────────────────────────┐  ║
-║  │                                                         │  ║
-║  │  A user reports: "I can register with 'test@test' but  │  ║
-║  │  it says my email is valid. That can't be right!"      │  ║
-║  │                                                         │  ║
-║  │  TASK:                                                  │  ║
-║  │  1. Find where email validation happens at registration │  ║
-║  │  2. Identify why 'test@test' passes                     │  ║
-║  │  3. Find the test file that should have caught this    │  ║
-║  │                                                         │  ║
-║  └─────────────────────────────────────────────────────────┘  ║
-║                                                                ║
-║  YOUR FINDINGS:                                                ║
-║  ┌─────────────────────────────────────────────────────────┐  ║
-║  │  Validation file:line  > _                              │  ║
-║  │  Why it passes         > _                              │  ║
-║  │  Test file             > _                              │  ║
-║  └─────────────────────────────────────────────────────────┘  ║
-║                                                                ║
-║  ⏱️ 4:32 remaining                                            ║
-║  [H] Hint (-30 sec)  [S] Skip (-1 life)  [ENTER] Submit       ║
-╚════════════════════════════════════════════════════════════════╝
-```
-
-**After submission:**
-
-```
-╔════════════════════════════════════════════════════════════════╗
-║  ✅ CORRECT!                                    +100 XP        ║
-╠════════════════════════════════════════════════════════════════╣
-║                                                                ║
-║  📚 KNOWLEDGE UNLOCKED: Email Validation                       ║
-║  ┌─────────────────────────────────────────────────────────┐  ║
-║  │                                                         │  ║
-║  │  LOCATION: src/utils/validators.ts:23-41                │  ║
-║  │                                                         │  ║
-║  │  THE BUG: The regex only checks for @ symbol, not       │  ║
-║  │  for a valid TLD. 'test@test' has an @ so it passes.   │  ║
-║  │                                                         │  ║
-║  │  THE FIX: Use a proper email validation library like    │  ║
-║  │  'validator.js' or 'zod.string().email()'              │  ║
-║  │                                                         │  ║
-║  │  WHY IT MATTERS: This is a common security issue.      │  ║
-║  │  Invalid emails can bypass verification flows and      │  ║
-║  │  create orphaned accounts.                              │  ║
-║  │                                                         │  ║
-║  │  RELATED:                                               │  ║
-║  │  • ADR-012: Input Validation Strategy                  │  ║
-║  │  • src/utils/validators.test.ts (missing coverage!)    │  ║
-║  │                                                         │  ║
-║  └─────────────────────────────────────────────────────────┘  ║
-║                                                                ║
-║  [ENTER] Continue to next challenge                           ║
-╚════════════════════════════════════════════════════════════════╝
-```
-
 
 ---
 

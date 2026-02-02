@@ -29,7 +29,7 @@ Players are given symptom descriptions (like bug reports or user complaints) and
 
 ## Example Flow
 
-See Appendix A in PRD.md for a detailed example of the `grep --hunt` game flow, including:
+See [GAME-VISUALS.md](./GAME-VISUALS.md) for detailed visual examples of the game interface, including:
 - Hunt target presentation
 - User input collection
 - Timer mechanics
