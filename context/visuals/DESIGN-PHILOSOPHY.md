@@ -36,3 +36,26 @@
 ## Design Tone
 
 The game should feel professional yet fun—appealing to engineers who appreciate clever design without being childish or distracting.
+
+## Key Principle: Restraint
+
+Good game art is about **restraint**, not maximalism:
+
+- **One font** — `ANSI Shadow` everywhere
+- **One palette** — 5 core colors, no gradients (except victory)
+- **Minimal emojis** — ASCII symbols preferred
+- **Subtle animations** — typewriter, progress bars, nothing flashy
+
+---
+
+## Related Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [VISUAL-STYLE-GUIDE.md](./VISUAL-STYLE-GUIDE.md) | Box styles, patterns, consistency rules |
+| [TYPOGRAPHY.md](./TYPOGRAPHY.md) | Font selection, text hierarchy |
+| [COLORS.md](./COLORS.md) | Color palette, context mapping |
+| [ANIMATIONS.md](./ANIMATIONS.md) | Animation specs, timing |
+| [UI-COMPONENTS.md](./UI-COMPONENTS.md) | Progress bars, health bars, timers |
+| [EXAMPLES.md](./EXAMPLES.md) | Visual mockups, screen examples |
+| [JUICE-FEEDBACK.md](./JUICE-FEEDBACK.md) | Feedback systems, game feel |

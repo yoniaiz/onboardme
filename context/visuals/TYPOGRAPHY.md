@@ -1,47 +1,96 @@
 # Typography & Text Art
 
-## Text Art Libraries
+> **One font, used consistently.** Restraint over variety.
 
-| Library | Use Case | Example |
-|---------|----------|---------|
-| **figlet** | Big ASCII text titles | `LEVEL UP!`, `GUARDIAN`, etc. |
-| **gradient-string** | Rainbow/gradient text | Title screens, victory messages |
-| **chalk** | Basic colors | All text styling |
-| **chalk-animation** | Animated text effects | `rainbow`, `pulse`, `glitch`, `neon` |
-| **ascii-art** | Image to ASCII conversion | Monster sprites from images |
+## Font Selection
 
-## Usage Example
+Use **one figlet font** across the entire game for consistency:
+
+| Context | Font | Example |
+|---------|------|---------|
+| **All headers** | `ANSI Shadow` | Title, TODO headers, victory, defeat, boss |
+
+```typescript
+import figlet from 'figlet';
+
+// Standard header - use everywhere
+const header = figlet.textSync('ONBOARDME', { font: 'ANSI Shadow' });
+```
+
+### Why ANSI Shadow?
+
+- Clean, readable at terminal sizes
+- Tech/retro aesthetic matches the game
+- Works well with box-drawing frames
+- Widely available in figlet
+
+---
+
+## Text Styling Libraries
+
+| Library | Use Case | Status |
+|---------|----------|--------|
+| **figlet** | ASCII text headers | Required |
+| **chalk** | Text colors | Required |
+| **gradient-string** | Gradient text | Optional (victory screen only) |
+
+**Skip these:**
+- ~~chalk-animation~~ — too gimmicky
+- ~~ascii-art~~ — deprecated
+- ~~cfonts~~ — overkill, figlet is enough
+
+---
+
+## Usage Examples
+
+### Standard Header
+
+```typescript
+import figlet from 'figlet';
+import chalk from 'chalk';
+
+// Green title
+const title = figlet.textSync('TODO #1', { font: 'ANSI Shadow' });
+console.log(chalk.hex('#00ff88')(title));
+```
+
+### Victory Screen (with optional gradient)
 
 ```typescript
 import figlet from 'figlet';
 import gradient from 'gradient-string';
-import chalkAnimation from 'chalk-animation';
 
-// Big gradient title
-const title = figlet.textSync('ONBOARDME', { font: 'ANSI Shadow' });
-console.log(gradient.pastel.multiline(title));
-
-// Animated subtitle
-const rainbow = chalkAnimation.rainbow('The Quest Begins...');
-setTimeout(() => rainbow.stop(), 2000);
+// Victory with gradient (the ONE place it's allowed)
+const victory = figlet.textSync('VICTORY', { font: 'ANSI Shadow' });
+console.log(gradient.pastel.multiline(victory));
 ```
 
-## ASCII Art Resources & Tools
+### Defeat Screen
 
-| Resource | URL | Use |
-|----------|-----|-----|
-| **REXPaint** | gridsagegames.com/rexpaint | Professional ASCII art editor for roguelikes |
-| **ASCII Art Archive** | asciiart.eu | Large collection of monsters, dragons, creatures |
-| **ascii.co.uk** | ascii.co.uk/art | Detailed dragon/demon designs |
-| **terminal-kit** | npm: terminal-kit | Sprites, animations, screen buffers |
-| **terminal-game-io** | npm: terminal-game-io | Simple ASCII game frame handling |
+```typescript
+// Red for defeat
+const defeat = figlet.textSync('SEGFAULT', { font: 'ANSI Shadow' });
+console.log(chalk.hex('#ff6b6b')(defeat));
+```
 
-## Monster Design Direction
+---
 
-The Spaghetti Code Monster should be designed using proper ASCII art tools (REXPaint) or sourced/adapted from existing art. Key considerations:
-- Use **block characters** (█ ▓ ░) for shading and depth
-- Consider **ANSI colors** for dramatic effect (glowing eyes, damage states)
-- Design **multiple frames** for animation (idle, angry, damaged, documented)
-- Reference roguelike games (Dwarf Fortress, NetHack, DCSS) for creature design language
-- The Monster should feel **tangled and tragic**, not evil
-- Visual degradation should show code "untangling" as it takes damage
+## Text Hierarchy
+
+| Level | Style | Example |
+|-------|-------|---------|
+| **H1** | figlet ANSI Shadow | Game title, TODO headers |
+| **H2** | UPPERCASE + box | Section titles |
+| **H3** | Bold/bright | Sub-section titles |
+| **Body** | Normal | Regular text |
+| **Muted** | Dim/gray | Hints, secondary info |
+
+---
+
+## Monster ASCII Art
+
+The Monster is **handcrafted**, not generated. See [fixme-spaghetti-monster/GAME-VISUALS.md](../games/fixme-spaghetti-monster/GAME-VISUALS.md) for the design.
+
+---
+
+*See also: [VISUAL-STYLE-GUIDE.md](./VISUAL-STYLE-GUIDE.md) | [COLORS.md](./COLORS.md)*

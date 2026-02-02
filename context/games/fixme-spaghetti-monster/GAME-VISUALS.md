@@ -2,23 +2,97 @@
 
 ## Visual Design Notes
 
-This is the boss battle, so visuals should be dramatic and impactful. Visual elements should emphasize:
+This is the boss battle. Visual elements should be **minimalistic but impactful**:
 
-- **Monster ASCII art** designed using proper tools (REXPaint) or sourced/adapted
+- **Monster ASCII art** — small, cute, but menacing
 - **Health bar visualization** showing Monster Integrity
-- **Phase transitions** with dramatic effects
+- **Phase transitions** with subtle effects
 - **Damage animations** when Monster takes damage
 - **Victory/defeat animations** for endings
 
-## Monster Design Direction
+## Monster Design — The Spaghetti Code Monster
 
-The Spaghetti Code Monster should be designed using proper ASCII art tools (REXPaint) or sourced/adapted from existing art. Key considerations:
-- Use **block characters** (█ ▓ ░) for shading and depth
-- Consider **ANSI colors** for dramatic effect (glowing eyes, damage states)
-- Design **multiple frames** for animation (idle, angry, damaged, documented)
-- Reference roguelike games (Dwarf Fortress, NetHack, DCSS) for creature design language
-- The Monster should feel **tangled and tragic**, not evil
-- Visual degradation should show code "untangling" as it takes damage
+A minimalistic design that communicates "code monster" through:
+- `{ }` curly braces as the body frame
+- `~~~~` wavy lines representing tangled spaghetti code
+- `╱│││╲` tentacles/dependencies hanging below
+- Visual degradation as health decreases
+
+### Health States
+
+**100% — Full Power**
+```
+     ╭─────────╮
+     │ { ◉ ◉ } │
+     │  ~~~~   │
+     ╰────┬────╯
+       ╱│││╲
+```
+
+**75% — Concerned**
+```
+     ╭─────────╮
+     │ { ◉ ◉ } │
+     │  ~~~    │
+     ╰────┬────╯
+       ╱││╲
+```
+
+**50% — Worried**
+```
+     ╭─────────╮
+     │ { ◉ _ } │
+     │  ~~     │
+     ╰────┬────╯
+       ╱│╲
+```
+
+**25% — Desperate**
+```
+     ╭ ─ ─ ─ ─╮
+     │ { x _ } │
+     │   ~     │
+     ╰────┬────╯
+        │
+```
+
+**10% — Critical**
+```
+     ╭  ─  ─  ╮
+     │ { x x } │
+     │         │
+     ╰ ─ ─┬─ ─╯
+```
+
+**0% — Documented (Peaceful)**
+```
+     ╭─────────╮
+     │ { - - } │
+     │   __    │
+     ╰─────────╯
+```
+
+### With Speech Bubble (Dialogue Display)
+
+```
+ ╭────────────────────────────────────╮
+ │ "I've crashed more browsers than   │
+ │  you've written functions."        │
+ ╰──────────────────┬─────────────────╯
+                    │
+               ╭─────────╮
+               │ { ◉ ◉ } │
+               │  ~~~~   │
+               ╰────┬────╯
+                 ╱│││╲
+```
+
+## Design Principles
+
+- **Minimalistic** — small footprint, easy to render
+- **Expressive** — conveys emotion through simple changes (eyes, tentacles)
+- **Code-themed** — curly braces and squiggles = spaghetti code
+- **Degradation** — visual "untangling" as it takes damage (fewer ~, fewer tentacles)
 
 ## Health Bars with Character
 

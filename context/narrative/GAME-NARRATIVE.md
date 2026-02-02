@@ -380,53 +380,60 @@ Subtle reminders the Monster is present:
 
 ## 7. Visual Direction
 
-### Monster ASCII Art Concepts
+### Monster ASCII Art — Minimalistic Design
 
-**Full Power (100%)**
+The Monster uses a small, expressive design that communicates "spaghetti code" through curly braces, wavy lines, and tentacle-like dependencies.
+
+**100% — Full Power**
 ```
-        ╭─────────────────────────────╮
-        │    ╱╲    ╱╲    ╱╲          │
-        │   ╱  ╲  ╱  ╲  ╱  ╲         │
-        │  (●  ●)(●  ●)(●  ●)        │
-        │   ╲  ╱  ╲  ╱  ╲  ╱         │
-        │    ╲╱────╲╱────╲╱          │
-        │     ▓▓▓▓▓▓▓▓▓▓▓▓▓          │
-        │    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓         │
-        │   ╱▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╲        │
-        │  ╱ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ╲       │
-        │ ╱  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ╲      │
-        ╰─────────────────────────────╯
+     ╭─────────╮
+     │ { ◉ ◉ } │
+     │  ~~~~   │
+     ╰────┬────╯
+       ╱│││╲
 ```
 
-**Damaged (50%)**
+**50% — Worried**
 ```
-        ╭─────────────────────────────╮
-        │    ╱╲    ╱     ╱╲          │
-        │   ╱  ╲  ╱     ╱  ╲         │
-        │  (●  ●)(x   )(●  ●)        │
-        │   ╲  ╱  ╲   ╱ ╲  ╱         │
-        │    ╲╱    ╲╱   ╲╱           │
-        │     ▓▓▓░░░░░▓▓▓▓           │
-        │    ▓▓▓░░░░░░░░▓▓▓          │
-        │   ╱▓▓░░ HELP ░░▓▓╲         │
-        │  ╱ ▓░░░░░░░░░░░░▓ ╲        │
-        ╰─────────────────────────────╯
+     ╭─────────╮
+     │ { ◉ _ } │
+     │  ~~     │
+     ╰────┬────╯
+       ╱│╲
 ```
 
-**Critical (10%)**
+**10% — Critical**
 ```
-        ╭─────────────────────────────╮
-        │         ╱           ╲      │
-        │        ╱             ╲     │
-        │  (x   )      (x   )(x   )  │
-        │   ╲  ╱        ╲   ╱       │
-        │          ░░░░              │
-        │     ░░░░░░░░░░░░           │
-        │    ░// TODO: ░░░░          │
-        │   ░░ respawn ░░░░          │
-        │  ░░░░░░░░░░░░░░░░░         │
-        ╰─────────────────────────────╯
+     ╭  ─  ─  ╮
+     │ { x x } │
+     │         │
+     ╰ ─ ─┬─ ─╯
 ```
+
+**0% — Documented (Peaceful)**
+```
+     ╭─────────╮
+     │ { - - } │
+     │   __    │
+     ╰─────────╯
+```
+
+### With Dialogue
+
+```
+ ╭────────────────────────────────────╮
+ │ "I've crashed more browsers than   │
+ │  you've written functions."        │
+ ╰──────────────────┬─────────────────╯
+                    │
+               ╭─────────╮
+               │ { ◉ ◉ } │
+               │  ~~~~   │
+               ╰────┬────╯
+                 ╱│││╲
+```
+
+> **Full visual specifications:** See [fixme-spaghetti-monster/GAME-VISUALS.md](../games/fixme-spaghetti-monster/GAME-VISUALS.md)
 
 ### Screen Templates
 
