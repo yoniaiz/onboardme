@@ -19,10 +19,10 @@ todos:
     status: completed
   - id: implement-juice
     content: Implement juice/feedback specs across all games
-    status: pending
+    status: completed
   - id: update-docs
     content: Update PRD and game files with agreed changes
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -597,27 +597,27 @@ TOTAL: ~97 min (8 games + boss battle)
 - [context/games/todo-2-grep-hunt/GAME.md](context/games/todo-2-grep-hunt/GAME.md)
 - [context/games/todo-2-feature-locate/GAME.md](context/games/todo-2-feature-locate/GAME.md)
 
-### TODO #1 Games (DEPRECATED)
+### Juice/Feedback Documentation
 
-- ~~[context/games/todo-1-tree-discover/GAME.md](context/games/todo-1-tree-discover/GAME.md)~~ → Replaced
-- ~~[context/games/todo-1-ps-aux-grep/GAME.md](context/games/todo-1-ps-aux-grep/GAME.md)~~ → Replaced
+- [context/visuals/JUICE-FEEDBACK.md](context/visuals/JUICE-FEEDBACK.md) - NEW
 
-### TODO #2 Games (DEPRECATED)
+### Deleted Game Files
 
-- ~~[context/games/todo-2-import-puzzle/GAME.md](context/games/todo-2-import-puzzle/GAME.md)~~ → Replaced by feature --locate
+The following games were deprecated and deleted:
+- `todo-1-tree-discover/` → Replaced by `npm start --challenge`
+- `todo-1-ps-aux-grep/` → Replaced by `flow --trace`
+- `todo-2-import-puzzle/` → Replaced by `feature --locate`
+- `todo-3-traceroute-function/` → Redundant with `flow --trace`
+- `todo-3-debug-inject/` → Redundant with `grep --hunt`
+- `todo-4-whois-system/` → Can't generate content
+- `todo-4-man-explain-20q/` → Can't generate content
+- `todo-5-tail-incident/` → Can't generate content
+- `todo-5-chmod-deploy/` → Can't generate content
 
 ### FIXME Boss Battle (UPDATED)
 
 - [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md)
 
-### TODO #3-5 Games (DEPRECATED - CUT)
-
-- ~~[context/games/todo-3-traceroute-function/GAME.md](context/games/todo-3-traceroute-function/GAME.md)~~ → Redundant with flow --trace
-- ~~[context/games/todo-3-debug-inject/GAME.md](context/games/todo-3-debug-inject/GAME.md)~~ → Redundant with grep --hunt
-- ~~[context/games/todo-4-whois-system/GAME.md](context/games/todo-4-whois-system/GAME.md)~~ → Can't generate content
-- ~~[context/games/todo-4-man-explain-20q/GAME.md](context/games/todo-4-man-explain-20q/GAME.md)~~ → Can't generate content
-- ~~[context/games/todo-5-tail-incident/GAME.md](context/games/todo-5-tail-incident/GAME.md)~~ → Can't generate content
-- ~~[context/games/todo-5-chmod-deploy/GAME.md](context/games/todo-5-chmod-deploy/GAME.md)~~ → Can't generate content
 
 ### Core Documentation
 
