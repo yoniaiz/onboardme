@@ -124,19 +124,72 @@ When completing a game/TODO:
 
 ## 5. Monster Watching Indicators
 
-Subtle reminders the Monster is present during gameplay:
+Subtle reminders the Monster is present during gameplay. Each indicator includes Monster sound effects for atmosphere.
 
+### Indicator Format
 ```
-"I've seen faster type inference..." — The Monster
-"Even my deprecated methods work faster." — The Monster  
-"This is giving 'undefined is not a function' energy." — The Monster
+*[sound]* "[comment]" *[sound]*
 ```
 
-**Rules:**
+### Indicator Library
+
+**Impatience (10+ seconds idle):**
+```
+*tap tap tap* "...Still thinking?" *drip*
+*kzzzt* "Take your time. I've got seven years of patience left." *kzzzt*
+*whirrrr* "Processing... oh wait, that's you." *heh*
+*crackle* "The timeout for this isn't infinite, you know." *crackle*
+```
+
+**Mocking (player struggling):**
+```
+*kzzzt* "I've seen faster type inference..." *kzzzt*
+*slrrrrp* "Even my deprecated methods work faster." *CLICK*
+*static* "This is giving 'undefined is not a function' energy." *heh*
+*tangle* "The intern got this one on the first try." *pause* "Just saying." *slrrrrp*
+```
+
+**Creepy (atmosphere building):**
+```
+*drip... drip...* "I'm not going anywhere." *slrrrrp*
+*creak* "The code watches. I watch. Same thing." *creak*
+*hummmmm* "Every keystroke echoes in here." *hummmmm*
+*static* "I can hear you thinking. It's... slow." *kzzzt*
+```
+
+**Observational (player exploring):**
+```
+*kzzzt* "Interesting approach. Wrong, but interesting." *kzzzt*
+*whirrrr* "Is that... is that how you indent?" *static spike*
+*crackle* "I've seen interns debug faster. In COBOL." *crackle*
+*slrrrrp* "You're getting warmer. Or colder. I forget which is good." *heh*
+```
+
+**Boss Battle Specific:**
+```
+*KZZZT* "Is that all you've got?" *HRRRRNN*
+*tangle tangle* "I've survived twelve refactoring attempts." *crackle*
+*static spike* "The last engineer who got this far..." *pause* "...nevermind." *slrrrrp*
+*creak* "Even if you win, who maintains me after you leave?" *drip*
+```
+
+### Display Rules
 - Appear after 10+ seconds of no input
 - Fade in slowly (not jarring)
-- Different message each time
+- Different message each time (no repeats until all shown)
 - Never block gameplay
+- Sound effects displayed with italics styling
+- Monster attribution shown subtly: `— The Monster`
+
+### Visual Styling
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   *kzzzt* "I've seen faster type inference..." *kzzzt*     │
+│                                          — The Monster      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 

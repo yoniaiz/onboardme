@@ -1,28 +1,31 @@
 # CLI Commands
 
+> **Clear, professional command documentation. Every command does exactly what it says.**
+
 ## Core Commands
 
+| Command | Purpose | Quick Example |
+|---------|---------|---------------|
+| `onboardme init` | Initialize OnboardMe for this repository | `onboardme init --agent=cursor` |
+| `onboardme start` | Start or resume your game | `onboardme start` |
+| `onboardme status` | View your current progress | `onboardme status` |
+| `onboardme knowledge` | Browse unlocked documentation | `onboardme knowledge auth` |
+| `onboardme reset` | Start over (preserves high scores) | `onboardme reset --hard` |
+| `onboardme config` | View or modify settings | `onboardme config theme dark` |
+
 ```bash
-# Initialize OnboardMe for this repository
+# Quick reference
 onboardme init [--agent=cursor|claude|opencode]
-
-# Start or resume the game
 onboardme start
-
-# Show current progress
 onboardme status
-
-# View unlocked knowledge
 onboardme knowledge [topic]
-
-# Reset progress (start over)
 onboardme reset [--hard]
-
-# Configuration
 onboardme config [key] [value]
 ```
 
 ## Development/Debug Commands
+
+For testing and debugging game content:
 
 ```bash
 # Test a specific game in isolation
@@ -31,27 +34,38 @@ onboardme game:test <game-id> [--verbose] [--fixture=<path>]
 # List all registered games
 onboardme game:list
 
-# Preview generated questions for a game (without playing)
+# Preview generated questions (without playing)
 onboardme game:preview <game-id>
 
 # Regenerate questions for a specific level/game
 onboardme regenerate [--level=<n>] [--game=<id>]
 
-# Dump gathered context (for debugging)
+# Dump gathered codebase context (debugging)
 onboardme debug:context
 
 # Validate all generated questions (paths exist, etc.)
 onboardme debug:validate
 ```
 
+---
+
 ## Command Details
 
 ### `onboardme init`
 
+**What it does:** Scans your codebase, generates questions, and awakens the Monster.
+
+**Usage:**
+```bash
+onboardme init                    # Auto-detect agent
+onboardme init --agent=cursor     # Specify agent explicitly
+```
+
+**Output:**
 ```
 $ onboardme init
 
-🔍 SCANNING THE REALM...
+🔍 SCANNING CODEBASE...
 
 Detecting agent framework...
   ✓ Found: Claude Code
@@ -78,42 +92,86 @@ Phase 4: Game Generation           ███████████████
 
 ✅ INITIALIZATION COMPLETE
 
-The Spaghetti Code Monster stirs...
-Born from: 234 TODOs, the legendary processPayment() (1,847 lines)
-"I've been waiting for someone like you."
+*kzzzt*
 
-Run 'onboardme start' to begin your quest.
+Something stirs in the depths...
+
+*crackle*
+
+The Spaghetti Code Monster awakens.
+Origin: 234 forgotten TODOs. The legendary processPayment() — 1,847 lines.
+
+*slrrrrp*
+
+"Finally. Fresh documentation..."
+
+*[CONNECTION ESTABLISHED]*
+
+Run 'onboardme start' to begin.
 ```
+
+---
 
 ### `onboardme start`
 
+**What it does:** Launches the game or resumes from your last checkpoint.
+
+**Usage:**
+```bash
+onboardme start                   # Continue from last position
+onboardme start --todo=2          # Jump to specific TODO (if unlocked)
+```
+
+**Output:**
 ```
 $ onboardme start
 
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
-║              ⚔️ ONBOARDME: THE QUEST BEGINS ⚔️                  ║
+║                    ░█████╗░███╗░░██╗██████╗░                   ║
+║                    ██╔══██╗████╗░██║██╔══██╗                   ║
+║                    ██║░░██║██╔██╗██║██████╦╝                   ║
+║                    ██║░░██║██║╚████║██╔══██╗                   ║
+║                    ╚█████╔╝██║░╚███║██████╦╝                   ║
+║                    ░╚════╝░╚═╝░░╚══╝╚═════╝░                   ║
 ║                                                                ║
-║  Welcome, Engineer.                                            ║
+║                    ══════════════════════                      ║
+║                       THE QUEST BEGINS                         ║
+║                    ══════════════════════                      ║
 ║                                                                ║
-║  Deep within this codebase lies THE ANCIENT LEDGER OF ACME.   ║
-║  To defeat it, you must first understand its realm.           ║
+║  Your mission: Understand this codebase. Defeat the Monster.  ║
 ║                                                                ║
-║  Your journey:                                                 ║
-║    L1  ./init           Discover what exists                  ║
-║    L2  cd ./deeper      Learn to navigate                     ║
-║    L3  cat ./deep-dive  Understand components                 ║
-║    L4  man domain       Master the business logic             ║
-║    L5  sudo ./execute   Prove you can operate                 ║
-║    👑  THE GUARDIAN     Final confrontation                   ║
+║  CRITICAL TODOs:                                               ║
+║    □ TODO #0: // understand what we have                      ║
+║    □ TODO #1: // trace flows and run the app                  ║
+║    □ TODO #2: // find bugs and plan features                  ║
+║    ▣ FIXME:   // the monster itself                           ║
 ║                                                                ║
-║                    [PRESS ENTER TO BEGIN]                     ║
+║  *kzzzt*                                                       ║
+║                                                                ║
+║  "So. You're the new one."                                    ║
+║  "Let's see how long you last."                               ║
+║                                                                ║
+║  *slrrrrp*                                                     ║
+║                                                                ║
+║                      [PRESS ENTER TO BEGIN]                    ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 ```
 
+---
+
 ### `onboardme status`
 
+**What it does:** Shows your current progress, stats, and the Monster's health.
+
+**Usage:**
+```bash
+onboardme status                  # Full status display
+onboardme status --brief          # One-line summary
+```
+
+**Output:**
 ```
 $ onboardme status
 
@@ -124,21 +182,84 @@ $ onboardme status
 ║  Monster: The Spaghetti Code Monster                          ║
 ║  Integrity: ████████░░░░░░░░░░░░ 40%                          ║
 ║                                                                ║
+║  *kzzzt* "You're still here? Persistent." *kzzzt*             ║
+║                                                                ║
 ║  CRITICAL TODOs:                                              ║
 ║  ────────────────────────────────────────────────────────     ║
-║  ✓ TODO #1: // understand what we have        RESOLVED        ║
-║  ✓ TODO #2: // figure out how to find things  RESOLVED        ║
-║  → TODO #3: // trace data flows (URGENT)      IN PROGRESS     ║
-║  ○ TODO #4: // document why this works        BLOCKED         ║
-║  ○ TODO #5: // learn how to deploy safely     BLOCKED         ║
+║  ✓ TODO #0: // understand what we have        RESOLVED        ║
+║  ✓ TODO #1: // trace flows and run the app    RESOLVED        ║
+║  → TODO #2: // find bugs and plan features    IN PROGRESS     ║
 ║  ▣ FIXME:   // the monster itself             LOCKED          ║
 ║                                                                ║
 ║  STATS:                                                        ║
+║  ────────────────────────────────────────────────────────     ║
 ║  • Total Commits: 2,340                                       ║
-║  • Challenges: 38/47 correct (81%)                            ║
+║  • Accuracy: 38/47 correct (81%)                              ║
 ║  • Time played: 2h 34m                                        ║
 ║  • Longest clean streak: 7                                    ║
 ║                                                                ║
 ║  Run 'onboardme start' to continue.                           ║
 ╚════════════════════════════════════════════════════════════════╝
 ```
+
+---
+
+### `onboardme knowledge`
+
+**What it does:** Browse documentation you've unlocked through gameplay.
+
+**Usage:**
+```bash
+onboardme knowledge               # List all unlocked topics
+onboardme knowledge auth          # View specific topic
+onboardme knowledge --all         # List all topics (including locked)
+```
+
+**Output:**
+```
+$ onboardme knowledge
+
+╔════════════════════════════════════════════════════════════════╗
+║  📚 UNLOCKED KNOWLEDGE                                         ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  You've documented 12 topics:                                  ║
+║                                                                ║
+║  ✓ project-structure    How the codebase is organized         ║
+║  ✓ tech-stack           Languages, frameworks, and tools      ║
+║  ✓ auth-flow            How authentication works              ║
+║  ✓ database-schema      Main entities and relationships       ║
+║  ✓ api-endpoints        Available routes and handlers         ║
+║  ✓ test-patterns        How tests are organized               ║
+║  ○ deployment           [LOCKED - Complete TODO #2]           ║
+║  ○ monitoring           [LOCKED - Complete TODO #2]           ║
+║                                                                ║
+║  Use 'onboardme knowledge <topic>' to view details.           ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Error Messages
+
+Errors are designed to be helpful, not just informative:
+
+| Error | Message | What to Do |
+|-------|---------|------------|
+| Not initialized | `No .onboardme found. Run 'onboardme init' first.` | Run init in repo root |
+| Invalid game | `Game 'xyz' not found. Run 'onboardme game:list' to see available games.` | Check game ID spelling |
+| Locked content | `TODO #3 is locked. Complete TODO #2 first.` | Progress sequentially |
+| Agent not detected | `Could not detect agent. Use --agent flag to specify.` | Add explicit `--agent=` |
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | Invalid arguments |
+| 3 | Not initialized |
+| 4 | Game validation failed |

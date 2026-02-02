@@ -1,6 +1,6 @@
 # Game Terminology
 
-All game elements use code-themed naming:
+> **All game elements use code-themed naming for consistency and immersion.**
 
 | Generic Term | Code-Themed Term | Context |
 |--------------|-----------------|---------|
@@ -41,3 +41,32 @@ All game elements use code-themed naming:
 | All TODOs done | `All tickets closed. FIXME remains.` |
 | Victory | `Deployed to PRODUCTION (your brain)` |
 | Defeat | `SEGMENTATION FAULT (core dumped)` |
+
+## Monster Sound Vocabulary
+
+The Monster has a distinctive sonic identity. For the complete style guide, see [MONSTER-VOICE.md](./MONSTER-VOICE.md).
+
+### Quick Reference
+
+| Sound | Written As | Meaning |
+|-------|-----------|---------|
+| Static burst | `*kzzzt*` | Appearing, transitioning |
+| Processing | `*whirrrr*` | Thinking, calculating |
+| Growl | `*hrrrrnn*` | Threatening |
+| Code tangle | `*tangle*` | Frustration, memories |
+| Slither | `*slrrrrp*` | Movement, creepy |
+| Laugh | `*heh*` | Mocking |
+| Creak | `*creak*` | Age, atmosphere |
+| Drip | `*drip*` | Suspense |
+
+### Exit Tags
+
+| Tag | Context |
+|-----|---------|
+| `*[DISCONNECTED]*` | Normal departure |
+| `*[SIGNAL LOST]*` | Normal departure |
+| `*[CARRIER LOST]*` | Abrupt departure |
+| `*[TRANSMISSION ENDED]*` | Formal departure |
+| `*[BOSS BATTLE INITIATED]*` | Pre-boss |
+| `*[DOCUMENTED]*` | Victory |
+| `*[IMPRESSED — BUT DON'T TELL ANYONE]*` | Grudging respect |

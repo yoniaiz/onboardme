@@ -99,9 +99,48 @@ See [GAME-VISUALS.md](./GAME-VISUALS.md) for screen mockups and visual design.
 After completing this sub-task, the Monster watches with narrowed eyes:
 
 ```
-"Hmm. You actually looked before you leaped."
+*crackle*
+
+*something shifts in the codebase*
+
+"Hmm."
+
+*tangle tangle*
+
+"You actually looked before you leaped."
+
+*slrrrrp*
+
 "Examined the evidence. Drew conclusions."
+
+*pause*
+
+"Identified the tech stack without grep'ing for 'framework'."
+
+*static spike*
+
 "That's... that's not how this usually goes."
-"Usually they just grep for 'TODO' and start typing."
+
+*whirrrr*
+
+"Usually they just open package.json, say 'ah, JavaScript,'
+ and start typing things."
+
+*creak*
+
+"You're methodical."
+
+*pause*
+
+"I don't like methodical."
+
+*hrrrrnn*
+
+"Methodical people find things."
+
+*kzzzt*
+
 "I'm watching you."
+
+*[SIGNAL LOST]*
 ```

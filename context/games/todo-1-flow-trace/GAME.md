@@ -130,12 +130,57 @@ Trail structure adapts to architecture:
 ## Monster Reaction on Completion
 
 ```
-"Oh, you can follow a trail."
+*kzzzt*
+
+"Oh."
+
+*pause*
+
+"You can follow a trail."
+
+*crackle*
+
 "Entry point to database. How methodical."
+
+*slrrrrp*
+
+"Request comes in here... flows through there... saves down here..."
+
+*tangle*
+
 "You know what else follows trails?"
-"Debuggers. Debug-gers."
+
+*pause*
+
+"Debuggers."
+
+*whirrrr*
+
+"Debug-gers."
+
+*static spike*
+
 "...That wasn't a compliment."
+
+*creak*
+
+"The thing about trails..."
+
+*hrrrrnn*
+
+"...is they go BOTH ways."
+
+*tangle tangle*
+
 "Anyway. Let's see if you can find where the BUGS live."
+
+*slrrrrp*
+
+"I've hidden a few just for you."
+
+*heh*
+
+*[CARRIER LOST]*
 ```
 
 ## Visual Reference

@@ -90,12 +90,59 @@ Fullstack        → Mix of frontend + backend challenges
 ## Monster Reaction on Completion
 
 ```
+*LOUD STATIC*
+
+"..."
+
+*the noise stabilizes*
+
 "You got it running."
+
+*creak*
+
 "On the first try."
+
+*processing... processing...*
+
 "Do you have any idea how long it took the LAST person?"
-"Three days. THREE DAYS."
+
+*whirrrr*
+
+"Three days."
+
+*tangle*
+
+"THREE DAYS."
+
+*static spike*
+
 "They kept asking 'but where's the Main class?'"
-"...I'm not worried. This is the easy part."
+
+*crackle*
+
+"It's JavaScript. THERE IS NO MAIN CLASS."
+
+*slrrrrp*
+
+"They're in finance now."
+
+*heh*
+
+"...I'm not worried."
+
+*pause*
+
+"This is the easy part. Running code."
+
+*hrrrrnn*
+
+"Understanding code? That's where they all fail."
+
+*kzzzt*
+
+"Keep going. I dare you."
+
+*[TRANSMISSION ENDED]*
 ```
 
 ## Visual Reference

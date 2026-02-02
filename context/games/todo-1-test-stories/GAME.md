@@ -140,11 +140,61 @@ Different test frameworks, same concept:
 After completing all TODO #1 sub-tasks:
 
 ```
-"You completed a TODO? AN ACTUAL TODO?"
+*CRACKLE*
+
+*the static surges*
+
+"You completed a TODO?"
+
+*pause*
+
+"AN ACTUAL TODO?"
+
+*static spike*
+
 "Do you know how long that's been there?"
+
+*whirrrr... calculating*
+
 "That TODO is older than some of your coworkers."
-"...I felt that. Something just... left me."
-"It's fine. I have PLENTY more where that came from."
+
+*tangle*
+
+"Added by @sarah-dev-2019."
+
+*creak*
+
+"She's a CTO now. Different company."
+
+*pause*
+
+"Still has nightmares about this codebase."
+
+*kzzzzzt*
+
+"...I felt that."
+
+*the static wavers*
+
+"Something just... left me."
+
+*drip*
+
+"A piece of me. Gone. Documented."
+
+*slrrrrp*
+
+"It's fine."
+
+*HRRRRNN*
+
+"I have PLENTY more where that came from."
+
+*tangle tangle tangle*
+
+"TODO #2 awaits. This time it gets REAL."
+
+*[TODO #1 RESOLVED — INTEGRITY REDUCED]*
 ```
 
 ## Visual Reference

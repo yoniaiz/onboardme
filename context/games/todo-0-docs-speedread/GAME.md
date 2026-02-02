@@ -90,9 +90,55 @@ See [GAME-VISUALS.md](./GAME-VISUALS.md) for screen mockups and visual design.
 After completing this sub-task, the Monster stirs:
 
 ```
+*kzzzzzt*
+
+*the static resolves into something like a voice*
+
 "You read the documentation?"
+
+*pause*
+
 "ACTUALLY read it?"
-"...I didn't even know we HAD documentation."
+
+*crackle*
+
+"Hmm."
+
+*slrrrrp*
+
+"I didn't even know we HAD documentation."
+
+*whirrrr*
+
 "I mean, I knew. I've been here since the beginning."
+
+*creak*
+
 "I just assumed it was all lies by now."
+
+*tangle*
+
+"The README hasn't been updated since..."
+
+*processing*
+
+"...2019."
+
+*heh*
+
+"Surprised it didn't just say 'TODO: write docs.'"
+
+*static spike*
+
+"You're different. Most people skip straight to the code."
+
+*pause*
+
+"Interesting."
+
+*the static fades*
+
+"I'll be watching."
+
+*[DISCONNECTED]*
 ```

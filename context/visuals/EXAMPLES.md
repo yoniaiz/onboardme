@@ -72,9 +72,12 @@
 ║  FIXME: The Spaghetti Code Monster              Phase 1 of 3        ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║                                                                      ║
+║   *kzzzt*                                                            ║
+║                                                                      ║
 ║   ╭────────────────────────────────────╮                             ║
 ║   │ "Nobody needs to know why that     │                             ║
 ║   │  timeout is 3847ms."               │                             ║
+║   │                              *hrrrrnn* │                         ║
 ║   ╰──────────────────┬─────────────────╯                             ║
 ║                      │                                               ║
 ║                 ╭─────────╮                                          ║
@@ -112,12 +115,18 @@
 ║                                                                   ║
 ║    ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★     ║
 ║                                                                   ║
+║   *the static... softens*                                         ║
+║                                                                   ║
 ║                 ╭─────────╮                                       ║
 ║                 │ { - - } │                                       ║
 ║                 │   __    │                                       ║
 ║                 ╰─────────╯                                       ║
 ║                                                                   ║
+║   *gentle hum*                                                    ║
+║                                                                   ║
 ║            "I'm not defeated. I'm... documented."                 ║
+║                                                                   ║
+║   *[DOCUMENTED]*                                                  ║
 ║                                                                   ║
 ║                    You are now a true                             ║
 ║                   CODEBASE MASTER                                 ║

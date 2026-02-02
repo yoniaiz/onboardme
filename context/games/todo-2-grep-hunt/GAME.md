@@ -167,15 +167,66 @@ Bug scenarios adapt to project type:
 
 ## Monster Reaction on Completion
 
-After completing both TODO #2 games:
+After completing the bug hunt:
 
 ```
-"You can grep. Impressive."
+*crackle crackle crackle*
+
+"You found the bug."
+
+*pause*
+
+"The actual bug. Not just... somewhere near it."
+
+*static spike*
+
+"Most people mark the whole file and hope for partial credit."
+
+*slrrrrp*
+
+"You can grep."
+
+*whirrrr*
+
+"Impressive."
+
+*tangle*
+
 "My grandma's bash script can grep."
+
+*pause*
+
 "...Okay, she doesn't have a bash script."
+
+*crackle*
+
 "She's also not real. I made her up."
+
+*heh*
+
 "I do that sometimes. Make things up."
+
+*tangle tangle*
+
 "Like the comments in this codebase."
+
+*creak*
+
+"'// TODO: fix this properly' — written 2018."
+
+*drip*
+
+"'// temporary workaround' — still in production."
+
+*heheheh*
+
+"The lies we tell ourselves."
+
+*kzzzt*
+
+"...The lies I tell YOU."
+
+*[CARRIER LOST]*
 ```
 
 ## Visual Reference

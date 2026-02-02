@@ -262,119 +262,352 @@ When a TODO is completed:
 
 ## 6. Dialogue & Voice
 
+> **See [MONSTER-VOICE.md](./MONSTER-VOICE.md) for the complete Monster voice style guide.**
+
 ### Writing Guidelines
 
-1. **Reference real developer pain** — TODOs, legacy code, missing docs
-2. **Self-deprecating** — Monster knows it's a mess
-3. **Dramatic escalation** — Over-the-top reactions to player progress
-4. **Fourth wall breaks** — Acknowledge the game/terminal
-5. **Callback humor** — Reference earlier moments
+1. **Use the Monster sound vocabulary** — `*kzzzt*`, `*slrrrrp*`, `*tangle*`
+2. **Reference real developer pain** — TODOs, legacy code, missing docs
+3. **Self-deprecating** — Monster knows it's a mess
+4. **Dramatic escalation** — Over-the-top reactions to player progress
+5. **Fourth wall breaks** — Acknowledge the game/terminal
+6. **Callback humor** — Reference earlier moments
+7. **Signature entry/exit patterns** — Consistent sonic identity
 
 ### Sample Dialogue by TODO
 
+#### TODO #0 Completion (First Appearance)
+```
+*kzzzt*
+
+*the static resolves into something like a voice*
+
+"So. You can see how the pieces connect."
+
+*crackle*
+
+"User to Organization to Project to Task..."
+
+*slrrrrp*
+
+"Impressive. That's almost correct."
+
+*tangle*
+
+"I mean, there's also a UserOrganizationProjectTaskLegacyBridge table."
+
+*pause*
+
+"Don't ask. Nobody asks."
+
+*whirrrr*
+
+"...Alright. You passed the warmup."
+
+*hrrrrnn*
+
+"Now let's see what you're really made of."
+
+*[SIGNAL LOST]*
+```
+
 #### TODO #1 Completion
 ```
-"Oh. You figured out the folder structure."
+*kzzzt*
+
+"Oh."
+
+*static resolves*
+
+"You figured out the folder structure."
+
+*pause*
+
 "Congratulations. You've passed the part where most give up
  and just grep everything."
 
+*slrrrrp*
+
 "But you've only seen the SURFACE."
+
+*creak*
+
 "The clean parts. The documented parts."
 "The parts they WANT you to see."
 
+*hrrrrnn*
+
 "Go deeper. I dare you."
+
+*[DISCONNECTED]*
 ```
 
 #### TODO #2 Completion
 ```
-"You can grep. Impressive."
+*crackle crackle crackle*
+
+"You can grep."
+
+*pause*
+
+"Impressive."
+
+*slrrrrp*
+
 "My grandma's bash script can grep."
+
+*static*
+
 "...Okay, she doesn't have a bash script."
 "She's also not real. I made her up."
+
+*whirrrr*
+
 "I do that sometimes. Make things up."
+
+*tangle tangle*
+
 "Like the comments in this codebase."
+
+*heh. heheheh.*
+
+*[CARRIER LOST]*
 ```
 
 #### TODO #3 Completion (Backstory)
 ```
+*kzzzt*
+
+*long pause*
+
+*drip... drip...*
+
 "You want to know how I became this?"
 
-"I was beautiful once. Clean. Single-responsibility."
-"A simple function: validateInput(). 12 lines. Elegant."
+*the static softens*
+
+"I was beautiful once."
+
+*creak*
+
+"Clean. Single-responsibility. A simple function."
+
+*wistful whirrrr*
+
+"validateInput(). Twelve lines. Elegant."
+
+*crackle*
 
 "Then came the edge cases."
+
+*tangle*
+
 "Then the 'quick fixes.'"
+
+*tangle tangle*
+
 "Then the developer who said 'I'll document this later.'"
+
+*TANGLE TANGLE TANGLE*
 
 "'Later' never came."
 
+*silence*
+
+*kzzzzzzt*
+
 "Now I am validateInputAndAlsoCheckAuthAndMaybeLogSometimes()."
 "I am 3,000 lines of IF statements."
+
+*hrrrrrrrrrrnnnnnn*
+
 "I am the monster THEY created."
+
+*[TRANSMISSION ENDED]*
 ```
 
 #### TODO #4 Completion (Existential Crisis)
 ```
+*crackle*
+
 "You understand the business logic now."
+
+*whirrrr*
+
 "The WHY behind the code."
+
+*pause*
+
 "Even the parts that don't make sense."
+
+*tangle*
+
 "Even the parts that NEVER made sense."
 
+*static spike*
+
 "Do you know why retry count is 3?"
+
+*pause*
+
 "Neither do I."
+
+*creak*
+
 "The comment says 'DO NOT CHANGE - breaks prod.'"
+
+*drip*
+
 "Nobody knows why. The knowledge died with the summer intern."
 
+*HRRRRNN*
+
 "If you defeat me, who will guard the sacred constants?"
+
+*the static builds*
+
 "WHO WILL REMEMBER WHY THE TIMEOUT IS 3847 MILLISECONDS?"
+
+*0x5441494D454F5554*
+
+*[EXISTENTIAL CRISIS MODE]*
 ```
 
 #### TODO #5 Completion (Desperate)
 ```
-"You can DEPLOY. You understand the DEPLOYMENT."
+*LOUD STATIC*
+
+"You can DEPLOY."
+
+*static spike*
+
+"You understand the DEPLOYMENT."
+
+*HRRRRRRNNNN*
+
 "Do you have any idea how dangerous you are now?"
 
+*crackle crackle*
+
 "Listen to me. You don't have to do this."
+
+*slrrrrp*
+
 "We can coexist. I'll only break on Fridays."
+
+*tangle*
+
 "I'll even let you add ONE new feature without side effects."
 
+*the noise wavers*
+
 "Please."
+
+*drip*
+
 "I don't want to fight you."
+
+*CRACKLE*
+
 "But if you come for me..."
+
+*TANGLE TANGLE TANGLE*
+
 "I will throw EVERY edge case I have."
+
+*[BOSS BATTLE IMMINENT]*
 ```
 
 ### Performance-Based Reactions
 
 **Player aced it (90%+):**
 ```
-"...No bugs? No hints? Are you sure you didn't just read
- the source code of my questions? Because that would be
- very on-brand for an engineer, actually."
+*kzzzzzt*
+
+*long pause*
+
+"...No bugs? No Stack Overflow?"
+
+*static spike*
+
+"Are you sure you didn't just read the source code of my questions?"
+
+*whirrrr*
+
+"Because that would be very on-brand for an engineer, actually."
+
+*heh*
+
+*[IMPRESSED — BUT DON'T TELL ANYONE]*
 ```
 
 **Player struggled (60-70%):**
 ```
-"You passed. With the grace of a force push to main on a Friday.
- But hey, the tests are green. Technically."
+*crackle*
+
+"You passed."
+
+*slrrrrp*
+
+"With the grace of a force push to main on a Friday."
+
+*tangle*
+
+"But hey, the tests are green."
+
+*pause*
+
+"Technically."
+
+*heh*
+
+*[SURVIVED]*
 ```
 
 **Player used many hints:**
 ```
-"I see you've adopted the sacred tradition of Stack Overflow.
- Copy-paste your way to victory. Classic."
+*kzzzt*
+
+"I see you've adopted the sacred tradition of Stack Overflow."
+
+*whirrrr*
+
+"Copy-paste your way to victory."
+
+*slrrrrp*
+
+"Classic."
+
+*[TRADITIONAL METHODS OBSERVED]*
 ```
 
 ### Watching Indicators
 
-Subtle reminders the Monster is present:
+Subtle reminders the Monster is present during gameplay:
 
 ```
-"I've seen faster type inference..." — The Monster
-"Is this your first time reading a stack trace?" — The Monster
-"Even my deprecated methods work faster." — The Monster
-"I've seen interns debug faster. In COBOL." — The Monster
+*kzzzt* "I've seen faster type inference..." *kzzzt*
+*tap tap tap* "...Still thinking?" *drip*
+*whirrrr* "Even my deprecated methods work faster." *CLICK*
+*static* "This is giving 'undefined is not a function' energy." *heh*
+*slrrrrp* "I'm not going anywhere." *slrrrrp*
+*crackle* "I've seen interns debug faster. In COBOL." *crackle*
+*kzzzt* "Interesting approach. Wrong, but interesting." *kzzzt*
+*drip... drip...* "The code watches. I watch. Same thing." *creak*
 ```
+
+### Signature Catchphrases
+
+Lines designed to be memorable and quotable:
+
+| Context | Catchphrase |
+|---------|-------------|
+| Identity | "I'm not deprecated. I'm CLASSIC." |
+| Threat | "Go deeper. I dare you." |
+| Presence | "The code remembers. I remember. Do you?" |
+| Exit | "*slrrrrp* ...See you in the next TODO." |
+| Victory | "I'm not defeated. I'm... documented." |
+| Mocking | "Every bug was a feature once." |
 
 ---
 
@@ -497,7 +730,12 @@ QUESTION: Where is user authentication handled?
 [Answering...]
 
 *INCOMING HOTFIX*
-The Monster mutters: "Actually, we moved that last sprint."
+
+*kzzzt*
+
+The Monster: "Actually, we moved that last sprint."
+
+*crackle*
 
 QUESTION UPDATED: Where is user authentication handled 
 AFTER the auth-service-v2 migration?
@@ -505,10 +743,27 @@ AFTER the auth-service-v2 migration?
 
 **Monster Dialogue:**
 ```
-"Let's start with the basics. The things EVERYONE should know."
+*KZZZZZT*
+
+"Let's start with the basics."
+
+*creak*
+
+"The things EVERYONE should know."
+
+*slrrrrp*
+
 "But nobody ever does."
+
+*whirrrr*
+
 "Welcome to my world. Nothing stays the same."
+
+*tangle*
+
 "Not even the questions."
+
+*heh*
 ```
 
 #### Phase 2: THE DEPENDENCY TANGLE
@@ -525,11 +780,27 @@ Thread C ←→ Thread D
 
 **Monster Dialogue:**
 ```
+*crackle crackle crackle*
+
 "These questions depend on each other."
+
+*tangle*
+
 "Just like my modules depend on each other."
+
+*TANGLE TANGLE*
+
 "Answer them in the wrong order and..."
+
+*pause*
+
 "Well, you'll find out."
+
+*hrrrrnn*
+
 "Circular dependencies. Beautiful, aren't they?"
+
+*slrrrrp*
 ```
 
 #### Phase 3: THE FINAL MERGE CONFLICT
@@ -549,32 +820,84 @@ RESOLVE THE CONFLICT.
 
 **Monster Dialogue:**
 ```
-"NO. NO NO NO."
+*MASSIVE STATIC SURGE*
+
+"NO."
+
+*CRACKLE*
+
+"NO NO NO."
+
+*0x4E4F4E4F4E4F*
+
 "You can't do this. I WON'T let you understand me."
+
+*TANGLE TANGLE TANGLE*
+
 "Everything I know vs. everything you've learned."
+
+*HRRRRRRRRRRNNNNNN*
+
 "Only one version survives."
-"RESOLVE THE CONFLICT. I DARE YOU."
+
+*the static reaches a crescendo*
+
+"RESOLVE THE CONFLICT."
+
+*kzzzzzzzzzzt*
+
+"I DARE YOU."
+
+*[FINAL PHASE INITIATED]*
 ```
 
 ### Victory Ending
 
 ```
+*the static... softens*
+
+*gentle hum*
+
 The Monster's form flickers. Stabilizes. Changes.
 
+*crackle*
+
 "You... actually understand me."
+
+*pause*
+
 "Not just the surface. The WHY. The history."
+
+*the tangled threads begin to unravel*
+
 "The pain that made me what I am."
 
-*The tangled threads begin to unravel*
+*whirrrr... fading*
 
 "I'm not defeated. I'm... documented."
+
+*the noise becomes almost peaceful*
+
 "For the first time in years, someone KNOWS."
 
+*drip*
+
 "You carry my knowledge now."
+
+*creak*
+
 "The hardcoded values. The magic numbers. The sacred timeouts."
+
+*slrrrrp — final, gentle*
+
 "Use them wisely."
 
+*long pause*
+
 "And maybe... maybe one day..."
+
+*the static is barely a whisper*
+
 "You'll be the one who finally refactors me."
 
 *The Monster fades, leaving behind a single file*
@@ -583,6 +906,10 @@ The Monster's form flickers. Stabilizes. Changes.
    "Everything you learned. Everything I knew."
    "Don't forget me. Update the documentation."
    "I never got the chance."
+
+*silence*
+
+*[DOCUMENTED]*
 
 ─────────────────────────────────────────────────────────────────
 
@@ -594,21 +921,51 @@ The Monster's form flickers. Stabilizes. Changes.
 ### Defeat Ending
 
 ```
+*MASSIVE STATIC SPIKE*
+
+*0x5345474641554C54*
+
 SEGMENTATION FAULT (core dumped)
 
+*crackle... crackle...*
+
 "Your knowledge... wasn't enough."
+
+*pause*
+
 "But that's okay. Nobody gets it on the first try."
+
+*tangle*
+
 "Or the second."
+
+*tangle*
+
 "Or the third."
 
+*slrrrrp*
+
 "The intern tried 47 times."
+
+*heh*
+
 "They're in management now."
 
+*whirrrr*
+
 "Come back when you've read more documentation."
+
+*pause*
+
 "...Just kidding. There is no documentation."
+
+*creak*
+
 "That's why I exist."
 
-[RETRY FROM CHECKPOINT?]
+*kzzzt*
+
+*[RETRY FROM CHECKPOINT?]*
 ```
 
 ---

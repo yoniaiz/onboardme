@@ -75,9 +75,12 @@ A minimalistic design that communicates "code monster" through:
 ### With Speech Bubble (Dialogue Display)
 
 ```
+ *kzzzt*
+ 
  ╭────────────────────────────────────╮
  │ "I've crashed more browsers than   │
  │  you've written functions."        │
+ │                              *hrrrrnn* │
  ╰──────────────────┬─────────────────╯
                     │
                ╭─────────╮
@@ -85,6 +88,30 @@ A minimalistic design that communicates "code monster" through:
                │  ~~~~   │
                ╰────┬────╯
                  ╱│││╲
+```
+
+### With Extended Dialogue (Multiple Lines)
+
+```
+ *crackle*
+ 
+ ╭────────────────────────────────────╮
+ │ "I was beautiful once."            │
+ │                                    │
+ │ *drip*                             │
+ │                                    │
+ │ "Clean. Single-responsibility."    │
+ │                                    │
+ │ *tangle*                           │
+ │                                    │
+ │ "Then came the edge cases."        │
+ ╰──────────────────┬─────────────────╯
+                    │
+               ╭─────────╮
+               │ { ◉ _ } │
+               │  ~~     │
+               ╰────┬────╯
+                 ╱│╲
 ```
 
 ## Design Principles

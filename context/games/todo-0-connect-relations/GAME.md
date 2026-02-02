@@ -82,13 +82,62 @@ See [GAME-VISUALS.md](./GAME-VISUALS.md) for screen mockups and visual design.
 
 ## Monster Reaction on Completion
 
-After completing TODO #0, the Monster speaks for the first time:
+After completing TODO #0, the Monster delivers a full assessment:
 
 ```
-"So. You can see how the pieces connect."
+*kzzzt*
+
+*the static resolves into something like a voice*
+
+"So."
+
+*pause*
+
+"You can see how the pieces connect."
+
+*crackle*
+
 "User to Organization to Project to Task..."
-"Impressive. That's almost correct."
+
+*slrrrrp*
+
+"Impressive."
+
+*tangle*
+
+"That's almost correct."
+
+*whirrrr*
+
 "I mean, there's also a UserOrganizationProjectTaskLegacyBridge table."
+
+*creak*
+
 "Don't ask. Nobody asks."
-"...Alright. You passed the warmup. Now let's see what you're really made of."
+
+*pause*
+
+"The developer who created it is in witness protection now."
+
+*heh*
+
+"...Alright. You passed the warmup."
+
+*the static grows darker*
+
+"You read the docs. You investigated the evidence. You mapped the relationships."
+
+*hrrrrnn*
+
+"Now let's see what you're really made of."
+
+*CRACKLE*
+
+"TODO #1 awaits."
+
+*slrrrrp*
+
+"...See you in the next TODO."
+
+*[TODO #0 RESOLVED — SIGNAL LOST]*
 ```
