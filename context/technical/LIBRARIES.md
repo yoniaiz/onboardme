@@ -90,4 +90,5 @@
 ---
 
 > **Project structure details:** See [ARCHITECTURE.md](../ARCHITECTURE.md#6-project-structure).
+> **Plugin architecture:** See [PLUGIN-ARCHITECTURE.md](./PLUGIN-ARCHITECTURE.md).
 > **Visual guidelines:** See [context/visuals/](../visuals/) for design specs.

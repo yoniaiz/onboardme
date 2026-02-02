@@ -77,18 +77,23 @@ Traditional onboarding sucks:
 1. Engineer joins new company
 2. Clones the repo
 3. Runs: onboardme init
-4. AI scans codebase, generates game content
-5. Runs: onboardme start
-6. Experiences cold open (Monster's first appearance)
-7. Plays through 5 TODOs (~90-120 min)
+   - Creates .onboardme/ folder
+   - Installs skill to AI platform
+4. In AI platform: "Run initialize context"
+   - AI scans codebase, saves context to files
+5. In AI platform: "Run prepare game"
+   - AI transforms context into game-ready data
+6. Runs: onboardme start
+7. Experiences cold open (Monster's first appearance)
+8. Plays through TODOs (~90-120 min)
    - Unlocks memory logs revealing Monster's backstory
    - Makes dialogue choices that shape relationship
    - Uses actual dev tools (grep, git blame) as weapons
-8. Faces "The Spaghetti Code Monster" (FIXME boss battle)
-9. Documents the Monster (victory = understanding, not destruction)
-10. Receives shareable victory summary
-11. Gets suggested first contribution based on learned areas
-12. Commits CODEBASE_KNOWLEDGE.md as first real contribution
+9. Faces "The Spaghetti Code Monster" (FIXME boss battle)
+10. Documents the Monster (victory = understanding, not destruction)
+11. Receives shareable victory summary
+12. Gets suggested first contribution based on learned areas
+13. Commits CODEBASE_KNOWLEDGE.md as first real contribution
 ```
 
 ### Non-Users (v1)
@@ -104,16 +109,20 @@ Traditional onboarding sucks:
 
 > **See [ARCHITECTURE.md](./context/ARCHITECTURE.md) for complete architectural documentation.**
 
-The OnboardMe system follows a modular architecture with clear separation between:
-- **CLI Layer**: Terminal UI, game loop, state management
-- **Agent Layer**: AI-powered code analysis and content generation
-- **Storage Layer**: Local filesystem-based state and context
+OnboardMe uses a **skill-based plugin architecture**:
+
+- **Skills Layer**: User-invoked AI skills for context gathering and game preparation
+- **CLI Layer**: Game runner, state management, terminal UI
+- **Plugin Layer**: Composable game plugins that can be customized
+- **Storage Layer**: Local filesystem-based context, prepared data, and state
 
 Key architectural principles:
-- **Standalone CLI** for maximum portability
-- **User's existing agent** for AI capabilities (no API keys needed)
+- **Skill-based AI workflow** — User controls when AI runs via skills in their platform
+- **Plugin-based games** — Composable, extensible, users can customize or create games
+- **Template system** — Users define which games to include and their order
+- **Platform agnostic** — Works with any AI platform that supports skills (Cursor, Claude, etc.)
 - **Local-first** state management (no cloud, no accounts)
-- **Deterministic game logic** with AI-powered content generation
+- **Deterministic game logic** — CLI runs games without needing AI at runtime
 
 ---
 
@@ -237,24 +246,29 @@ The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy 
 ### Core Commands
 
 ```bash
-onboardme init [--agent=cursor|claude|opencode]  # Initialize OnboardMe
-onboardme start                                   # Start or resume the game
-onboardme status                                  # Show current progress
-onboardme knowledge [topic]                      # View unlocked knowledge
-onboardme memories                                # View unlocked memory logs
-onboardme reset [--hard]                         # Reset progress
-onboardme config [key] [value]                    # Configuration
+onboardme init                    # Setup .onboardme/, install skill
+onboardme start                   # Validate prepared/, run games
+onboardme status                  # Show current progress
+onboardme validate                # Check prepared/ structure, output errors
+onboardme template                # Create starter template
+onboardme template build          # Compile TypeScript template
+onboardme knowledge [topic]       # View unlocked knowledge
+onboardme memories                # View unlocked memory logs
+onboardme reset [--hard]          # Reset progress
 ```
 
-### Development/Debug Commands
+### Workflow
 
 ```bash
-onboardme game:test <game-id> [--verbose] [--fixture=<path>]  # Test a specific game
-onboardme game:list                                            # List all registered games
-onboardme game:preview <game-id>                              # Preview generated questions
-onboardme regenerate [--level=<n>] [--game=<id>]              # Regenerate questions
-onboardme debug:context                                        # Dump gathered context
-onboardme debug:validate                                       # Validate all questions
+# 1. Initialize
+onboardme init
+
+# 2. Run skills from AI platform
+# "Run initialize context"
+# "Run prepare game"
+
+# 3. Start playing
+onboardme start
 ```
 
 > **Complete CLI command documentation:** See [CLI-COMMANDS.md](./context/technical/CLI-COMMANDS.md) for full command details, examples, and output formats.
@@ -265,43 +279,44 @@ onboardme debug:validate                                       # Validate all qu
 
 > **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#7-file-system-structure) for complete file system structure documentation.**
 
-All game data is stored in `.onboarding/` at the repository root, organized into:
-- **`context/`**: Gathered codebase knowledge (services, functions, flows, domain terms)
-- **`todos/`**: Generated questions and challenges for each TODO level
-- **`state/`**: User progress, history, and unlocked knowledge (gitignored)
+All game data is stored in `.onboardme/` at the repository root, organized into:
+- **`context/`**: Raw codebase knowledge gathered by the "initialize context" skill (gitignored)
+- **`prepared/`**: Game-ready data structured by the "prepare game" skill (gitignored)
+- **`template/`**: User's custom template (committed, shared with team)
+- **`state/`**: User progress, history, and unlocked knowledge (gitignored, managed by CLI)
 
 ---
 
-## 8. Agent Framework Integration
+## 8. Skill-Based Workflow
 
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#8-agent-framework-integration) for complete agent integration documentation.**
+> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#3-skill-based-workflow) for complete workflow documentation.**
 
-The CLI delegates AI tasks to the user's existing agent framework (Claude Code, Cursor CLI, or OpenCode). Users select their agent during `onboardme init`, and OnboardMe calls the agent's CLI under the hood.
+OnboardMe uses **skills** that users run from their AI platform (Cursor, Claude Desktop, etc.). This approach:
+- **No complex CLI-agent integration** — Skills run in user's existing AI environment
+- **User control** — Explicit commands, visible context files
+- **Platform agnostic** — Works with any AI platform supporting skills
+- **Debuggable** — Context and prepared files are human-readable
 
-**Supported Agents:**
-- ✅ **Claude Code** (v1) - Primary support
-- 🔜 **Cursor CLI** (v2) - Coming soon
-- 🔜 **OpenCode** (v2) - Coming soon
-
-The agent is used for:
-- Codebase analysis during init
-- Question generation
-- Free-form answer evaluation
-- Knowledge brief generation
-- Boss battle question regeneration
+**Two Skills:**
+1. **Initialize Context** — Scans repo, gathers all context to `.onboardme/context/`
+2. **Prepare Game** — Reads template + context, structures data for CLI in `.onboardme/prepared/`
 
 ---
 
-## 9. Bootstrap: Context Gathering
+## 9. Context Gathering
 
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#9-bootstrap-context-gathering) for complete context gathering documentation.**
+> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#9-context-schema) for complete context schema documentation.**
 
-During `onboardme init`, the system gathers comprehensive codebase context including:
+The "Initialize Context" skill gathers comprehensive codebase context:
 - **Project metadata**: Language, framework, package manager
+- **Structure**: Key directories, entry points, patterns
 - **Services/modules**: Identified services with verified paths and dependencies
-- **Data flows**: Traced request/response flows through the system
+- **Data flows**: User journeys, request paths, architecture layers
+- **Features**: Feature areas, modules, what the app does
 - **Domain knowledge**: Business terms, acronyms, configuration patterns
-- **Monster origin**: Technical debt analysis (TODOs, complexity, legacy code)
+- **Technical debt**: TODOs, complexity, legacy code (Monster origin)
+- **Tests**: Test files, frameworks, coverage
+- **Git history**: Old commits, authors, timeline
 
 All gathered information is **verified** against the actual codebase—paths must exist, functions must be locatable, and configs must be readable. Unverifiable data is marked as `uncertain` and excluded from questions.
 
@@ -419,7 +434,7 @@ When all TODOs are complete, only one item remains: the FIXME boss battle.
 
 ## 12. State Management
 
-The system tracks progress, history, unlocked documentation, behavioral patterns, and memory logs in local filesystem storage. All state is stored in `.onboarding/state/` (gitignored).
+The system tracks progress, history, unlocked documentation, behavioral patterns, and memory logs in local filesystem storage. All state is stored in `.onboardme/state/` (gitignored).
 
 > **Complete state management documentation:** See [STATE-MANAGEMENT.md](./context/technical/STATE-MANAGEMENT.md) for:
 > - Progress tracking interface
@@ -454,11 +469,11 @@ Questions must require **real exploration**, not just grep. They should be multi
 
 ### Architecture Questions
 
-1. ~~**Agent invocation pattern:**~~ **DECIDED** — CLI calls agent CLI/SDK as subprocess. User selects agent during init, handles their own auth. Start with Claude Code only.
+1. ~~**Agent invocation pattern:**~~ **DECIDED** — Skill-based architecture. Users run skills from their AI platform (Cursor, Claude, etc.). No CLI-agent integration needed.
 
-2. **Streaming responses:** Should AI responses stream in real-time during briefs/explanations? **DECIDED** — No, we will not have streaming responses.
+2. **Streaming responses:** Should AI responses stream in real-time during briefs/explanations? **DECIDED** — No, we will not have streaming responses. All AI work happens during skill execution.
 
-3. **Offline mode:** Should there be a degraded mode without agent access? **DECIDED** — No, we will not have a degraded mode without agent access.
+3. **Offline mode:** Should there be a degraded mode without agent access? **DECIDED** — No. Skills require AI platform, but CLI runs offline once prepared data exists.
 
 ### Game Design Questions
 
@@ -487,22 +502,21 @@ Questions must require **real exploration**, not just grep. They should be multi
 ### Potential Future Features
 
 - **Team mode:** Multiple engineers compete/collaborate
-- **Custom games:** Teams add their own mini-games
 - **Leaderboards:** Team-based victory summaries (already have individual shareable cards ✅)
 - **Manager dashboard:** Track team onboarding progress
 - **Integration with ticketing:** First ticket tied to onboarding (partially implemented via task suggestion ✅)
 - **Replay mode:** Re-challenge the Monster with harder questions
-- **Community content:** Share question packs between companies
+- **Community content:** Share game plugins and templates between companies
 - **Automatic file watcher:** Detect command execution for IDE-as-weapon questions
 - **Slack/Discord integration:** Auto-post victory summaries to team channels
 
-### Extensibility Points
+### Current Extensibility (v1)
 
-Design the system to allow:
-- New game types (plugin architecture)
-- New agent backends
-- Custom question templates
-- Branded themes
+The plugin architecture enables:
+- ✅ **Custom games** — Teams create their own mini-games using the plugin interface
+- ✅ **Custom templates** — Teams define which games to include and their order
+- ✅ **Game composition** — Mix built-in games with custom games
+- 🔜 **Branded themes** — Custom visual themes (future)
 
 ---
 

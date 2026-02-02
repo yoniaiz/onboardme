@@ -1,50 +1,44 @@
 # CLI Commands
 
-> **Clear, professional command documentation. Every command does exactly what it says.**
+> **The CLI is a runner—it validates prepared data and runs games. AI work happens through skills.**
 
-## Core Commands
-
-| Command | Purpose | Quick Example |
-|---------|---------|---------------|
-| `onboardme init` | Initialize OnboardMe for this repository | `onboardme init --agent=cursor` |
-| `onboardme start` | Start or resume your game | `onboardme start` |
-| `onboardme status` | View your current progress | `onboardme status` |
-| `onboardme knowledge` | Browse unlocked documentation | `onboardme knowledge auth` |
-| `onboardme reset` | Start over (preserves high scores) | `onboardme reset --hard` |
-| `onboardme config` | View or modify settings | `onboardme config theme dark` |
+## Quick Reference
 
 ```bash
-# Quick reference
-onboardme init [--agent=cursor|claude|opencode]
-onboardme start
-onboardme status
-onboardme knowledge [topic]
-onboardme reset [--hard]
-onboardme config [key] [value]
+# Setup
+onboardme init                    # Setup .onboardme/, install skill
+
+# Playing
+onboardme start                   # Validate prepared/, run games
+onboardme status                  # Show current progress
+
+# Templates
+onboardme template                # Create starter template
+onboardme template build          # Compile TypeScript template
+
+# Utilities
+onboardme validate                # Check prepared/ structure
+onboardme knowledge [topic]       # View unlocked knowledge
+onboardme memories                # View unlocked memory logs
+onboardme reset [--hard]          # Reset progress
 ```
 
-## Development/Debug Commands
+## Workflow Overview
 
-For testing and debugging game content:
-
-```bash
-# Test a specific game in isolation
-onboardme game:test <game-id> [--verbose] [--fixture=<path>]
-
-# List all registered games
-onboardme game:list
-
-# Preview generated questions (without playing)
-onboardme game:preview <game-id>
-
-# Regenerate questions for a specific level/game
-onboardme regenerate [--level=<n>] [--game=<id>]
-
-# Dump gathered codebase context (debugging)
-onboardme debug:context
-
-# Validate all generated questions (paths exist, etc.)
-onboardme debug:validate
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  1. onboardme init                                              │
+│     Creates .onboardme/, installs skill                         │
+├─────────────────────────────────────────────────────────────────┤
+│  2. In AI platform: "Run initialize context"                    │
+│     Skill scans repo → writes to .onboardme/context/            │
+├─────────────────────────────────────────────────────────────────┤
+│  3. In AI platform: "Run prepare game"                          │
+│     Skill reads template → writes to .onboardme/prepared/       │
+├─────────────────────────────────────────────────────────────────┤
+│  4. onboardme start                                             │
+│     CLI validates prepared/ → runs games → saves state          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -53,42 +47,33 @@ onboardme debug:validate
 
 ### `onboardme init`
 
-**What it does:** Scans your codebase, generates questions, and awakens the Monster.
+**What it does:** Sets up the OnboardMe folder structure and installs the skill to your AI platform.
 
 **Usage:**
 ```bash
-onboardme init                    # Auto-detect agent
-onboardme init --agent=cursor     # Specify agent explicitly
+onboardme init
 ```
 
 **Output:**
 ```
 $ onboardme init
 
-🔍 SCANNING CODEBASE...
+🔧 INITIALIZING ONBOARDME...
 
-Detecting agent framework...
-  ✓ Found: Claude Code
+Creating .onboardme/ directory structure...
+  ✓ Created .onboardme/context/
+  ✓ Created .onboardme/prepared/
+  ✓ Created .onboardme/template/
+  ✓ Created .onboardme/state/
+  ✓ Created .onboardme/.gitignore
 
-Phase 1: Structural Scan           ████████████████████ 100%
-  • Language: TypeScript
-  • Framework: Express + React
-  • Services: 6 identified
+Installing skill...
+  ✓ Skill installed to .cursor/skills/onboardme/
 
-Phase 2: Deep Analysis             ████████████████████ 100%
-  • Entry points: 23 mapped
-  • Key functions: 156 extracted
-  • Data flows: 8 traced
-
-Phase 3: Knowledge Extraction      ████████████████████ 100%
-  • Domain terms: 34 catalogued
-  • ADRs: 5 found
-  • Config patterns: 12 identified
-
-Phase 4: Game Generation           ████████████████████ 100%
-  • Monster origin: src/services/payment/core/
-  • TODOs generated: 5
-  • Challenges created: 47
+Updating .gitignore...
+  ✓ Added .onboardme/context/ to .gitignore
+  ✓ Added .onboardme/prepared/ to .gitignore
+  ✓ Added .onboardme/state/ to .gitignore
 
 ✅ INITIALIZATION COMPLETE
 
@@ -99,7 +84,6 @@ Something stirs in the depths...
 *crackle*
 
 The Spaghetti Code Monster awakens.
-Origin: 234 forgotten TODOs. The legendary processPayment() — 1,847 lines.
 
 *slrrrrp*
 
@@ -107,24 +91,37 @@ Origin: 234 forgotten TODOs. The legendary processPayment() — 1,847 lines.
 
 *[CONNECTION ESTABLISHED]*
 
-Run 'onboardme start' to begin.
+─────────────────────────────────────────────────────────────────
+
+Next steps:
+  1. In your AI platform, run: "Initialize context"
+  2. Then run: "Prepare game"  
+  3. Finally: onboardme start
+
+The Monster awaits.
 ```
 
 ---
 
 ### `onboardme start`
 
-**What it does:** Launches the game or resumes from your last checkpoint.
+**What it does:** Validates the prepared game data and starts (or resumes) the game.
 
 **Usage:**
 ```bash
-onboardme start                   # Continue from last position
-onboardme start --todo=2          # Jump to specific TODO (if unlocked)
+onboardme start                   # Start or resume
+onboardme start --game=2          # Jump to specific game (if unlocked)
 ```
 
-**Output:**
+**If validation passes:**
 ```
 $ onboardme start
+
+Validating prepared data...
+  ✓ manifest.json valid
+  ✓ file-detective: 6 questions ready
+  ✓ flow-trace: 4 journeys ready
+  ✓ spaghetti-monster: 3 phases ready
 
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
@@ -139,18 +136,18 @@ $ onboardme start
 ║                       THE QUEST BEGINS                         ║
 ║                    ══════════════════════                      ║
 ║                                                                ║
-║  Your mission: Understand this codebase. Defeat the Monster.  ║
+║  Your mission: Understand this codebase. Document the Monster. ║
 ║                                                                ║
 ║  CRITICAL TODOs:                                               ║
-║    □ TODO #0: // understand what we have                      ║
-║    □ TODO #1: // trace flows and run the app                  ║
-║    □ TODO #2: // find bugs and plan features                  ║
-║    ▣ FIXME:   // the monster itself                           ║
+║    □ TODO #0: // understand what we have                       ║
+║    □ TODO #1: // trace flows and run the app                   ║
+║    □ TODO #2: // find bugs and plan features                   ║
+║    ▣ FIXME:   // the monster itself                            ║
 ║                                                                ║
 ║  *kzzzt*                                                       ║
 ║                                                                ║
-║  "So. You're the new one."                                    ║
-║  "Let's see how long you last."                               ║
+║  "So. You're the new one."                                     ║
+║  "Let's see how long you last."                                ║
 ║                                                                ║
 ║  *slrrrrp*                                                     ║
 ║                                                                ║
@@ -159,11 +156,37 @@ $ onboardme start
 ╚════════════════════════════════════════════════════════════════╝
 ```
 
+**If validation fails:**
+```
+$ onboardme start
+
+Validating prepared data...
+  ✗ flow-trace: Missing required field 'journeys[0].entryPoint'
+
+❌ VALIDATION FAILED
+
+{
+  "valid": false,
+  "errors": [
+    {
+      "game": "flow-trace",
+      "field": "journeys[0].entryPoint",
+      "error": "Missing required field",
+      "expected": "string",
+      "received": "undefined"
+    }
+  ],
+  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
+}
+
+Show this error to your AI and ask it to fix the prepared data.
+```
+
 ---
 
 ### `onboardme status`
 
-**What it does:** Shows your current progress, stats, and the Monster's health.
+**What it does:** Shows your current progress through the game.
 
 **Usage:**
 ```bash
@@ -180,26 +203,153 @@ $ onboardme status
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
 ║  Monster: The Spaghetti Code Monster                          ║
-║  Integrity: ████████░░░░░░░░░░░░ 40%                          ║
+║  Technical Debt: ████████░░░░░░░░░░░░ 40%                     ║
 ║                                                                ║
 ║  *kzzzt* "You're still here? Persistent." *kzzzt*             ║
 ║                                                                ║
-║  CRITICAL TODOs:                                              ║
+║  PROGRESS:                                                     ║
 ║  ────────────────────────────────────────────────────────     ║
-║  ✓ TODO #0: // understand what we have        RESOLVED        ║
-║  ✓ TODO #1: // trace flows and run the app    RESOLVED        ║
-║  → TODO #2: // find bugs and plan features    IN PROGRESS     ║
-║  ▣ FIXME:   // the monster itself             LOCKED          ║
+║  ✓ TODO #0: file-detective                   COMPLETE         ║
+║  → TODO #1: flow-trace                       IN PROGRESS      ║
+║  ○ TODO #2: grep-hunt                        LOCKED           ║
+║  ▣ FIXME:   spaghetti-monster                LOCKED           ║
 ║                                                                ║
 ║  STATS:                                                        ║
 ║  ────────────────────────────────────────────────────────     ║
-║  • Total Commits: 2,340                                       ║
-║  • Accuracy: 38/47 correct (81%)                              ║
-║  • Time played: 2h 34m                                        ║
-║  • Longest clean streak: 7                                    ║
+║  • Total Commits: 1,240                                       ║
+║  • Accuracy: 18/22 correct (82%)                              ║
+║  • Time played: 1h 12m                                        ║
+║  • Longest clean streak: 5                                    ║
 ║                                                                ║
 ║  Run 'onboardme start' to continue.                           ║
 ╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+### `onboardme validate`
+
+**What it does:** Checks if the prepared data is valid without starting the game. Useful for debugging.
+
+**Usage:**
+```bash
+onboardme validate                # Validate all
+onboardme validate --game=flow-trace  # Validate specific game
+onboardme validate --json         # Output as JSON (for AI consumption)
+```
+
+**Output (success):**
+```
+$ onboardme validate
+
+Validating .onboardme/prepared/...
+
+  ✓ manifest.json
+  ✓ games/file-detective/config.json
+  ✓ games/file-detective/questions.json
+  ✓ games/flow-trace/config.json
+  ✓ games/flow-trace/journeys.json
+  ✓ games/spaghetti-monster/config.json
+  ✓ games/spaghetti-monster/phases.json
+  ✓ narrative/monster.json
+  ✓ narrative/memory-logs.json
+
+✅ All validation passed. Ready to play!
+
+*kzzzt*
+
+"The preparation is complete."
+
+*slrrrrp*
+
+"Now comes the fun part."
+
+*[VALIDATION COMPLETE]*
+```
+
+**Output (failure, JSON):**
+```
+$ onboardme validate --json
+
+{
+  "valid": false,
+  "errors": [
+    {
+      "file": "games/flow-trace/journeys.json",
+      "game": "flow-trace",
+      "field": "journeys[0].entryPoint",
+      "error": "Missing required field",
+      "expected": "string",
+      "received": "undefined",
+      "line": 12
+    }
+  ],
+  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
+}
+```
+
+---
+
+### `onboardme template`
+
+**What it does:** Creates a starter template for customization.
+
+**Usage:**
+```bash
+onboardme template                # Create template.json
+onboardme template --typescript   # Create template.ts
+```
+
+**Output:**
+```
+$ onboardme template
+
+Creating template at .onboardme/template/template.json...
+
+✅ Template created!
+
+{
+  "games": [
+    { "id": "file-detective" },
+    { "id": "flow-trace" },
+    { "id": "grep-hunt" },
+    { "id": "spaghetti-monster" }
+  ]
+}
+
+Edit this file to customize which games are included.
+Then re-run 'prepare game' skill to regenerate.
+```
+
+---
+
+### `onboardme template build`
+
+**What it does:** Compiles a TypeScript template.
+
+**Usage:**
+```bash
+onboardme template build
+```
+
+**Output:**
+```
+$ onboardme template build
+
+Building .onboardme/template/template.ts...
+
+  ✓ TypeScript compiled
+  ✓ Template validated
+  ✓ 3 games registered
+
+✅ Template built successfully!
+
+Games in template:
+  1. file-detective
+  2. my-custom-game (custom)
+  3. spaghetti-monster
+
+Re-run 'prepare game' skill to use the new template.
 ```
 
 ---
@@ -223,34 +373,173 @@ $ onboardme knowledge
 ║  📚 UNLOCKED KNOWLEDGE                                         ║
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
-║  You've documented 12 topics:                                  ║
+║  You've documented 8 topics:                                   ║
 ║                                                                ║
 ║  ✓ project-structure    How the codebase is organized         ║
 ║  ✓ tech-stack           Languages, frameworks, and tools      ║
 ║  ✓ auth-flow            How authentication works              ║
 ║  ✓ database-schema      Main entities and relationships       ║
-║  ✓ api-endpoints        Available routes and handlers         ║
-║  ✓ test-patterns        How tests are organized               ║
+║  ○ api-endpoints        [LOCKED - Complete TODO #1]           ║
 ║  ○ deployment           [LOCKED - Complete TODO #2]           ║
-║  ○ monitoring           [LOCKED - Complete TODO #2]           ║
+║                                                                ║
+║  *kzzzt* "You're learning my secrets." *kzzzt*                ║
 ║                                                                ║
 ║  Use 'onboardme knowledge <topic>' to view details.           ║
-║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+### `onboardme memories`
+
+**What it does:** View unlocked memory logs—backstory fragments that reveal the Monster's origin.
+
+**Usage:**
+```bash
+onboardme memories                # List all memory logs
+onboardme memories 3              # View specific memory log
+onboardme memories --all          # List all (including locked)
+```
+
+**Output:**
+```
+$ onboardme memories
+
+╔════════════════════════════════════════════════════════════════╗
+║  🧠 CORRUPTED MEMORY LOGS                                      ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  *kzzzt* "You found my memories..." *crackle*                  ║
+║                                                                ║
+║  RECOVERED FRAGMENTS: 4 / 8                                    ║
+║                                                                ║
+║  ✓ Memory #1: "The First Commit"                               ║
+║    Unlocked: TODO #0 completion                                ║
+║                                                                ║
+║  ✓ Memory #2: "The Promise"                                    ║
+║    Unlocked: Perfect score on file-detective                   ║
+║                                                                ║
+║  ✓ Memory #3: "The Shortcut"                                   ║
+║    Unlocked: TODO #1 completion                                ║
+║                                                                ║
+║  ✓ Memory #4: "The Departure"                                  ║
+║    Unlocked: Found the oldest TODO                             ║
+║                                                                ║
+║  ○ Memory #5: [CORRUPTED - Continue playing]                   ║
+║  ○ Memory #6: [CORRUPTED - Continue playing]                   ║
+║  ○ Memory #7: [CORRUPTED - Continue playing]                   ║
+║  ○ Memory #8: [CORRUPTED - Defeat the Monster]                 ║
+║                                                                ║
+║  *tangle* "Some things are better left forgotten." *drip*      ║
+║                                                                ║
+║  Use 'onboardme memories <number>' to read a fragment.         ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+**Viewing a specific memory:**
+```
+$ onboardme memories 1
+
+╔════════════════════════════════════════════════════════════════╗
+║  🧠 MEMORY LOG #1: "The First Commit"                          ║
+╠════════════════════════════════════════════════════════════════╣
+║                                                                ║
+║  *static crackle*                                              ║
+║                                                                ║
+║  Date: 2017-03-14                                              ║
+║  Author: sarah@company.com                                     ║
+║                                                                ║
+║  "Initial commit. Clean architecture."                         ║
+║  "This will be different. This time we'll do it right."        ║
+║                                                                ║
+║  *pause*                                                       ║
+║                                                                ║
+║  "Single responsibility. No shortcuts."                        ║
+║  "The future team will thank us."                              ║
+║                                                                ║
+║  *the static fades to silence*                                 ║
+║                                                                ║
+║  commit: a1b2c3d                                               ║
+║  files: 12 added                                               ║
+║  message: "Initial project setup - clean slate"                ║
+║                                                                ║
+║  *kzzzt*                                                       ║
+║                                                                ║
+║  "She meant it, you know."                                     ║
+║  "They always mean it at the beginning."                       ║
+║                                                                ║
+║  *[END OF FRAGMENT]*                                           ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+### `onboardme reset`
+
+**What it does:** Resets your game progress.
+
+**Usage:**
+```bash
+onboardme reset                   # Soft reset (preserves stats)
+onboardme reset --hard            # Full reset (deletes everything)
+```
+
+**Output:**
+```
+$ onboardme reset
+
+⚠️  This will reset your progress to the beginning.
+    Your high scores and achievements will be preserved.
+
+Are you sure? (y/n) y
+
+Resetting progress...
+  ✓ Progress cleared
+  ✓ History archived
+  ✓ Knowledge preserved
+
+*kzzzt*
+
+"Back for more?"
+
+*pause*
+
+"I admire the persistence."
+
+*crackle*
+
+"Most people just... give up."
+
+*tangle*
+
+"Read the README once and call it onboarding."
+
+*slrrrrp*
+
+"But you? You want to understand."
+
+*whirrrr*
+
+"...Interesting."
+
+*[PROGRESS RESET — MONSTER INTEGRITY RESTORED TO 100%]*
+
+Run 'onboardme start' to begin again.
 ```
 
 ---
 
 ## Error Messages
 
-Errors are designed to be helpful, not just informative:
+Errors are designed to be helpful and actionable:
 
 | Error | Message | What to Do |
 |-------|---------|------------|
 | Not initialized | `No .onboardme found. Run 'onboardme init' first.` | Run init in repo root |
-| Invalid game | `Game 'xyz' not found. Run 'onboardme game:list' to see available games.` | Check game ID spelling |
-| Locked content | `TODO #3 is locked. Complete TODO #2 first.` | Progress sequentially |
-| Agent not detected | `Could not detect agent. Use --agent flag to specify.` | Add explicit `--agent=` |
+| No prepared data | `No prepared data found. Run skills first.` | Run "initialize context" then "prepare game" skills |
+| Validation failed | `Prepared data invalid. See errors above.` | Show errors to AI, re-run prepare skill |
+| Locked game | `TODO #2 is locked. Complete TODO #1 first.` | Progress sequentially |
+| Missing template | `Template not found. Using default.` | Optional—default template works fine |
 
 ---
 
@@ -262,4 +551,5 @@ Errors are designed to be helpful, not just informative:
 | 1 | General error |
 | 2 | Invalid arguments |
 | 3 | Not initialized |
-| 4 | Game validation failed |
+| 4 | Validation failed |
+| 5 | Game error |

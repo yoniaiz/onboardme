@@ -493,7 +493,7 @@ $ onboardme memories
 ### Storage
 
 ```json
-// .onboarding/state/memory-logs.json
+// .onboardme/state/memory-logs.json
 {
   "unlocked": [
     {

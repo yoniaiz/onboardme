@@ -338,7 +338,7 @@ interface PlayerTracking {
 ### Persistence
 
 ```json
-// .onboarding/state/behavioral-tracking.json
+// .onboardme/state/behavioral-tracking.json
 {
   "session": {
     "startTime": "2025-02-02T10:00:00Z",

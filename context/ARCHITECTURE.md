@@ -2,7 +2,7 @@
 
 > **Architectural decisions, system design, and technical specifications for OnboardMe.**
 
-This document covers the high-level architecture, technical stack, file system structure, agent integration, context gathering mechanisms, and post-game flow including victory artifacts and task suggestions.
+This document covers the high-level architecture, skill-based workflow, plugin system, technical stack, file system structure, and post-game flow including victory artifacts and task suggestions.
 
 ---
 
@@ -10,13 +10,13 @@ This document covers the high-level architecture, technical stack, file system s
 
 1. [High-Level Architecture](#1-high-level-architecture)
 2. [Key Architectural Decisions](#2-key-architectural-decisions)
-3. [CLI vs Agent Responsibilities](#3-cli-vs-agent-responsibilities)
-4. [Tech Stack](#4-tech-stack)
-5. [Game Template Architecture](#5-game-template-architecture)
+3. [Skill-Based Workflow](#3-skill-based-workflow)
+4. [Plugin Architecture](#4-plugin-architecture)
+5. [Tech Stack](#5-tech-stack)
 6. [Project Structure](#6-project-structure)
 7. [File System Structure](#7-file-system-structure)
-8. [Agent Framework Integration](#8-agent-framework-integration)
-9. [Bootstrap: Context Gathering](#9-bootstrap-context-gathering)
+8. [CLI Commands](#8-cli-commands)
+9. [Context Schema](#9-context-schema)
 10. [Installation & System Requirements](#10-installation--system-requirements)
 11. [Post-Game Flow: Bridging to Real Work](#11-post-game-flow-bridging-to-real-work)
 12. [Victory Artifact: CODEBASE_KNOWLEDGE.md](#12-victory-artifact-codebase_knowledgemd)
@@ -26,26 +26,41 @@ This document covers the high-level architecture, technical stack, file system s
 
 ## 1. High-Level Architecture
 
+OnboardMe uses a **skill-based architecture** where AI-powered context gathering and game preparation happen through user-invoked skills in their AI platform (Cursor, Claude, etc.), while the CLI handles game execution, state management, and user interactions.
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER'S TERMINAL                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌─────────────┐         ┌─────────────────────────────────┐  │
-│   │  OnboardMe  │ ◄─────► │  Agent Framework                │  │
-│   │    CLI      │         │  (Cursor/Claude Code/OpenCode)  │  │
-│   └──────┬──────┘         └─────────────────────────────────┘  │
-│          │                                                      │
-│          ▼                                                      │
-│   ┌─────────────────────────────────────────────────────────┐  │
-│   │                  .onboarding/                            │  │
-│   │  ├── context/     (gathered codebase knowledge)         │  │
-│   │  ├── games/       (generated questions & challenges)    │  │
-│   │  ├── state/       (user progress & history)             │  │
-│   │  └── config.json  (settings & agent config)             │  │
-│   └─────────────────────────────────────────────────────────┘  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                     USER'S AI PLATFORM                              │
+│                 (Cursor / Claude / etc.)                            │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   ┌──────────────────────────┐    ┌──────────────────────────────┐ │
+│   │   Skill: Initialize      │    │   Skill: Prepare Game        │ │
+│   │   Context                │ ─► │                              │ │
+│   │   (scans repo, gathers   │    │   (reads template, structures│ │
+│   │    context to files)     │    │    output for CLI)           │ │
+│   └──────────────────────────┘    └──────────────────────────────┘ │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                        .onboardme/                                  │
+│  ├── context/           (gathered codebase knowledge)               │
+│  ├── prepared/          (game-ready structured data)                │
+│  ├── template/          (user's game template - optional)           │
+│  └── state/             (progress, history - managed by CLI)        │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     OnboardMe CLI                                   │
+│  • onboardme init     → Sets up .onboardme, installs skill          │
+│  • onboardme start    → Validates prepared/, runs games             │
+│  • onboardme status   → Shows progress                              │
+│  • onboardme template → Creates/builds user template                │
+│  • onboardme validate → Checks prepared/ structure                  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -54,232 +69,230 @@ This document covers the high-level architecture, technical stack, file system s
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
+| AI Workflow | Skill-based | User controls when AI runs; no complex CLI-agent integration |
 | Delivery | Standalone CLI | Maximum interactivity, works in any terminal |
-| AI Backend | User's existing agent | No API key management, leverages existing tools |
+| AI Backend | User's AI platform | Platform agnostic—works with Cursor, Claude, any skill-supporting tool |
 | State | Local filesystem | Simple, portable, no accounts needed |
 | Game Logic | Deterministic | Predictable, testable, doesn't require AI for core loop |
-| AI Role | Content generation + dynamic responses | Init generates content; runtime AI for briefs, boss, Q&A |
+| Games | Plugin-based | Composable, extensible, users can customize or create games |
+| Templates | User-configurable | Users define which games to include and their order |
 
 ---
 
-## 3. CLI vs Agent Responsibilities
+## 3. Skill-Based Workflow
 
-| Component | CLI Responsibility | Agent Responsibility |
-|-----------|-------------------|---------------------|
-| **Init** | Orchestrate scanning | Analyze code, generate questions |
-| **Game Loop** | Display UI, track state | — |
-| **Question Display** | Render question, timer, UI | — |
-| **Answer Validation** | Check against expected answer | Evaluate free-form answers |
-| **Knowledge Briefs** | Display template | Generate contextual explanation |
-| **Boss Battle** | Manage phases, health, lives | Regenerate questions each attempt |
-| **User Q&A** | Detect when user asks question | Answer based on context |
+OnboardMe uses two AI skills that users run from their AI platform:
+
+### Skill 1: Initialize Context
+
+**Purpose:** Scan the repository and gather all context needed for games.
+
+**When to run:** After `onboardme init`, or when you want to refresh context.
+
+**What it gathers:**
+
+| Category | Data | Stored In |
+|----------|------|-----------|
+| Project Meta | name, language, framework, package manager, file count | `meta.json` |
+| Structure | key directories, entry points, folder patterns | `structure.json` |
+| Services | services map, dependencies, key functions | `services.json` |
+| Data Flows | user journeys, request paths, architecture layers | `flows.json` |
+| Domain | terms, acronyms, configs, business concepts | `domain.json` |
+| Features | feature areas, modules, what the app does | `features.json` |
+| Technical Debt | TODOs, oldest TODO, longest functions, complexity | `debt.json` |
+| Tests | test files, test frameworks, failing test candidates | `tests.json` |
+| Documentation | README content, doc files, inline docs | `docs.json` |
+| Git History | old commits, authors, monster birth year | `history.json` |
+
+**Output:** Files saved to `.onboardme/context/`
+
+### Skill 2: Prepare Game
+
+**Purpose:** Transform raw context into game-ready structure based on template.
+
+**When to run:** After context initialization, or after template changes.
+
+**What it does:**
+1. Reads template (user's custom or default)
+2. For each game in template:
+   - Reads game's required context schema
+   - Transforms raw context into game-specific structure
+   - Generates questions/challenges
+3. Writes to `.onboardme/prepared/`
+
+**Output:** Files saved to `.onboardme/prepared/`
+
+### Workflow Diagram
+
+```
+User runs: onboardme init
+       │
+       ▼
+CLI creates .onboardme/, installs skill, updates .gitignore
+       │
+       ▼
+User tells AI: "Run initialize context"
+       │
+       ▼
+Skill scans repo → writes to .onboardme/context/
+       │
+       ▼
+User tells AI: "Run prepare game"
+       │
+       ▼
+Skill reads template + context → writes to .onboardme/prepared/
+       │
+       ▼
+User runs: onboardme start
+       │
+       ▼
+CLI validates prepared/ → runs games → saves state
+```
 
 ---
 
-## 4. Tech Stack
+## 4. Plugin Architecture
+
+Games are **plugins**—modular, composable units that can be mixed, matched, and customized.
+
+### Plugin Schema
+
+Each game plugin defines its schema:
+
+```typescript
+interface GamePluginSchema {
+  id: string;                     // e.g., "file-detective"
+  name: string;                   // e.g., "file --detective"
+  description: string;
+  estimatedTime: number;          // minutes
+  
+  // What context this game needs (for skill to generate)
+  requiredContext: ContextRequirement[];
+}
+
+interface ContextRequirement {
+  key: string;                    // e.g., "projectType", "techStack"
+  source: string;                 // Which context file to read from
+  schema: JSONSchema;             // Expected output schema
+}
+```
+
+### Game Plugin Interface
+
+```typescript
+abstract class GamePlugin {
+  abstract schema: GamePluginSchema;
+  
+  // Lifecycle (called by CLI)
+  abstract initialize(preparedData: GamePreparedData): Promise<void>;
+  abstract start(): Promise<void>;
+  abstract getCurrentQuestion(): GameQuestion;
+  abstract submitAnswer(answer: string): Promise<AnswerResult>;
+  abstract end(): GameResult;
+  
+  // Optional hooks
+  onCorrectAnswer?(question: GameQuestion): void;
+  onWrongAnswer?(question: GameQuestion): void;
+  onHintUsed?(question: GameQuestion): void;
+}
+```
+
+### Template System
+
+Templates define which games to include and their order. **Position in array = TODO level.**
+
+**Default template (bundled):**
+
+```typescript
+// Built into onboardme package
+export const defaultTemplate = [
+  FileDetective,        // Position 0 → TODO #0
+  FlowTrace,            // Position 1 → TODO #1
+  GrepHunt,             // Position 2 → TODO #2
+  SpaghettiMonster,     // Last → FIXME (boss)
+];
+```
+
+**User's custom template:**
+
+```typescript
+// .onboardme/template/template.ts
+import { FileDetective, FlowTrace, GrepHunt, SpaghettiMonster } from 'onboardme';
+
+export const template = [
+  FileDetective,
+  FlowTrace,
+  // GrepHunt removed - team doesn't want this game
+  SpaghettiMonster,
+];
+```
+
+**Or JSON format:**
+
+```json
+{
+  "games": [
+    { "id": "file-detective" },
+    { "id": "flow-trace" },
+    { "id": "spaghetti-monster" }
+  ]
+}
+```
+
+### Adding Custom Games
+
+Users can create their own games:
+
+1. Create game class extending `GamePlugin`
+2. Define schema with required context
+3. Add to template
+4. Run `onboardme template build` (if TypeScript)
+
+```typescript
+// .onboardme/template/games/my-custom-game.ts
+import { GamePlugin } from 'onboardme';
+
+export class MyCustomGame extends GamePlugin {
+  schema = {
+    id: 'my-custom-game',
+    name: 'custom --game',
+    description: 'My team-specific onboarding game',
+    estimatedTime: 10,
+    requiredContext: [
+      {
+        key: 'customData',
+        source: 'features.json',
+        schema: { type: 'array', items: { type: 'object' } }
+      }
+    ]
+  };
+  
+  // ... implement methods
+}
+
+// Add to template
+import { FileDetective, SpaghettiMonster } from 'onboardme';
+import { MyCustomGame } from './games/my-custom-game';
+
+export const template = [
+  FileDetective,
+  MyCustomGame,      // Custom game at position 1
+  SpaghettiMonster,
+];
+```
+
+---
+
+## 5. Tech Stack
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
 | Language | TypeScript | Type safety, good CLI tooling |
 | CLI Framework | Commander.js or Oclif | Mature, well-documented |
-| Terminal UI | Ink (React for CLI) or Blessed | Rich terminal UI |
+| Terminal UI | Ink (React for CLI) | Rich terminal UI, React patterns |
 | Testing | Vitest | Fast, modern |
 | Build | tsup or esbuild | Fast builds |
 | Package | npm | Standard distribution |
-
----
-
-## 5. Game Template Architecture
-
-Games are **modular, isolated, and extensible**. Each game is a self-contained unit that can be:
-- Developed independently
-- Tested in isolation
-- Added/removed without affecting others
-- Run standalone for debugging
-
-### Base Game Interface
-
-```typescript
-interface GameConfig {
-  id: string;                    // e.g., "tree-discover"
-  name: string;                  // e.g., "tree --discover"  
-  level: number;                 // 1-5 or 0 for boss
-  description: string;
-  estimatedTime: number;         // minutes
-  maxQuestions: number;
-}
-
-interface GameState {
-  currentQuestion: number;
-  score: number;
-  maxScore: number;
-  lives: number;
-  hintsRemaining: number;
-  streak: number;
-  startTime: Date;
-  answers: AnswerRecord[];
-}
-
-interface GameQuestion {
-  id: string;
-  type: 'multiple-choice' | 'text-input' | 'multi-step' | 'timed';
-  prompt: string;
-  context?: string;
-  hints: string[];
-  timeLimit?: number;            // seconds, optional
-  validation: ValidationRule;
-  knowledgeReward: string[];     // Knowledge IDs unlocked on correct
-  xpReward: number;
-}
-
-interface GameResult {
-  completed: boolean;
-  score: number;
-  maxScore: number;
-  timeSpent: number;
-  knowledgeUnlocked: string[];
-  totalXP: number;
-}
-
-abstract class BaseGame {
-  abstract config: GameConfig;
-  protected state: GameState;
-  protected context: CodebaseContext;
-  protected questions: GameQuestion[];
-
-  // Lifecycle
-  abstract initialize(context: CodebaseContext): Promise<void>;
-  abstract generateQuestions(): Promise<GameQuestion[]>;
-  abstract start(): Promise<void>;
-  abstract pause(): void;
-  abstract resume(): void;
-  abstract end(): GameResult;
-
-  // Question flow
-  abstract getCurrentQuestion(): GameQuestion;
-  abstract submitAnswer(answer: string): Promise<AnswerResult>;
-  abstract useHint(): string | null;
-  abstract skip(): void;
-
-  // Teaching
-  abstract generateBrief(question: GameQuestion, wasCorrect: boolean): Promise<string>;
-
-  // For isolated testing/debugging
-  abstract runTestMode(mockContext?: Partial<CodebaseContext>): Promise<void>;
-}
-```
-
-### Game Registry
-
-Games are registered centrally and loaded dynamically:
-
-```typescript
-// src/games/registry.ts
-const gameRegistry = new Map<string, typeof BaseGame>();
-
-function registerGame(gameClass: typeof BaseGame) {
-  const instance = new gameClass();
-  gameRegistry.set(instance.config.id, gameClass);
-}
-
-function getGame(id: string): BaseGame {
-  const GameClass = gameRegistry.get(id);
-  if (!GameClass) throw new Error(`Game '${id}' not found`);
-  return new GameClass();
-}
-
-// Auto-register all games
-registerGame(TreeDiscoverGame);
-registerGame(PsAuxGrepGame);
-registerGame(GrepHuntGame);
-// ... etc
-```
-
-### Isolated Game Testing
-
-Each game can be run standalone:
-
-```bash
-# Run a specific game in test mode with mock context
-npm run game:test tree-discover
-
-# Run with verbose output
-npm run game:test tree-discover -- --verbose
-
-# Run with a specific test fixture
-npm run game:test grep-hunt -- --fixture=./tests/fixtures/small-ts-app
-```
-
-The test runner:
-1. Loads the game class
-2. Provides mock or real context
-3. Runs through all questions
-4. Reports results and any errors
-
-### Adding New Games
-
-To add a new game:
-
-1. Create `src/games/levelN/my-new-game.ts`
-2. Extend `BaseGame`
-3. Implement all abstract methods
-4. Register in `src/games/registry.ts`
-5. Add to level configuration
-6. Create question generation prompts
-
-```typescript
-// Example: Adding a new game
-export class MyNewGame extends BaseGame {
-  config = {
-    id: 'my-new-game',
-    name: 'my --newgame',
-    level: 2,
-    description: 'Description of what this game teaches',
-    estimatedTime: 8,
-    maxQuestions: 6,
-  };
-
-  async initialize(context: CodebaseContext): Promise<void> {
-    this.context = context;
-    this.questions = await this.generateQuestions();
-  }
-
-  async generateQuestions(): Promise<GameQuestion[]> {
-    // Use agent to generate context-specific questions
-    // or use predefined templates filled with context data
-  }
-
-  // ... implement other methods
-}
-```
-
-### Boss as a Special Game
-
-The boss battle is also a game, but with special mechanics:
-
-```typescript
-class SpaghettiCodeMonsterBoss extends BaseGame {
-  config = {
-    id: 'spaghetti-monster',
-    name: 'FIXME: // the monster',
-    level: 0,  // Special level for boss (FIXME)
-    description: 'Final confrontation with the Spaghetti Code Monster',
-    estimatedTime: 15,
-    maxQuestions: 0,  // Dynamic
-  };
-
-  // Boss-specific properties
-  technicalDebt: number = 100;  // Not "health" - we're documenting, not killing
-  shields: number = 5;
-  currentPhase: 1 | 2 | 3 = 1;
-  glitchIntensity: 'none' | 'light' | 'medium' | 'heavy' | 'extreme' = 'none';
-
-  // Override to regenerate questions each attempt
-  async generateQuestions(): Promise<GameQuestion[]> {
-    // Questions are regenerated each attempt to prevent memorization
-  }
-}
-```
 
 ---
 
@@ -289,10 +302,11 @@ class SpaghettiCodeMonsterBoss extends BaseGame {
 onboardme/
 ├── src/
 │   ├── cli/                    # CLI command handlers
-│   │   ├── init.ts
-│   │   ├── start.ts
-│   │   ├── status.ts
-│   │   └── ...
+│   │   ├── init.ts             # Setup .onboardme, install skill
+│   │   ├── start.ts            # Validate & run games
+│   │   ├── status.ts           # Show progress
+│   │   ├── template.ts         # Template management
+│   │   └── validate.ts         # Validate prepared/ structure
 │   ├── core/                   # Core game engine
 │   │   ├── engine.ts           # Main game loop
 │   │   ├── state.ts            # State management
@@ -301,67 +315,65 @@ onboardme/
 │   │   ├── pacing.ts           # Emotional pacing & valleys
 │   │   ├── behavioral.ts       # Player behavior tracking
 │   │   └── rendering.ts        # Text animation & typing speeds
-│   ├── challenges/             # Sub-task implementations
+│   ├── games/                  # Game plugin implementations
 │   │   ├── base/               # Base classes & interfaces
-│   │   │   ├── BaseChallenge.ts
-│   │   │   ├── types.ts
-│   │   │   └── registry.ts
-│   │   ├── todo-1/
-│   │   │   ├── tree-discover.ts
-│   │   │   └── ps-aux-grep.ts
-│   │   ├── todo-2/
-│   │   │   ├── grep-hunt.ts
-│   │   │   └── import-puzzle.ts
-│   │   ├── todo-3/
-│   │   │   ├── traceroute-function.ts
-│   │   │   └── debug-inject.ts
-│   │   ├── todo-4/
-│   │   │   ├── whois-system.ts
-│   │   │   └── man-explain-20q.ts
-│   │   ├── todo-5/
-│   │   │   ├── tail-incident.ts
-│   │   │   └── chmod-deploy.ts
-│   │   └── fixme/
-│   │       └── spaghetti-monster.ts
-│   ├── agent/                  # Agent framework adapters
-│   │   ├── adapter.ts          # Base adapter interface
-│   │   ├── claude-code.ts      # Claude Code implementation
-│   │   └── index.ts            # Agent detection & factory
-│   ├── bootstrap/              # Context gathering
-│   │   ├── scanner.ts          # File system scanning
-│   │   ├── analyzer.ts         # Code analysis
-│   │   ├── monster.ts          # Monster generation
-│   │   └── memory-logs.ts      # Generate memory logs from git history
-│   │   └── questions.ts        # Question generation
+│   │   │   ├── GamePlugin.ts   # Abstract plugin class
+│   │   │   ├── types.ts        # Shared types
+│   │   │   └── schemas.ts      # JSON schemas for validation
+│   │   ├── file-detective/
+│   │   │   ├── index.ts
+│   │   │   └── schema.json
+│   │   ├── flow-trace/
+│   │   │   ├── index.ts
+│   │   │   └── schema.json
+│   │   ├── grep-hunt/
+│   │   │   ├── index.ts
+│   │   │   └── schema.json
+│   │   └── spaghetti-monster/
+│   │       ├── index.ts
+│   │       └── schema.json
+│   ├── template/               # Template handling
+│   │   ├── loader.ts           # Load user/default template
+│   │   ├── builder.ts          # Build TypeScript templates
+│   │   └── default.ts          # Default game template
+│   ├── validation/             # Prepared data validation
+│   │   ├── validator.ts        # Validate against schemas
+│   │   └── errors.ts           # Structured error output
 │   ├── state/                  # State persistence
 │   │   ├── progress.ts
 │   │   ├── history.ts
 │   │   └── documentation.ts
 │   ├── ui/                     # Terminal UI components
 │   │   ├── components/         # Reusable UI elements
-│   │   │   ├── dialogue-choice.tsx  # Player choice prompts
-│   │   │   └── memory-log.tsx       # Memory fragment display
+│   │   │   ├── dialogue-choice.tsx
+│   │   │   └── memory-log.tsx
 │   │   ├── screens/            # Full-screen layouts
-│   │   │   ├── cold-open.tsx   # Atmospheric introduction
-│   │   │   ├── loading.tsx     # Worldbuilding loading screens
-│   │   │   └── victory.tsx     # Victory summary card
+│   │   │   ├── cold-open.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── victory.tsx
 │   │   ├── animations/         # Animation helpers
-│   │   │   ├── glitch.ts       # Visual corruption effects
-│   │   │   └── typewriter.ts   # Variable typing speeds
-│   │   └── theme.ts            # Colors, borders, etc.
-│   └── utils/                  # Shared utilities
+│   │   │   ├── glitch.ts
+│   │   │   └── typewriter.ts
+│   │   └── theme.ts
+│   └── utils/
 │       ├── fs.ts
 │       ├── git.ts
 │       └── prompt.ts
+├── skill/                      # OnboardMe skill (installed to user's project)
+│   ├── SKILL.md                # Main skill instructions
+│   └── references/
+│       ├── context-schema.md   # What to gather
+│       └── game-schemas/       # Per-game requirements
+│           ├── file-detective.md
+│           ├── flow-trace.md
+│           └── ...
 ├── tests/
 │   ├── unit/
 │   ├── integration/
-│   ├── games/                  # Game-specific tests
-│   └── fixtures/               # Test codebases
+│   ├── games/
+│   └── fixtures/
 ├── package.json
 ├── tsconfig.json
-├── PRD.md
-├── PROGRESS.md
 └── README.md
 ```
 
@@ -369,251 +381,197 @@ onboardme/
 
 ## 7. File System Structure
 
-All game data stored in `.onboarding/` at repository root.
+All game data stored in `.onboardme/` at repository root.
 
 ```
-.onboarding/
-├── config.json                    # Settings & agent configuration
-├── context/
-│   ├── codebase.json             # Full gathered context
-│   ├── monster.json              # Generated monster info
-│   ├── services.json             # Service map with verified data
-│   ├── functions.json            # Key functions extracted
-│   ├── flows.json                # Data flow traces
-│   └── domain.json               # Business terms & acronyms
-├── todos/
-│   ├── todo-1/
-│   │   ├── tree-discover.json    # Challenges for this sub-task
-│   │   └── ps-aux-grep.json
-│   ├── todo-2/
-│   │   ├── grep-hunt.json
-│   │   └── import-puzzle.json
-│   ├── todo-3/
-│   │   ├── traceroute-function.json
-│   │   └── debug-inject.json
-│   ├── todo-4/
-│   │   ├── whois-system.json
-│   │   └── man-explain-20q.json
-│   ├── todo-5/
-│   │   ├── incident-simulator.json
-│   │   └── chmod-deploy.json
-│   └── fixme/
-│       └── spaghetti-monster.json
-├── state/
-│   ├── progress.json             # Current TODO, sub-task, challenge
+.onboardme/
+├── context/                      # Raw gathered context (from skill)
+│   ├── meta.json                 # Project metadata
+│   ├── structure.json            # Directory structure, entry points
+│   ├── services.json             # Service map
+│   ├── flows.json                # Data flows and user journeys
+│   ├── domain.json               # Terms, acronyms, business logic
+│   ├── features.json             # Feature areas
+│   ├── debt.json                 # Technical debt analysis
+│   ├── tests.json                # Test framework, test files
+│   ├── docs.json                 # Documentation summary
+│   └── history.json              # Git history analysis
+├── prepared/                     # Game-ready data (from skill)
+│   ├── manifest.json             # Which games, in what order
+│   ├── games/
+│   │   ├── file-detective/
+│   │   │   ├── config.json
+│   │   │   └── questions.json
+│   │   ├── flow-trace/
+│   │   │   ├── config.json
+│   │   │   └── journeys.json
+│   │   └── spaghetti-monster/
+│   │       ├── config.json
+│   │       └── phases.json
+│   └── narrative/
+│       ├── monster.json          # Generated monster personality
+│       └── memory-logs.json      # Backstory fragments
+├── template/                     # User's custom template (optional)
+│   ├── template.ts               # or template.json
+│   └── games/                    # Custom game implementations
+│       └── my-custom-game.ts
+├── state/                        # Game state (managed by CLI)
+│   ├── progress.json             # Current game, question
 │   ├── history.json              # All answers with timestamps
 │   ├── knowledge.json            # Unlocked knowledge entries
 │   └── achievements.json         # Badges & milestones
-└── .gitignore                    # Ignore state/ (keep context/ & games/)
+└── .gitignore
 ```
 
 ### What to Gitignore
 
 ```gitignore
-# .onboarding/.gitignore
+# .onboardme/.gitignore
+
+# Generated by skills (regenerate with skills)
+context/
+prepared/
 
 # User-specific state (don't commit)
 state/
 
-# Keep these (can be shared/regenerated)
-# context/
-# games/
-# config.json
+# Keep these (commit to share with team)
+# template/   - Custom game templates
 ```
+
+**Rationale:**
+- `context/` — Regenerated by "initialize context" skill, can be large
+- `prepared/` — Regenerated by "prepare game" skill
+- `state/` — User-specific progress, never commit
+- `template/` — Custom templates should be committed so team shares same games
 
 ---
 
-## 8. Agent Framework Integration
+## 8. CLI Commands
 
-### Strategy
+The CLI is a **runner**—it validates prepared data and runs games. AI work happens through skills.
 
-The CLI delegates AI tasks to the user's existing agent framework. The user:
-1. Already has an agent installed and authenticated (e.g., Claude Code)
-2. Selects which agent to use during `onboardme init`
-3. OnboardMe calls the agent's CLI under the hood
+### Core Commands
 
-### Supported Agents
+| Command | Purpose |
+|---------|---------|
+| `onboardme init` | Setup `.onboardme/`, install skill, update `.gitignore` |
+| `onboardme start` | Validate `prepared/`, run games, save state |
+| `onboardme status` | Show current progress |
+| `onboardme validate` | Check if `prepared/` is valid, output errors for AI to fix |
+| `onboardme template` | Create starter template for customization |
+| `onboardme template build` | Compile TypeScript template |
 
-| Agent | Status | Detection | Invocation |
-|-------|--------|-----------|------------|
-| **Claude Code** | ✅ v1 | Check for `claude` command | `claude -p "..." --output-format json` |
-| **Cursor CLI** | 🔜 v2 | Check for `cursor` command | TBD |
-| **OpenCode** | 🔜 v2 | Check for `opencode` command | TBD |
-| **Aider** | 🔜 Future | Check for `aider` command | TBD |
+### Error Output for AI
 
-### v1: Claude Code Integration
+When validation fails, CLI outputs structured errors that can be shown to AI:
 
-For v1, we support Claude Code only. This simplifies:
-- Single CLI interface to learn
-- Single output format to parse
-- Smaller surface area for bugs
-
-**Claude Code CLI Usage:**
-```bash
-# Basic invocation
-claude -p "Your prompt here"
-
-# With JSON output (easier to parse)
-claude -p "Your prompt here" --output-format json
-
-# With specific model
-claude -p "Your prompt here" --model claude-sonnet-4-20250514
-```
-
-### Agent Invocation Wrapper
-
-```typescript
-interface AgentResponse {
-  content: string;
-  success: boolean;
-  error?: string;
-}
-
-async function askAgent(prompt: string): Promise<AgentResponse> {
-  const config = loadConfig();
-  
-  if (config.agent !== 'claude-code') {
-    throw new Error(`Agent '${config.agent}' not yet supported. Use 'claude-code'.`);
-  }
-  
-  try {
-    const result = await execAsync(
-      `claude -p "${escapeShell(prompt)}" --output-format json`
-    );
-    return { content: result.stdout, success: true };
-  } catch (error) {
-    return { content: '', success: false, error: error.message };
-  }
+```json
+{
+  "valid": false,
+  "errors": [
+    {
+      "game": "flow-trace",
+      "field": "journeys[0].entryPoint",
+      "error": "Missing required field",
+      "expected": "string",
+      "received": "undefined"
+    }
+  ],
+  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
 }
 ```
 
-### Agent Setup Flow
-
-```
-$ onboardme init
-
-🔧 AGENT SETUP
-
-Which AI agent do you use?
-
-  ● Claude Code (recommended)
-  ○ Cursor CLI (coming soon)
-  ○ OpenCode (coming soon)
-
-Checking Claude Code installation...
-  ✓ Found: claude v1.0.3
-  ✓ Authenticated: yes
-
-Agent configured! Proceeding with scan...
-
-[Codebase scanning...]
-[Analysis complete]
-
-*kzzzt*
-"Oh. A new one."
-"Welcome to the codebase."
-*[CONNECTION ESTABLISHED]*
-
-[Game introduction begins...]
-```
-
-**Note:** The cold open (Monster's first appearance) occurs immediately after the scan completes, before any game explanation. See [COLD-OPEN.md](context/narrative/COLD-OPEN.md) for full specifications.
-
-### When Agent is Invoked
-
-| Action | Agent Needed? | Purpose |
-|--------|---------------|---------|
-| Init: Scan codebase | Yes | Analyze and understand code |
-| Init: Generate questions | Yes | Create contextual challenges |
-| Init: Generate memory logs | Yes | Create backstory from git history |
-| Game: Display question | No | Static content |
-| Game: Check multiple choice | No | Deterministic comparison |
-| Game: Evaluate free-form | Yes | Understand user's answer |
-| Game: Generate brief | Yes | Contextual explanation |
-| Game: Track behavior | No | Pattern detection (local) |
-| Boss: Regenerate questions | Yes | Dynamic difficulty |
-| User asks question | Yes | Answer based on context |
-| Post-game: Suggest first task | Yes | Match TODO to player knowledge |
-| Post-game: Generate artifact | Yes | Create CODEBASE_KNOWLEDGE.md content |
+**Workflow for fixing:**
+1. User runs `onboardme start`
+2. CLI outputs validation error
+3. User shows error to AI
+4. AI re-runs prepare skill to fix
+5. User runs `onboardme start` again
 
 ---
 
-## 9. Bootstrap: Context Gathering
+## 9. Context Schema
 
-### What Gets Gathered
+Context files have defined schemas that skills must follow.
+
+### meta.json
 
 ```typescript
-interface CodebaseContext {
-  // Project metadata
-  meta: {
-    projectName: string;
-    language: string;
-    framework: string;
-    packageManager: string;
-    totalFiles: number;
-    totalLines: number;
+interface MetaContext {
+  projectName: string;
+  language: string;           // "TypeScript", "JavaScript", "Python", etc.
+  framework: string;          // "Express", "Next.js", "Django", etc.
+  packageManager: string;     // "npm", "yarn", "pnpm", "pip", etc.
+  totalFiles: number;
+  totalLines: number;
+  entryPoints: string[];      // Main entry files
+}
+```
+
+### structure.json
+
+```typescript
+interface StructureContext {
+  keyDirectories: Array<{
+    path: string;
+    purpose: string;
+    contents: string[];       // Key files in this directory
+  }>;
+  patterns: {
+    hasTests: boolean;
+    testPattern: string;      // e.g., "**/*.test.ts"
+    hasConfig: boolean;
+    configFiles: string[];
   };
-  
-  // Services/modules
+}
+```
+
+### services.json
+
+```typescript
+interface ServicesContext {
   services: Array<{
     name: string;
-    path: string;                  // Verified to exist
+    path: string;             // Verified to exist
     description: string;
     entryPoint: string;
-    dependencies: string[];        // Other services
-    externalDeps: string[];        // npm packages, APIs
-    keyFunctions: FunctionInfo[];
+    dependencies: string[];   // Other services
+    externalDeps: string[];   // npm packages, APIs
+    keyFunctions: Array<{
+      name: string;
+      file: string;
+      line: number;
+      description: string;
+    }>;
   }>;
-  
-  // Data flows
-  flows: Array<{
-    name: string;
-    trigger: string;               // e.g., "POST /api/checkout"
-    steps: FlowStep[];
-  }>;
-  
-  // Domain knowledge
-  domain: {
-    terms: Record<string, string>;
-    acronyms: Record<string, string>;
-    configs: ConfigEntry[];
-  };
-  
-  // Monster origin (technical debt analysis)
+}
+```
+
+### debt.json
+
+```typescript
+interface DebtContext {
   monster: {
-    birthYear: number;             // Oldest file creation date
-    todoCount: number;             // Actual TODO count
-    oldestTodo: string;            // Most ancient TODO still in code
+    birthYear: number;        // Oldest file creation date
+    todoCount: number;        // Actual TODO count in codebase
+    oldestTodo: {
+      text: string;
+      file: string;
+      line: number;
+      age: string;            // "3 years", etc.
+    };
     longestFunction: {
       name: string;
       lines: number;
       file: string;
     };
-    complexityScore: number;
-    mostComplexPath: string;
-  };
-  
-  // Verification
-  _verified: {
-    timestamp: string;
-    filesChecked: number;
-    allPathsExist: boolean;
+    complexityScore: number;  // 1-100
   };
 }
 ```
 
-### Verification Requirements
-
-**Every piece of information must be verifiable:**
-
-| Data | Verification |
-|------|--------------|
-| Service path | `fs.existsSync(path)` |
-| Function location | Parse file, confirm line number |
-| Config value | Read actual config file |
-| Data flow step | Trace imports and calls |
-
-If something can't be verified, it's marked as `uncertain` and not used in questions.
+> **Complete schema definitions:** See [PLUGIN-ARCHITECTURE.md](./technical/PLUGIN-ARCHITECTURE.md) for all context schemas and game-specific requirements.
 
 ---
 
@@ -636,7 +594,37 @@ brew install onboardme
 
 - Node.js 18+
 - Git (for history analysis)
-- One of: Cursor CLI, Claude Code, OpenCode (for AI features)
+- AI platform with skill support (Cursor, Claude Desktop, etc.)
+
+### Setup Flow
+
+```bash
+# 1. Install CLI
+npm install -g onboardme
+
+# 2. Initialize in your repo
+cd your-project
+onboardme init
+
+# This creates:
+# - .onboardme/ folder structure
+# - .onboardme/.gitignore
+# - Installs skill to your AI platform
+
+# 3. Run skills from your AI platform
+# Tell AI: "Run initialize context"
+# Tell AI: "Run prepare game"
+
+# 4. Start playing
+onboardme start
+```
+
+### What `onboardme init` Does
+
+1. Creates `.onboardme/` directory structure (`context/`, `prepared/`, `template/`, `state/`)
+2. Creates `.onboardme/.gitignore` (ignores `context/`, `prepared/`, `state/`)
+3. Installs the OnboardMe skill to user's AI platform
+4. Outputs next steps for user
 
 ---
 

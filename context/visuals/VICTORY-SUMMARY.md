@@ -208,7 +208,7 @@ Save victory summary? (y/n)
   [n] Continue
 ```
 
-**Saved as:** `.onboarding/VICTORY.txt`
+**Saved as:** `.onboardme/VICTORY.txt`
 
 **Format:** ASCII art version with full stats
 
@@ -243,7 +243,7 @@ After displaying the victory summary:
 │                                                              │
 │  Share your victory:                                         │
 │                                                              │
-│  [1] Save to file (.onboarding/VICTORY.txt)                  │
+│  [1] Save to file (.onboardme/VICTORY.txt)                   │
 │  [2] Copy to clipboard (Markdown)                            │
 │  [3] Both                                                    │
 │  [4] Skip                                                    │
@@ -331,7 +331,7 @@ If multiple team members play, create a leaderboard:
 ╚══════════════════════════════════════════════════════════════╝
 ```
 
-**Storage:** `.onboarding/leaderboard.json` (team-shared)
+**Storage:** `.onboardme/leaderboard.json` (team-shared)
 
 ---
 
