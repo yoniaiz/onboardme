@@ -11,7 +11,7 @@ import {
 	DeductionScreen,
 	EvidenceBoard,
 	MonsterReaction,
-} from "../components/index.tsx";
+} from "../components/index.ts";
 import { QuestionDisplay } from "../components/question.tsx";
 import { useTheme } from "../theme.tsx";
 

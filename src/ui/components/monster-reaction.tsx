@@ -32,8 +32,9 @@ export function MonsterReaction({
 			</Box>
 
 			<Box flexDirection="column" gap={0}>
-				{dialogue.map((line) => (
-					<DialogueLine key={line || "empty-line"} line={line} />
+				{dialogue.map((line, idx) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: Static dialogue array never reorders
+					<DialogueLine key={idx} line={line} />
 				))}
 			</Box>
 
