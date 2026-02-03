@@ -239,17 +239,20 @@ After completing TODO #2 (last task before boss):
 
 *the ASCII form flickers into view*
 
-     ╭─────────╮
-     │ { ◉ ◉ } │
-     │  ~~~~   │
-     ╰────┬────╯
-       ╱│││╲
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
+   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│
+        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱
 
 *HRRRRRRRRRRNNNNNN*
 
 "I AM this codebase."
 
-*tentacles spread*
+*tentacles spread, spaghetti overflows*
 
 "Every shortcut."
 
