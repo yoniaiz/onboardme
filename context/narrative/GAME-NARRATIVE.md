@@ -699,57 +699,70 @@ Instead of telling the Monster's backstory directly, players unlock "Corrupted M
 
 ## 7. Visual Direction
 
-### Monster ASCII Art — Minimalistic Design
+### Monster ASCII Art — Chaotic to Clean Design
 
-The Monster uses a small, expressive design that communicates "spaghetti code" through curly braces, wavy lines, and tentacle-like dependencies.
+The Monster uses an expressive design that communicates "tangled legacy code" through:
+- `{ }` curly braces as the core identity
+- `~~~~` wavy lines representing spaghetti code that **escapes its boundaries**
+- Asymmetric tentacles representing chaotic dependencies
+- Larger presence befitting a final boss encounter
 
 **100% — Full Power**
 ```
-     ╭─────────╮
-     │ { ◉ ◉ } │
-     │  ~~~~   │
-     ╰────┬────╯
-       ╱│││╲
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
+   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│
+        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱
+              ╱  │││  ╲
 ```
 
 **50% — Worried**
 ```
-     ╭─────────╮
-     │ { ◉ _ } │
-     │  ~~     │
-     ╰────┬────╯
-       ╱│╲
+        ╭───────────╮
+    ~~~~│ { ◉   _ } │~~~~
+   ~~╱~~│    ~~     │~~╲~~
+     ╱  ╰─────┬─────╯  ╲
+    │       ╱│││╲       │
+    │        │││        │
+     ╲       │││       ╱
+              │
 ```
 
 **10% — Critical**
 ```
-     ╭  ─  ─  ╮
-     │ { x x } │
-     │         │
-     ╰ ─ ─┬─ ─╯
+      ╭  ─  ─  ─  ─  ╮
+      │ { x     x }  │
+      │              │
+      ╰ ─ ─ ─┬─ ─ ─ ╯
+             │
 ```
 
 **0% — Documented (Peaceful)**
 ```
-     ╭─────────╮
-     │ { - - } │
-     │   __    │
-     ╰─────────╯
+        ╭───────────╮
+        │ { -   - } │
+        │    __     │
+        ╰───────────╯
 ```
 
 ### With Dialogue
 
 ```
- ╭────────────────────────────────────╮
- │ "I've crashed more browsers than   │
- │  you've written functions."        │
- ╰──────────────────┬─────────────────╯
-                    │
-               ╭─────────╮
-               │ { ◉ ◉ } │
-               │  ~~~~   │
-               ╰────┬────╯
-                 ╱│││╲
+ ╭──────────────────────────────────────────╮
+ │ "I've crashed more browsers than         │
+ │  you've written functions."              │
+ ╰─────────────────────┬────────────────────╯
+                       │
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
 ```
 
 > **Full visual specifications:** See [fixme-spaghetti-monster/GAME-VISUALS.md](../games/fixme-spaghetti-monster/GAME-VISUALS.md)
