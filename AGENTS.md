@@ -6,6 +6,7 @@ This is OnboardMe — a gamified CLI tool for codebase onboarding.
 
 Before making changes, understand the project:
 
+- **[PROGRESS.md](./PROGRESS.md)** — Current milestone, task breakdown, and what to work on next
 - **[PRD.md](./PRD.md)** — Product requirements, vision, game design, and user journey
 - **[context/ARCHITECTURE.md](./context/ARCHITECTURE.md)** — Technical architecture, plugin system, and file structure
 
@@ -142,22 +143,33 @@ tests/
 
 ## Session Workflow
 
-### Before Making Changes
+### Before Starting Work
 
-1. Read relevant documentation (PRD, Architecture, specific context files)
-2. Understand the existing code structure
-3. Plan the minimal changes needed
+1. **Check [PROGRESS.md](./PROGRESS.md)** — Find the next `pending` task in the current milestone
+2. **Mark task as `in_progress`** — Update PROGRESS.md before starting
+3. Read relevant documentation for the task (PRD, Architecture, specific context files)
+4. Understand the existing code structure
+5. Plan the minimal changes needed
 
-### After Making Changes
+### While Working
 
-Run quality checks before finishing:
+- Complete one task at a time
+- Follow task acceptance criteria
+- Keep changes focused on the current task
+
+### After Completing a Task
+
+1. **Mark task as `completed`** in PROGRESS.md
+2. Run quality checks:
 
 ```bash
-bun run test        # Ensure tests pass
-bun run typecheck   # Ensure types are correct
+bun run test        # If you changed code that could affect tests
+bun run typecheck   # If you changed types or added new code
 bun run check       # Ensure code style is clean
 bun run knip        # Ensure no unused code
 ```
+
+3. Move to the next `pending` task, or end the session
 
 Only run checks for affected areas — if you changed code that could affect tests, run tests. If you only changed types, run typecheck.
 
@@ -167,6 +179,8 @@ Only run checks for affected areas — if you changed code that could affect tes
 
 ### Always Do
 
+- Check PROGRESS.md for the next task before starting work
+- Mark tasks as `in_progress` before starting, `completed` when done
 - Read documentation before implementing
 - Keep files under 200 lines
 - Add integration tests for new features
@@ -206,6 +220,7 @@ onboardme/
 │   ├── technical/
 │   └── visuals/
 ├── PRD.md                # Product requirements
+├── PROGRESS.md           # Task tracking & milestones
 ├── AGENTS.md             # This file
 ├── package.json
 ├── tsconfig.json
@@ -215,5 +230,5 @@ onboardme/
 
 ---
 
-*Document Version: 0.1*
+*Document Version: 0.2*
 *Last Updated: 2026-02-03*
