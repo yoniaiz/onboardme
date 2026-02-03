@@ -104,3 +104,35 @@ export function LoadManifestErrorScreen(): React.ReactElement {
 		</Box>
 	);
 }
+
+interface EngineInitErrorScreenProps {
+	errors: string[];
+}
+
+export function EngineInitErrorScreen({
+	errors,
+}: EngineInitErrorScreenProps): React.ReactElement {
+	return (
+		<Box flexDirection="column" gap={1}>
+			<Title>Starting OnboardMe...</Title>
+
+			<ErrorMessage>Failed to initialize game engine</ErrorMessage>
+
+			<Box flexDirection="column">
+				<Muted>Errors:</Muted>
+				{errors.map((err) => (
+					<Text key={err}>
+						{"  "}
+						<Text color="#ff6b6b">•</Text> {err}
+					</Text>
+				))}
+			</Box>
+
+			<RoundedBox variant="warning" title="How to Fix">
+				<Step number="1">Run the 'prepare game' skill in your AI platform</Step>
+				<Step number="2">Run: onboardme validate</Step>
+				<Step number="3">Once valid, run: onboardme start</Step>
+			</RoundedBox>
+		</Box>
+	);
+}

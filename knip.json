@@ -1,6 +1,14 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
-	"entry": ["tests/**/*.test.ts"],
+	"entry": [
+		"src/core/index.ts",
+		"src/testing/index.ts",
+		"src/testing/runner.ts",
+		"src/games/mock/index.ts",
+		"src/ui/screens/index.ts",
+		"src/ui/components/index.ts",
+		"tests/**/*.test.ts"
+	],
 	"project": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts"],
 	"ignoreBinaries": ["tsc"],
 	"rules": {
