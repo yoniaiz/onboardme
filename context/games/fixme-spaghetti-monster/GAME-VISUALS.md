@@ -31,14 +31,13 @@ A design that communicates "tangled legacy code monster" through:
 **100% — Full Power**
 ```
             ╭───────────╮
-    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+    ~~~~~~~~│ { ◉\ /◉ } │~~~~~~~~
   ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
      ╱ │    ╰─────┬─────╯    │ ╲
     ╱ ╱│        ╱│││╲        │╲ ╲
    │ ╱ │       ╱ │││ ╲       │ ╲ │
    │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│
         ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱
-              ╱  │││  ╲
 ```
 
 **75% — Concerned**
@@ -50,7 +49,7 @@ A design that communicates "tangled legacy code monster" through:
     ╱│        ╱│││╲        │╲
    │ │       ╱ │││ ╲       │ │
    │ ╲╲       ╱│││╲       ╱╱ │
-      ╲╲      │││       ╱╱
+      ╲╲       │││       ╱╱
 ```
 
 **50% — Worried**
@@ -62,7 +61,6 @@ A design that communicates "tangled legacy code monster" through:
     │       ╱│││╲       │
     │        │││        │
      ╲       │││       ╱
-              │
 ```
 
 **25% — Desperate**
@@ -73,7 +71,6 @@ A design that communicates "tangled legacy code monster" through:
       ╰──────┬──────╯
             ╱│╲
             │││
-             │
 ```
 
 **10% — Critical**

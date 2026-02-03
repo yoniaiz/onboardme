@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 2 In Progress  
-> **Current Focus**: Game Engine Core — Plugin system, game loop, scoring
+> **Status**: Milestone 3 In Progress  
+> **Current Focus**: First Game — file --detective playable end-to-end
 
 ---
 
@@ -22,17 +22,173 @@
 
 ---
 
-## Milestone 2: Game Engine Core
+## Milestone 3: First Game — file --detective
+
+**Goal**: Implement the first real game (file-detective) playable end-to-end. Players investigate evidence, build case notes, and make a final deduction about the project type.
+
+**Success Criteria**:
+- [ ] FileDetective game plugin with investigation mechanics
+- [ ] Evidence board UI with selectable evidence categories
+- [ ] Case notes accumulate as player examines evidence
+- [ ] Final deduction phase with multiple-choice project type
+- [ ] Prepared data schema defined for skill to generate
+- [ ] Integration tests for complete game flow
+- [ ] Monster reaction dialogue on game completion
+
+---
+
+### Tasks
+
+#### 3.1 FileDetective Game Plugin
+`completed`
+
+**Goal**: Create the core FileDetective game plugin that extends GamePlugin.
+
+**Files to create**:
+- `src/games/file-detective/index.ts` — Main game plugin class
+- `src/games/file-detective/types.ts` — Game-specific types (Evidence, CaseNote, Deduction)
+- `src/games/file-detective/schema.ts` — Plugin schema with required context
+
+**Acceptance Criteria**:
+- Extends GamePlugin base class
+- Schema defines required context (projectType, evidence, deduction)
+- Tracks examined evidence and case notes
+- Handles investigation flow (examine → answer → update notes)
+- Final deduction validation
+
+---
+
+#### 3.2 Prepared Data Schema
+`completed`
+
+**Goal**: Define the prepared data schema that the AI skill will generate.
+
+**Files created/updated**:
+- `src/games/file-detective/prepared-schema.ts` — Zod schema + validatePreparedData function
+- `src/core/loader.ts` — Integrated schema validation for file-detective
+- `src/commands/validate.ts` — Added game data validation (imports from game folder)
+
+**Acceptance Criteria**:
+- Schema for evidence categories (rootFiles, folderStructure, dependencies, scripts, configFiles)
+- Schema for questions per evidence category
+- Schema for correct deduction (projectType, language, framework, architecture)
+- Validation functions for prepared data
+
+---
+
+#### 3.3 Investigation Flow Logic
+`completed`
+
+**Goal**: Implement the investigation state machine and flow.
+
+**Files to update**:
+- `src/games/file-detective/index.ts` — Add investigation methods
+
+**Acceptance Criteria**:
+- Player can select evidence category to examine
+- Questions presented based on category
+- Answers update case notes
+- Track examined vs. unexamined evidence
+- Transition to deduction when ready
+
+---
+
+#### 3.4 Evidence Board UI Component
+`completed`
+
+**Goal**: Create the evidence board UI showing selectable evidence and case notes.
+
+**Files to create**:
+- `src/ui/components/evidence-board.tsx` — Main evidence board component
+- `src/ui/components/case-notes.tsx` — Accumulated findings display
+
+**Acceptance Criteria**:
+- Display 5 evidence categories with examine status
+- Show case notes accumulated so far
+- Keyboard navigation (1-5 to select, D for deduction)
+- Visual distinction for examined vs. unexamined
+
+---
+
+#### 3.5 Final Deduction UI
+`completed`
+
+**Goal**: Create the final deduction screen where player makes their conclusion.
+
+**Files to create**:
+- `src/ui/components/deduction.tsx` — Final deduction component
+
+**Acceptance Criteria**:
+- Multiple-choice project type selection
+- Show case notes for reference
+- Correct/incorrect feedback with explanation
+- Commits awarded based on correctness
+
+---
+
+#### 3.6 Game Screen Integration
+`pending`
+
+**Goal**: Integrate FileDetective with the game screen and engine.
+
+**Files to update**:
+- `src/ui/screens/game-screen.tsx` — Handle file-detective specific UI modes
+- `src/core/bootstrap.ts` — Register FileDetective plugin
+
+**Acceptance Criteria**:
+- GameScreen renders evidence board for file-detective
+- Handles transitions between investigation and deduction
+- Progress tracking works correctly
+- Monster reaction displays on completion
+
+---
+
+#### 3.7 Test Fixtures & Prepared Data
+`pending`
+
+**Goal**: Create test fixtures and sample prepared data for development.
+
+**Files to create**:
+- `src/games/file-detective/fixtures.ts` — Test fixtures for unit tests
+- `tests/fixtures/file-detective/` — Sample prepared data files
+
+**Acceptance Criteria**:
+- Sample prepared data matching schema
+- Configurable fixtures for different project types
+- Can test various investigation paths
+
+---
+
+#### 3.8 Integration Tests
+`pending`
+
+**Goal**: End-to-end tests for file-detective game.
+
+**Files to create**:
+- `tests/integration/file-detective.test.ts` — Full game flow tests
+
+**Acceptance Criteria**:
+- Test complete investigation flow
+- Test partial examination + deduction
+- Test correct and incorrect deductions
+- Test case notes accumulation
+- Test scoring and commits
+
+---
+
+## Milestone 2: Game Engine Core ✓
 
 **Goal**: Build the core game engine that can load plugins, run games, track scoring, and manage state. After this milestone, we can plug in actual games.
 
 **Success Criteria**:
-- [ ] Game plugin base class with lifecycle methods (initialize, start, submitAnswer, end)
-- [ ] Template system loads game order from manifest
-- [ ] Game engine runs games in sequence
-- [ ] Scoring system tracks Commits, streaks, and time
-- [ ] State persists progress between sessions
-- [ ] `onboardme start` launches first game when prepared data exists
+- [x] Game plugin base class with lifecycle methods (initialize, start, submitAnswer, end)
+- [x] Template system loads game order from manifest
+- [x] Game engine runs games in sequence
+- [x] Scoring system tracks Commits, streaks, and time
+- [x] State persists progress between sessions
+- [x] `onboardme start` launches first game when prepared data exists
+
+**Completed**: 2026-02-03
 
 ---
 
@@ -238,8 +394,7 @@
 
 | Milestone | Goal | Depends On |
 |-----------|------|------------|
-| **M3: First Game** | `file-detective` game playable end-to-end | M2 |
-| **M4: Narrative System** | Monster dialogue, cold open, pacing | M2 |
+| **M4: Narrative System** | Monster dialogue, cold open, pacing | M3 |
 | **M5: Boss Battle** | Spaghetti Monster encounter | M3, M4 |
 | **M6: Skills & Context** | AI skills for context gathering | M3 |
 | **M7: Polish & Victory** | Victory screen, knowledge export, PR generation | M5 |
@@ -262,4 +417,4 @@
 
 ---
 
-*Last Updated: 2026-02-03 (M2 Planning)*
+*Last Updated: 2026-02-03 (M3 Planning)*

@@ -1,10 +1,12 @@
 import { join } from "node:path";
+import { FileDetectivePreparedDataSchema } from "@/games/file-detective/prepared-schema.ts";
 import { fileExists, readJson } from "@/lib/fs.ts";
 import { getPreparedDir } from "@/lib/paths.ts";
 import type { GamePreparedData } from "./types.ts";
 
 const GAMES_DIR = "games";
 const DATA_FILE = "data.json";
+const FILE_DETECTIVE_ID = "file-detective";
 
 export function getGameDataPath(rootDir: string, gameId: string): string {
 	return join(getPreparedDir(rootDir), GAMES_DIR, gameId, DATA_FILE);
@@ -30,6 +32,10 @@ export async function validateGameData(
 	const data = await loadGameData(rootDir, gameId);
 	if (!data) {
 		return false;
+	}
+
+	if (gameId === FILE_DETECTIVE_ID) {
+		return FileDetectivePreparedDataSchema.safeParse(data).success;
 	}
 
 	return (

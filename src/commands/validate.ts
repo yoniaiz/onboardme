@@ -1,6 +1,12 @@
+import { getGameDataPath } from "@/core/loader.ts";
+import { validatePreparedData as validateFileDetective } from "@/games/file-detective/prepared-schema.ts";
 import { ExitCode } from "@/lib/errors.ts";
+import { fileExists } from "@/lib/fs.ts";
 import { findOnboardMeRoot } from "@/lib/paths.ts";
 import { validateManifest } from "@/services/validation.ts";
+import type { ValidationResult } from "@/types/manifest.ts";
+
+const FILE_DETECTIVE_ID = "file-detective";
 
 export async function validateCommand(): Promise<number> {
 	const rootDir = findOnboardMeRoot();
@@ -20,8 +26,26 @@ export async function validateCommand(): Promise<number> {
 		return ExitCode.NotInitialized;
 	}
 
-	const validationResult = await validateManifest(rootDir);
-	console.log(JSON.stringify(validationResult, null, 2));
+	const manifestResult = await validateManifest(rootDir);
+	const gameResults = await validateGameData(rootDir);
 
-	return validationResult.valid ? ExitCode.Success : ExitCode.ValidationFailed;
+	const combinedResult: ValidationResult = {
+		valid: manifestResult.valid && gameResults.valid,
+		errors: [...manifestResult.errors, ...gameResults.errors],
+		suggestion: manifestResult.suggestion ?? gameResults.suggestion,
+	};
+
+	console.log(JSON.stringify(combinedResult, null, 2));
+
+	return combinedResult.valid ? ExitCode.Success : ExitCode.ValidationFailed;
+}
+
+async function validateGameData(rootDir: string): Promise<ValidationResult> {
+	const fileDetectivePath = getGameDataPath(rootDir, FILE_DETECTIVE_ID);
+
+	if (!fileExists(fileDetectivePath)) {
+		return { valid: true, errors: [] };
+	}
+
+	return validateFileDetective(rootDir);
 }
