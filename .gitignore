@@ -20,3 +20,6 @@ bun.lock
 # OS
 .DS_Store
 Thumbs.db
+
+# OnboardMe local data
+.onboardme/

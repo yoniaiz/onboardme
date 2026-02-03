@@ -1,0 +1,23 @@
+{
+	"version": "1.0.0",
+	"generatedAt": "2024-01-15T10:00:00.000Z",
+	"projectName": "test-project",
+	"games": [
+		{
+			"id": "file-detective",
+			"name": "File Detective",
+			"description": "Learn the project structure by finding key files",
+			"difficulty": "easy",
+			"estimatedMinutes": 15,
+			"journeys": [
+				{
+					"id": "journey-1",
+					"name": "Find the Entry Point",
+					"entryPoint": "src/index.ts",
+					"checkpoints": ["src/lib/", "src/commands/"]
+				}
+			],
+			"maxScore": 100
+		}
+	]
+}
