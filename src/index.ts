@@ -1,18 +1,23 @@
 #!/usr/bin/env node
+import chalk from "chalk";
 import { Command } from "commander";
-import { initCommand } from "@/commands/init.ts";
-import { startCommand } from "@/commands/start.ts";
-import { statusCommand } from "@/commands/status.ts";
+import { initCommand } from "@/commands/init.tsx";
+import { startCommand } from "@/commands/start.tsx";
+import { statusCommand } from "@/commands/status.tsx";
 import { validateCommand } from "@/commands/validate.ts";
 import { ExitCode, type OnboardMeError } from "@/lib/errors.ts";
-import { colors, formatError } from "@/ui/theme.ts";
+import { theme } from "@/ui/theme.tsx";
 import packageJson from "../package.json";
+
+const { colors, symbols } = theme;
 
 const program = new Command();
 
 program
 	.name("onboardme")
-	.description(colors.primary("Gamified CLI for codebase onboarding"))
+	.description(
+		chalk.hex(colors.primary)("Gamified CLI for codebase onboarding"),
+	)
 	.version(packageJson.version, "-v, --version", "Show version number")
 	.helpOption("-h, --help", "Show help");
 
@@ -50,14 +55,20 @@ async function runCommand(command: () => Promise<number>): Promise<void> {
 		process.exit(exitCode);
 	} catch (error) {
 		if (isOnboardMeError(error)) {
-			console.error(formatError(error.message));
+			console.error(
+				`${chalk.hex(colors.error)(symbols.error)} ${chalk.hex(colors.error)(error.message)}`,
+			);
 			if (error.suggestion) {
-				console.error(`\n  ${colors.muted("To fix:")} ${error.suggestion}`);
+				console.error(
+					`\n  ${chalk.hex(colors.muted)("To fix:")} ${error.suggestion}`,
+				);
 			}
 			process.exit(error.code);
 		}
-		console.error(formatError("An unexpected error occurred"));
-		console.error(colors.muted(String(error)));
+		console.error(
+			`${chalk.hex(colors.error)(symbols.error)} ${chalk.hex(colors.error)("An unexpected error occurred")}`,
+		);
+		console.error(chalk.hex(colors.muted)(String(error)));
 		process.exit(ExitCode.GeneralError);
 	}
 }

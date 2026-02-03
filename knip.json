@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/knip@5/schema.json",
-	"entry": ["src/ui/components/app.tsx", "tests/**/*.test.ts"],
+	"entry": ["tests/**/*.test.ts"],
 	"project": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts"],
 	"ignoreBinaries": ["tsc"],
 	"rules": {

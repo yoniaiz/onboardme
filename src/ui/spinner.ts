@@ -1,9 +1,10 @@
+import chalk from "chalk";
 import ora, { type Ora } from "ora";
-import { colors } from "./theme.ts";
+import { theme } from "./theme.tsx";
 
 function createSpinner(text: string): Ora {
 	return ora({
-		text: colors.muted(text),
+		text: chalk.hex(theme.colors.muted)(text),
 		spinner: "dots",
 	});
 }
