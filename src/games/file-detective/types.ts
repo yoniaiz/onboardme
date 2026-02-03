@@ -9,6 +9,7 @@ export interface EvidenceQuestion {
 	id: string;
 	prompt: string;
 	options?: string[];
+	correctAnswer?: string;
 }
 
 export interface EvidenceCategory {

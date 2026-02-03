@@ -1,37 +1,28 @@
-import { Box, Text, useInput } from "ink";
+import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import type React from "react";
 import { useState } from "react";
 import type { AnswerResult, GameQuestion } from "@/core/types.ts";
 import { useTheme } from "../theme.tsx";
+import { AnswerOptions } from "./answer-options.tsx";
 
 interface QuestionDisplayProps {
 	question: GameQuestion;
 	onSubmit: (answer: string) => void;
 	disabled?: boolean;
+	wrongAnswers?: string[];
 }
 
 export function QuestionDisplay({
 	question,
 	onSubmit,
 	disabled = false,
+	wrongAnswers = [],
 }: QuestionDisplayProps): React.ReactElement {
 	const { colors } = useTheme();
 
 	const isMultipleChoice =
 		question.type === "multiple-choice" && Boolean(question.options);
-
-	useInput(
-		(input) => {
-			if (disabled || !isMultipleChoice) return;
-
-			const num = Number.parseInt(input, 10);
-			if (num >= 1 && num <= (question.options?.length ?? 0)) {
-				onSubmit(question.options?.[num - 1] ?? "");
-			}
-		},
-		{ isActive: !disabled && isMultipleChoice },
-	);
 
 	return (
 		<Box flexDirection="column" gap={1}>
@@ -52,8 +43,10 @@ export function QuestionDisplay({
 			</Box>
 
 			{isMultipleChoice ? (
-				<MultipleChoiceOptions
+				<AnswerOptions
 					options={question.options ?? []}
+					wrongAnswers={wrongAnswers}
+					onSelect={onSubmit}
 					disabled={disabled}
 				/>
 			) : (
@@ -66,31 +59,9 @@ export function QuestionDisplay({
 
 			<Text color={colors.muted}>
 				{isMultipleChoice
-					? `Press 1-${question.options?.length ?? 4} to select`
+					? "Use arrows to navigate, Enter to select"
 					: "Press Enter to submit"}
 			</Text>
-		</Box>
-	);
-}
-
-interface MultipleChoiceOptionsProps {
-	options: string[];
-	disabled: boolean;
-}
-
-function MultipleChoiceOptions({
-	options,
-	disabled,
-}: MultipleChoiceOptionsProps): React.ReactElement {
-	const { colors } = useTheme();
-
-	return (
-		<Box flexDirection="column" paddingLeft={2}>
-			{options.map((option, index) => (
-				<Text key={option} color={disabled ? colors.muted : colors.text}>
-					<Text color={colors.secondary}>[{index + 1}]</Text> {option}
-				</Text>
-			))}
 		</Box>
 	);
 }

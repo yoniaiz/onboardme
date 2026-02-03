@@ -12,7 +12,8 @@ export function ProgressBar({
 	width = 20,
 }: ProgressBarProps): React.ReactElement {
 	const { colors, symbols } = useTheme();
-	const filled = Math.round((percentage / 100) * width);
+	const clampedPercentage = Math.max(0, Math.min(100, percentage));
+	const filled = Math.round((clampedPercentage / 100) * width);
 	const empty = width - filled;
 
 	return (

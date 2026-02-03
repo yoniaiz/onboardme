@@ -1,6 +1,4 @@
-import { Box, Text, useInput } from "ink";
-import Divider from "ink-divider";
-import SelectInput from "ink-select-input";
+import { Box, Text } from "ink";
 import type React from "react";
 import type {
 	CaseNote,
@@ -8,7 +6,9 @@ import type {
 	ProjectTypeInfo,
 } from "@/games/file-detective/types.ts";
 import { useTheme } from "../theme.tsx";
+import { AnswerOptions } from "./answer-options.tsx";
 import { CaseNotes } from "./case-notes.tsx";
+import { Divider } from "./divider.tsx";
 
 interface DeductionScreenProps {
 	prompt: string;
@@ -16,11 +16,7 @@ interface DeductionScreenProps {
 	caseNotes: CaseNote[];
 	onSelect: (optionId: string) => void;
 	disabled?: boolean;
-}
-
-interface SelectItem {
-	label: string;
-	value: string;
+	wrongAnswers?: string[];
 }
 
 export function DeductionScreen({
@@ -29,30 +25,17 @@ export function DeductionScreen({
 	caseNotes,
 	onSelect,
 	disabled = false,
+	wrongAnswers = [],
 }: DeductionScreenProps): React.ReactElement {
 	const { colors } = useTheme();
 
-	const selectableItems: SelectItem[] = options.map((option, index) => ({
-		label: `[${index + 1}] ${option.label}`,
-		value: option.id,
-	}));
+	const optionLabels = options.map((opt) => opt.label);
+	const labelToId = new Map(options.map((opt) => [opt.label, opt.id]));
 
-	const handleSelect = (item: SelectItem) => {
-		if (disabled) return;
-		onSelect(item.value);
+	const handleSelect = (label: string) => {
+		const id = labelToId.get(label);
+		if (id) onSelect(id);
 	};
-
-	useInput(
-		(input) => {
-			if (disabled) return;
-
-			const num = Number.parseInt(input, 10);
-			if (num >= 1 && num <= options.length) {
-				onSelect(options[num - 1].id);
-			}
-		},
-		{ isActive: !disabled },
-	);
 
 	return (
 		<Box
@@ -81,17 +64,12 @@ export function DeductionScreen({
 
 			<Text> </Text>
 
-			{disabled ? (
-				<Box flexDirection="column" paddingLeft={2}>
-					{options.map((option, index) => (
-						<Text key={option.id} color={colors.muted}>
-							[{index + 1}] {option.label}
-						</Text>
-					))}
-				</Box>
-			) : (
-				<SelectInput items={selectableItems} onSelect={handleSelect} />
-			)}
+			<AnswerOptions
+				options={optionLabels}
+				wrongAnswers={wrongAnswers}
+				onSelect={handleSelect}
+				disabled={disabled}
+			/>
 
 			<Text> </Text>
 			<Divider />
@@ -100,9 +78,7 @@ export function DeductionScreen({
 			<CaseNotes notes={caseNotes} />
 
 			<Text> </Text>
-			<Text color={colors.muted}>
-				Press 1-{options.length} to select your deduction
-			</Text>
+			<Text color={colors.muted}>Use arrows to navigate, Enter to select</Text>
 		</Box>
 	);
 }

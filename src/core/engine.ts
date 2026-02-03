@@ -130,6 +130,10 @@ export class GameEngine {
 		return this.resolvedGames[this.currentGameIndex].id;
 	}
 
+	getCurrentPlugin(): GamePlugin | null {
+		return this.currentPlugin;
+	}
+
 	getProgress(): EngineProgress {
 		const totalQuestions = this.currentPlugin?.getProgress().total ?? 0;
 		const currentQuestionIndex = this.currentPlugin?.getProgress().current ?? 0;
@@ -152,25 +156,29 @@ export class GameEngine {
 		const answerTimeMs = Date.now() - this.questionStartTime;
 		const result = await this.currentPlugin.submitAnswer(answer);
 
-		const scoreResult = calculateScore({
-			correct: result.correct,
-			answerTimeMs,
-			currentStreak: this.streakState.currentStreak,
-			config: this.scoringConfig,
-		});
+		const isNavigation = result.isNavigation === true;
 
-		result.commitsEarned = scoreResult.totalCommits;
-		this.streakState = updateStreak(result.correct, this.streakState);
+		if (!isNavigation) {
+			const scoreResult = calculateScore({
+				correct: result.correct,
+				answerTimeMs,
+				currentStreak: this.streakState.currentStreak,
+				config: this.scoringConfig,
+			});
 
-		await recordAnswer(
-			this.rootDir,
-			result.correct,
-			scoreResult.totalCommits,
-			answerTimeMs,
-		);
+			result.commitsEarned = scoreResult.totalCommits;
+			this.streakState = updateStreak(result.correct, this.streakState);
 
-		const updatedProgress = await getOrCreateProgress(this.rootDir);
-		this.sessionStats = { ...updatedProgress.stats };
+			await recordAnswer(
+				this.rootDir,
+				result.correct,
+				scoreResult.totalCommits,
+				answerTimeMs,
+			);
+
+			const updatedProgress = await getOrCreateProgress(this.rootDir);
+			this.sessionStats = { ...updatedProgress.stats };
+		}
 
 		this.callbacks.onAnswerResult?.(result, {
 			streak: this.streakState.currentStreak,

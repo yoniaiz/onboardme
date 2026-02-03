@@ -127,19 +127,37 @@
 ---
 
 #### 3.6 Game Screen Integration
-`pending`
+`completed`
 
 **Goal**: Integrate FileDetective with the game screen and engine.
 
-**Files to update**:
+**Files updated/created**:
 - `src/ui/screens/game-screen.tsx` — Handle file-detective specific UI modes
-- `src/core/bootstrap.ts` — Register FileDetective plugin
+- `src/core/engine.ts` — Added getCurrentPlugin() method, skip scoring for navigation
+- `src/games/file-detective/index.ts` — Added getConfig(), getProgress(), retry logic
+- `src/ui/components/monster-reaction.tsx` — Monster reaction dialogue component
+- `src/ui/components/evidence-board.tsx` — Removed duplicate category list
+- `src/ui/components/question.tsx` — SelectInput for options, wrong answer display
+- `src/ui/components/deduction.tsx` — Wrong answer display with retry
+- `src/ui/components/progress.tsx` — Clamped percentage to prevent crashes
+- `src/games/file-detective/types.ts` — Added correctAnswer to EvidenceQuestion
+- `scripts/dev-setup.ts` — Added correctAnswer values for testing
 
 **Acceptance Criteria**:
 - GameScreen renders evidence board for file-detective
 - Handles transitions between investigation and deduction
-- Progress tracking works correctly
+- Progress tracking works correctly (categories examined / total)
 - Monster reaction displays on completion
+
+**Additional UX/Game Mechanics Fixes**:
+- Evidence questions validate answers with correctAnswer field
+- Wrong answers stay on screen with red strikethrough, user retries until correct
+- Final deduction allows retry until correct answer
+- Category/evidence selection doesn't award commits (navigation only)
+- Smooth transitions without UI glitches (no grayed-out evidence board)
+- Single evidence list (removed duplicate display)
+- SelectInput for all multiple-choice questions (arrow key navigation)
+- Progress bar shows meaningful "X/5 categories" instead of question index
 
 ---
 
@@ -417,4 +435,4 @@
 
 ---
 
-*Last Updated: 2026-02-03 (M3 Planning)*
+*Last Updated: 2026-02-03 (M3 Task 3.6 Complete with UX Fixes)*

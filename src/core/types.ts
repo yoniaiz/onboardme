@@ -19,6 +19,7 @@ export interface AnswerResult {
 	feedback: string;
 	knowledgeUnlocked?: string[];
 	commitsEarned: number;
+	isNavigation?: boolean;
 }
 
 export interface GameResult {

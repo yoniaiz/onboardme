@@ -1,9 +1,11 @@
 export { withSpinner } from "../spinner.ts";
+export { AnswerOptions, WrongAnswerList } from "./answer-options.tsx";
 export { Banner } from "./banner.tsx";
 export { CaseNotes } from "./case-notes.tsx";
 export { DeductionResultScreen, DeductionScreen } from "./deduction.tsx";
 export { EvidenceBoard } from "./evidence-board.tsx";
 export { Bullet, ErrorMessage, Step, Success, Warning } from "./feedback.tsx";
+export { MonsterReaction } from "./monster-reaction.tsx";
 export { ProgressBar, StatusIcon } from "./progress.tsx";
 export { FeedbackDisplay, QuestionDisplay } from "./question.tsx";
 export { ScoreDisplay } from "./score-display.tsx";

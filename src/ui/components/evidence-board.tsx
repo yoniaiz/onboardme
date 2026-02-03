@@ -1,5 +1,4 @@
 import { Box, Text, useInput } from "ink";
-import Divider from "ink-divider";
 import SelectInput from "ink-select-input";
 import type React from "react";
 import type {
@@ -9,6 +8,7 @@ import type {
 } from "@/games/file-detective/types.ts";
 import { useTheme } from "../theme.tsx";
 import { CaseNotes } from "./case-notes.tsx";
+import { Divider } from "./divider.tsx";
 
 const CATEGORY_ICONS: Record<EvidenceCategoryId, string> = {
 	"root-files": "📁",
@@ -40,7 +40,7 @@ export function EvidenceBoard({
 	onStartDeduction,
 	disabled = false,
 }: EvidenceBoardProps): React.ReactElement {
-	const { colors } = useTheme();
+	const { colors, symbols } = useTheme();
 
 	const examinedCount = examinedCategories.length;
 	const totalCount = categories.length;
@@ -91,6 +91,10 @@ export function EvidenceBoard({
 		{ isActive: !disabled },
 	);
 
+	const examinedItems = categories.filter((c) =>
+		examinedCategories.includes(c.id),
+	);
+
 	return (
 		<Box
 			flexDirection="column"
@@ -110,34 +114,36 @@ export function EvidenceBoard({
 
 			<Text> </Text>
 
-			<Box flexDirection="column">
-				{categories.map((category, index) => {
-					const isExamined = examinedCategories.includes(category.id);
-					const icon = CATEGORY_ICONS[category.id];
-					return (
-						<CategoryRow
-							key={category.id}
-							number={index + 1}
-							icon={icon}
-							title={category.title}
-							isExamined={isExamined}
-						/>
-					);
-				})}
-			</Box>
-
-			<Text> </Text>
-			<Divider />
-			<Text> </Text>
-
 			<CaseNotes notes={caseNotes} />
 
 			<Text> </Text>
 			<Divider />
 			<Text> </Text>
 
+			{examinedItems.length > 0 && (
+				<Box flexDirection="column" marginBottom={1}>
+					{examinedItems.map((c) => {
+						const categoryIndex =
+							categories.findIndex((cat) => cat.id === c.id) + 1;
+						const icon = CATEGORY_ICONS[c.id];
+						return (
+							<Text key={c.id} color={colors.muted}>
+								[{categoryIndex}] {icon} {c.title}{" "}
+								<Text color={colors.primary}>{symbols.success}</Text>
+							</Text>
+						);
+					})}
+				</Box>
+			)}
+
 			{disabled ? (
-				<Text color={colors.muted}>[D] Ready to make final deduction</Text>
+				<Box flexDirection="column">
+					{selectableItems.map((item) => (
+						<Text key={item.value} color={colors.muted}>
+							{item.label}
+						</Text>
+					))}
+				</Box>
 			) : (
 				<SelectInput items={selectableItems} onSelect={handleSelect} />
 			)}
@@ -146,38 +152,6 @@ export function EvidenceBoard({
 			<Text color={colors.muted}>
 				Press 1-{categories.length} to examine evidence, D for deduction
 			</Text>
-		</Box>
-	);
-}
-
-interface CategoryRowProps {
-	number: number;
-	icon: string;
-	title: string;
-	isExamined: boolean;
-}
-
-function CategoryRow({
-	number,
-	icon,
-	title,
-	isExamined,
-}: CategoryRowProps): React.ReactElement {
-	const { colors, symbols } = useTheme();
-
-	return (
-		<Box>
-			<Text color={isExamined ? colors.muted : colors.text}>
-				[{number}] {icon} {title}
-			</Text>
-			<Text>{"  "}</Text>
-			{isExamined ? (
-				<Text color={colors.primary} bold>
-					{symbols.success} EXAMINED
-				</Text>
-			) : (
-				<Text color={colors.muted}>{symbols.emptyCircle} Not examined</Text>
-			)}
 		</Box>
 	);
 }
