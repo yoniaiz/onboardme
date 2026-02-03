@@ -8,12 +8,12 @@
 		"onboardme": "dist/index.js"
 	},
 	"scripts": {
-		"cli": "bun run src/index.ts",
-		"cli:init": "bun run src/index.ts init",
-		"cli:start": "bun run src/index.ts start",
-		"cli:status": "bun run src/index.ts status",
-		"cli:validate": "bun run src/index.ts validate",
-		"dev": "bun run --hot src/index.ts",
+		"cli": "bun src/index.ts",
+		"cli:init": "bun src/index.ts init",
+		"cli:start": "bun src/index.ts start",
+		"cli:status": "bun src/index.ts status",
+		"cli:validate": "bun src/index.ts validate",
+		"dev": "bun --hot src/index.ts",
 		"build": "bun build src/index.ts --outdir dist --target node",
 		"typecheck": "tsc --noEmit",
 		"test": "bun test",
