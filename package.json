@@ -1,0 +1,31 @@
+{
+	"name": "onboardme",
+	"version": "0.1.0",
+	"description": "CLI onboarding tool",
+	"module": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run src/index.ts",
+		"build": "bun build src/index.ts --outdir ./dist --target bun",
+		"typecheck": "tsc --noEmit",
+		"knip": "knip",
+		"lint": "biome lint",
+		"lint:fix": "biome check --write",
+		"format": "biome format",
+		"format:fix": "biome format --write",
+		"check": "biome check",
+		"check:fix": "biome check --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.11",
+		"@types/bun": "latest",
+		"knip": "^5.81.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5.9.3"
+	},
+	"engines": {
+		"bun": ">=1.1.0"
+	}
+}
