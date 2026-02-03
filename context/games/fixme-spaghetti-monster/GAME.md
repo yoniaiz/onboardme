@@ -189,39 +189,47 @@ As Technical Debt decreases (100% → 0%), the Monster's appearance should chang
 
 **100% Debt (Full Power):**
 ```
-     ╭─────────╮
-     │ { ◉ ◉ } │
-     │  ~~~~   │
-     ╰────┬────╯
-       ╱│││╲
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
+   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│
+        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱
+              ╱  │││  ╲
 ```
-Jagged, many tentacles, red/chaotic colors
+Spaghetti escaping boundaries, chaotic tentacles, red/chaotic colors
 
 **50% Debt (Worried):**
 ```
-     ╭─────────╮
-     │ { ◉ _ } │
-     │  ~~     │
-     ╰────┬────╯
-       ╱│╲
+        ╭───────────╮
+    ~~~~│ { ◉   _ } │~~~~
+   ~~╱~~│    ~~     │~~╲~~
+     ╱  ╰─────┬─────╯  ╲
+    │       ╱│││╲       │
+    │        │││        │
+     ╲       │││       ╱
+              │
 ```
-Fewer tentacles, mixed colors
+Spaghetti receding, fewer tentacles, mixed colors
 
 **10% Debt (Critical):**
 ```
-     ╭  ─  ─  ╮
-     │ { - - } │
-     │         │
-     ╰ ─ ─┬─ ─╯
+      ╭  ─  ─  ─  ─  ╮
+      │ { x     x }  │
+      │              │
+      ╰ ─ ─ ─┬─ ─ ─ ╯
+             │
 ```
 Clean lines, minimal tentacles, green/calm colors
 
 **0% Debt (Documented/Peaceful):**
 ```
-     ╭─────────╮
-     │ { - - } │
-     │   __    │
-     ╰─────────╯
+        ╭───────────╮
+        │ { -   - } │
+        │    __     │
+        ╰───────────╯
 ```
 Completely clean, organized, peaceful expression
 
@@ -286,10 +294,10 @@ Conflicting information must be resolved, testing the player's comprehensive und
 
 The Monster's form flickers. Stabilizes. Changes.
 
-     ╭─────────╮
-     │ { - - } │
-     │   __    │
-     ╰─────────╯
+        ╭───────────╮
+        │ { -   - } │
+        │    __     │
+        ╰───────────╯
 
 *crackle*
 

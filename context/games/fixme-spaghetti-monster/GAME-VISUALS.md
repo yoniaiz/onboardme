@@ -2,74 +2,95 @@
 
 ## Visual Design Notes
 
-This is the boss battle. Visual elements should be **minimalistic but impactful**:
+This is the boss battle. Visual elements should be **dramatic and impactful**:
 
-- **Monster ASCII art** — small, cute, but menacing
-- **Health bar visualization** showing Monster Integrity
-- **Phase transitions** with subtle effects
-- **Damage animations** when Monster takes damage
+- **Monster ASCII art** — commanding presence, chaotic but sympathetic
+- **Health bar visualization** showing Technical Debt / Monster Integrity
+- **Phase transitions** with escalating visual effects
+- **Understanding animations** when technical debt decreases
 - **Victory/defeat animations** for endings
 
 ## Monster Design — The Spaghetti Code Monster
 
-A minimalistic design that communicates "code monster" through:
-- `{ }` curly braces as the body frame
-- `~~~~` wavy lines representing tangled spaghetti code
-- `╱│││╲` tentacles/dependencies hanging below
-- Visual degradation as health decreases
+A design that communicates "tangled legacy code monster" through:
+- `{ }` curly braces as the core identity (code)
+- `~~~~` wavy lines representing tangled spaghetti code that **escapes its boundaries**
+- Asymmetric tentacles representing chaotic dependencies
+- Visual progression from chaos to clean as technical debt decreases
+- Larger presence befitting a final boss encounter
+
+### Design Principles
+
+- **Spaghetti escapes the box** — Code that has grown beyond its intended scope
+- **Asymmetric tentacles** — Dependencies that vary in length and direction
+- **Dramatic size** — A final boss should command visual presence
+- **Chaos → Order** — Visual transformation tells the redemption story
 
 ### Health States
 
 **100% — Full Power**
 ```
-     ╭─────────╮
-     │ { ◉ ◉ } │
-     │  ~~~~   │
-     ╰────┬────╯
-       ╱│││╲
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
+   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│
+        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱
+              ╱  │││  ╲
 ```
 
 **75% — Concerned**
 ```
-     ╭─────────╮
-     │ { ◉ ◉ } │
-     │  ~~~    │
-     ╰────┬────╯
-       ╱││╲
+          ╭───────────╮
+    ~~~~~~│ { ◉   ◉ } │~~~~~~
+  ~~~~╱~~~│    ~~~    │~~~╲~~~~
+     ╱    ╰─────┬─────╯    ╲
+    ╱│        ╱│││╲        │╲
+   │ │       ╱ │││ ╲       │ │
+   │ ╲╲       ╱│││╲       ╱╱ │
+      ╲╲      │││       ╱╱
 ```
 
 **50% — Worried**
 ```
-     ╭─────────╮
-     │ { ◉ _ } │
-     │  ~~     │
-     ╰────┬────╯
-       ╱│╲
+        ╭───────────╮
+    ~~~~│ { ◉   _ } │~~~~
+   ~~╱~~│    ~~     │~~╲~~
+     ╱  ╰─────┬─────╯  ╲
+    │       ╱│││╲       │
+    │        │││        │
+     ╲       │││       ╱
+              │
 ```
 
 **25% — Desperate**
 ```
-     ╭ ─ ─ ─ ─╮
-     │ { x _ } │
-     │   ~     │
-     ╰────┬────╯
-        │
+      ╭ ─ ─ ─ ─ ─ ─ ╮
+   ~~ │ { x     _ } │ ~~
+      │      ~      │
+      ╰──────┬──────╯
+            ╱│╲
+            │││
+             │
 ```
 
 **10% — Critical**
 ```
-     ╭  ─  ─  ╮
-     │ { x x } │
-     │         │
-     ╰ ─ ─┬─ ─╯
+      ╭  ─  ─  ─  ─  ╮
+      │ { x     x }  │
+      │              │
+      ╰ ─ ─ ─┬─ ─ ─ ╯
+             │
 ```
 
 **0% — Documented (Peaceful)**
 ```
-     ╭─────────╮
-     │ { - - } │
-     │   __    │
-     ╰─────────╯
+        ╭───────────╮
+        │ { -   - } │
+        │    __     │
+        ╰───────────╯
 ```
 
 ### With Speech Bubble (Dialogue Display)
@@ -77,17 +98,18 @@ A minimalistic design that communicates "code monster" through:
 ```
  *kzzzt*
  
- ╭────────────────────────────────────╮
- │ "I've crashed more browsers than   │
- │  you've written functions."        │
- │                              *hrrrrnn* │
- ╰──────────────────┬─────────────────╯
-                    │
-               ╭─────────╮
-               │ { ◉ ◉ } │
-               │  ~~~~   │
-               ╰────┬────╯
-                 ╱│││╲
+ ╭──────────────────────────────────────────╮
+ │ "I've crashed more browsers than         │
+ │  you've written functions."              │
+ │                                 *hrrrrnn* │
+ ╰─────────────────────┬────────────────────╯
+                       │
+            ╭───────────╮
+    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~
+  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~
+     ╱ │    ╰─────┬─────╯    │ ╲
+    ╱ ╱│        ╱│││╲        │╲ ╲
+   │ ╱ │       ╱ │││ ╲       │ ╲ │
 ```
 
 ### With Extended Dialogue (Multiple Lines)
@@ -95,31 +117,33 @@ A minimalistic design that communicates "code monster" through:
 ```
  *crackle*
  
- ╭────────────────────────────────────╮
- │ "I was beautiful once."            │
- │                                    │
- │ *drip*                             │
- │                                    │
- │ "Clean. Single-responsibility."    │
- │                                    │
- │ *tangle*                           │
- │                                    │
- │ "Then came the edge cases."        │
- ╰──────────────────┬─────────────────╯
-                    │
-               ╭─────────╮
-               │ { ◉ _ } │
-               │  ~~     │
-               ╰────┬────╯
-                 ╱│╲
+ ╭──────────────────────────────────────────╮
+ │ "I was beautiful once."                  │
+ │                                          │
+ │ *drip*                                   │
+ │                                          │
+ │ "Clean. Single-responsibility."          │
+ │                                          │
+ │ *tangle*                                 │
+ │                                          │
+ │ "Then came the edge cases."              │
+ ╰─────────────────────┬────────────────────╯
+                       │
+        ╭───────────╮
+    ~~~~│ { ◉   _ } │~~~~
+   ~~╱~~│    ~~     │~~╲~~
+     ╱  ╰─────┬─────╯  ╲
+    │       ╱│││╲       │
 ```
 
-## Design Principles
+## Design Philosophy
 
-- **Minimalistic** — small footprint, easy to render
-- **Expressive** — conveys emotion through simple changes (eyes, tentacles)
-- **Code-themed** — curly braces and squiggles = spaghetti code
-- **Degradation** — visual "untangling" as it takes damage (fewer ~, fewer tentacles)
+- **Chaos escapes containment** — Spaghetti code overflows its boundaries, not neatly contained
+- **Expressive** — Conveys emotion through eyes, tentacles, and overall form
+- **Code-themed** — Curly braces as core identity, tildes as tangled code
+- **Progressive cleanup** — Visual "untangling" as technical debt decreases
+- **Boss presence** — Larger, more dramatic than regular game elements
+- **Asymmetry** — Chaotic dependencies don't follow neat patterns
 
 ## Health Bars with Character
 
