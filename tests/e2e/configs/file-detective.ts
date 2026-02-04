@@ -13,6 +13,7 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "rf-1",
 					prompt: "What file defines dependencies?",
+					options: ["package.json", "deps.txt", "requirements.txt", "Gemfile"],
 					correctAnswer: "package.json",
 				},
 			],
@@ -25,6 +26,7 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "fs-1",
 					prompt: "Where is the source code?",
+					options: ["src", "lib", "app", "source"],
 					correctAnswer: "src",
 				},
 			],
@@ -37,6 +39,7 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "dp-1",
 					prompt: "What runtime is used?",
+					options: ["bun", "node", "deno", "npm"],
 					correctAnswer: "bun",
 				},
 			],
@@ -49,6 +52,7 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "sc-1",
 					prompt: "What runs tests?",
+					options: ["test", "check", "verify", "spec"],
 					correctAnswer: "test",
 				},
 			],
@@ -61,6 +65,7 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "cf-1",
 					prompt: "TypeScript config file?",
+					options: ["tsconfig.json", "typescript.json", "ts.config.js", ".tsrc"],
 					correctAnswer: "tsconfig.json",
 				},
 			],

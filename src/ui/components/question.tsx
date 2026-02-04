@@ -81,6 +81,7 @@ function TextInputField({
 	const handleSubmit = (text: string) => {
 		if (!disabled && text.trim()) {
 			onSubmit(text.trim());
+			setValue("");
 		}
 	};
 
