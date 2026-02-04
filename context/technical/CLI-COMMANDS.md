@@ -182,64 +182,24 @@ $ onboardme status
 
 ### `onboardme validate`
 
-**What it does:** Checks if the prepared data is valid without starting the game. Useful for debugging.
+**What it does:** Validates the prepared data files (and manifest) without starting the game.
 
 **Usage:**
 ```bash
-onboardme validate                # Validate all
-onboardme validate --game=flow-trace  # Validate specific game
-onboardme validate --json         # Output as JSON (for AI consumption)
+onboardme validate
 ```
 
-**Output (success):**
-```
-$ onboardme validate
-
-Validating .onboardme/prepared/...
-
-  ✓ manifest.json
-  ✓ games/file-detective/config.json
-  ✓ games/file-detective/questions.json
-  ✓ games/flow-trace/config.json
-  ✓ games/flow-trace/journeys.json
-  ✓ games/spaghetti-monster/config.json
-  ✓ games/spaghetti-monster/phases.json
-  ✓ narrative/monster.json
-  ✓ narrative/memory-logs.json
-
-✅ All validation passed. Ready to play!
-
-*kzzzt*
-
-"The preparation is complete."
-
-*slrrrrp*
-
-"Now comes the fun part."
-
-*[VALIDATION COMPLETE]*
-```
-
-**Output (failure, JSON):**
-```
-$ onboardme validate --json
-
+**Output (JSON):**
+```json
 {
-  "valid": false,
-  "errors": [
-    {
-      "file": "games/flow-trace/journeys.json",
-      "game": "flow-trace",
-      "field": "journeys[0].entryPoint",
-      "error": "Missing required field",
-      "expected": "string",
-      "received": "undefined",
-      "line": 12
-    }
-  ],
-  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
+  "valid": true,
+  "errors": []
 }
 ```
+
+**Notes:**
+- Always prints JSON to stdout (intended for AI consumption).
+- Use this before `onboardme start` when you want to verify `.onboardme/prepared/` outputs.
 
 ---
 

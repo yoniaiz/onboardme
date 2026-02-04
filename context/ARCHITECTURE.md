@@ -56,7 +56,7 @@ OnboardMe uses a **skill-based architecture** where AI-powered context gathering
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     OnboardMe CLI                                   │
-│  • onboardme init     → Sets up .onboardme, installs skill          │
+│  • onboardme init     → Sets up .onboardme folder structure         │
 │  • onboardme game:new → Scaffolds a new game                        │
 │  • onboardme start    → Loads config, runs games                    │
 │  • onboardme status   → Shows progress                              │
