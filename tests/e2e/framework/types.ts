@@ -1,39 +1,21 @@
-import type React from "react";
-import type { GameEngine } from "@/core/engine.ts";
-import type { GamePluginConstructor } from "@/core/registry.ts";
-import type { AnswerResult, GameQuestion } from "@/core/types.ts";
+import type { AnswerResult, GameComponent, GameResult } from "@/types/game.ts";
 
-export interface GameCallbacks {
-	onSubmitAnswer: (answer: string) => Promise<void>;
+export interface E2EOptions<TConfig> {
+	GameComponent: GameComponent<TConfig>;
+	config: TConfig;
 }
 
-export interface GameRenderProps<TState = unknown> {
-	state: TState;
-	currentQuestion: GameQuestion | null;
-	lastResult: AnswerResult | null;
-	wrongAnswers: string[];
-	disabled: boolean;
-	callbacks: GameCallbacks;
-}
-
-export interface GameAdapter<TState = unknown> {
-	extractState(engine: GameEngine): TState | null;
-	createCallbacks(
-		submitAnswer: (answer: string) => Promise<void>,
-		getState: () => TState | null,
-	): GameCallbacks;
-	render(props: GameRenderProps<TState>): React.ReactElement | null;
-}
-
-export interface E2EGameConfig {
-	id: string;
-	plugin: GamePluginConstructor;
-	config: Record<string, unknown>;
-}
-
-export interface E2EOptions<TState = unknown> {
-	game: E2EGameConfig;
-	adapter: GameAdapter<TState>;
+export interface E2EHelper {
+	lastFrame(): string;
+	press(key: KeyName): Promise<void>;
+	type(text: string): Promise<void>;
+	waitFor(
+		condition: (frame: string) => boolean,
+		options?: { timeout?: number; interval?: number },
+	): Promise<void>;
+	debug(label?: string): void;
+	getResults(): AnswerResult[];
+	getGameResult(): GameResult | null;
 }
 
 export type KeyName =

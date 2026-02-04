@@ -1,6 +1,5 @@
 import type {
 	DeductionConfig,
-	DeductionOption,
 	EvidenceCategory,
 	FileDetectiveConfig,
 	ProjectTypeInfo,
@@ -108,72 +107,8 @@ const DEFAULT_DEDUCTION: DeductionConfig = {
 	correctId: "api-service",
 };
 
-export function createDefaultConfig(): FileDetectiveConfig {
-	return {
-		projectType: DEFAULT_PROJECT_TYPE,
-		evidence: DEFAULT_EVIDENCE,
-		deduction: DEFAULT_DEDUCTION,
-	};
-}
-
-export function parseConfig(raw: unknown): FileDetectiveConfig {
-	if (!isRecord(raw)) {
-		return createDefaultConfig();
-	}
-
-	return {
-		projectType: normalizeProjectType(raw.projectType),
-		evidence: normalizeEvidence(raw.evidence),
-		deduction: isRecord(raw.deduction)
-			? normalizeDeduction(raw.deduction)
-			: DEFAULT_DEDUCTION,
-	};
-}
-
-function normalizeProjectType(value: unknown): ProjectTypeInfo {
-	if (!isRecord(value)) {
-		return DEFAULT_PROJECT_TYPE;
-	}
-
-	return {
-		projectType:
-			typeof value.projectType === "string"
-				? value.projectType
-				: DEFAULT_PROJECT_TYPE.projectType,
-		language:
-			typeof value.language === "string"
-				? value.language
-				: DEFAULT_PROJECT_TYPE.language,
-		framework:
-			typeof value.framework === "string"
-				? value.framework
-				: DEFAULT_PROJECT_TYPE.framework,
-		architecture:
-			typeof value.architecture === "string"
-				? value.architecture
-				: DEFAULT_PROJECT_TYPE.architecture,
-	};
-}
-
-function normalizeEvidence(value: unknown): EvidenceCategory[] {
-	return Array.isArray(value)
-		? (value as EvidenceCategory[])
-		: DEFAULT_EVIDENCE;
-}
-
-function normalizeDeduction(raw: Record<string, unknown>): DeductionConfig {
-	const prompt =
-		typeof raw.prompt === "string" ? raw.prompt : DEFAULT_DEDUCTION.prompt;
-	const options = Array.isArray(raw.options)
-		? (raw.options as DeductionOption[])
-		: DEFAULT_DEDUCTION.options;
-	const correctId =
-		typeof raw.correctId === "string"
-			? raw.correctId
-			: DEFAULT_DEDUCTION.correctId;
-	return { prompt, options, correctId };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null;
-}
+export const defaultConfig: FileDetectiveConfig = {
+	projectType: DEFAULT_PROJECT_TYPE,
+	evidence: DEFAULT_EVIDENCE,
+	deduction: DEFAULT_DEDUCTION,
+};

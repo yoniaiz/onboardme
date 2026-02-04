@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import chalk from "chalk";
 import { Command } from "commander";
+import { gameNewCommand } from "@/commands/game-new.ts";
 import { initCommand } from "@/commands/init.tsx";
 import { startCommand } from "@/commands/start.tsx";
 import { statusCommand } from "@/commands/status.tsx";
@@ -26,6 +27,14 @@ program
 	.description("Initialize OnboardMe in current repository")
 	.action(async () => {
 		await runCommand(initCommand);
+	});
+
+program
+	.command("game:new")
+	.description("Create a new game scaffold in src/games")
+	.argument("<id>", "Game id (kebab-case)")
+	.action(async (id: string) => {
+		await runCommand(() => gameNewCommand(id));
 	});
 
 program

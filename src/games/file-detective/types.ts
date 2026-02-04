@@ -51,11 +51,3 @@ export interface FileDetectiveConfig {
 }
 
 export type InvestigationStep = "select" | "evidence" | "deduction";
-
-export interface InvestigationState {
-	step: InvestigationStep;
-	examinedCategories: EvidenceCategoryId[];
-	caseNotes: CaseNote[];
-	currentCategoryId: EvidenceCategoryId | null;
-	totalCategories: number;
-}

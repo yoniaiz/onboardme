@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 import type React from "react";
 import { useState } from "react";
-import type { AnswerResult, GameQuestion } from "@/core/types.ts";
+import type { AnswerResult, GameQuestion } from "@/types/game.ts";
 import { useTheme } from "../theme.tsx";
 import { AnswerOptions } from "./answer-options.tsx";
 

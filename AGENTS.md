@@ -125,15 +125,11 @@ export function calculateScore(correct: number, total: number): number {
 
 ```
 tests/
-├── integration/     # Full flow tests
-│   ├── cli.test.ts
-│   └── games/
-├── unit/            # Critical module tests
-│   └── scoring.test.ts
-└── e2e/             # End-to-end UI tests
+├── integration/     # Full CLI flows
+├── unit/            # Critical utilities/modules
+└── e2e/             # End-to-end Ink UI tests
     ├── framework/   # E2E testing framework
-    ├── adapters/    # Game-specific adapters
-    ├── configs/     # Test configurations
+    ├── configs/     # Game configs used by tests
     └── sandbox/     # Experimentation area
 ```
 
@@ -160,24 +156,18 @@ The E2E framework allows testing game UIs with real interactions. It renders Ink
 ### Quick Start
 
 ```typescript
-import { withE2E } from "./framework/index.ts";
-import { fileDetectiveAdapter } from "./adapters/file-detective.ts";
+import { withGameE2E } from "./framework/index.ts";
 import { FILE_DETECTIVE_TEST_CONFIG } from "./configs/file-detective.ts";
-import { FileDetective } from "@/games/file-detective/index.ts";
+import { FileDetectiveComponent } from "@/games/file-detective/component.tsx";
 
-await withE2E({
-  game: {
-    id: "file-detective",
-    plugin: FileDetective,
-    config: FILE_DETECTIVE_TEST_CONFIG,
-  },
-  adapter: fileDetectiveAdapter,
+await withGameE2E({
+  GameComponent: FileDetectiveComponent,
+  config: FILE_DETECTIVE_TEST_CONFIG,
 }, async (e2e) => {
   e2e.debug("Initial");           // Print current screen
   await e2e.press("enter");       // Press Enter key
-  await e2e.type("package.json"); // Type text
   await e2e.press("enter");       // Submit
-  expect(e2e.lastFrame()).toContain("✓");
+  expect(e2e.getResults().at(-1)?.correct).toBe(true);
 });
 ```
 
@@ -190,7 +180,8 @@ await withE2E({
 | `e2e.press(key)` | Press key: `enter`, `up`, `down`, `left`, `right`, `escape`, `tab`, `backspace` |
 | `e2e.type(text)` | Type text input |
 | `e2e.waitFor(fn)` | Wait for condition to be true |
-| `e2e.engine` | Access the underlying GameEngine |
+| `e2e.getResults()` | Get the `AnswerResult[]` captured so far |
+| `e2e.getGameResult()` | Get the final `GameResult` (or `null` if incomplete) |
 
 ### Sandbox for Experimentation
 
@@ -208,10 +199,9 @@ The sandbox is ideal for:
 
 ### Adding E2E Tests for New Games
 
-1. Create adapter in `tests/e2e/adapters/`
-2. Create config in `tests/e2e/configs/`
-3. Create test file as `tests/e2e/{game-name}.e2e.test.ts`
-4. Optionally create sandbox file for experimentation
+1. Create config in `tests/e2e/configs/`
+2. Create test file as `tests/e2e/{game-name}.e2e.test.ts`
+3. Optionally create sandbox file for experimentation
 
 ---
 
@@ -304,5 +294,5 @@ onboardme/
 
 ---
 
-*Document Version: 0.2*
-*Last Updated: 2026-02-03*
+*Document Version: 0.3*
+*Last Updated: 2026-02-04*

@@ -1,7 +1,6 @@
-import { FileDetective } from "@/games/file-detective/index.ts";
-import { fileDetectiveAdapter } from "../adapters/file-detective.ts";
+import { FileDetectiveComponent } from "../../../src/games/file-detective/component.tsx";
 import { FILE_DETECTIVE_TEST_CONFIG } from "../configs/file-detective.ts";
-import { withE2E } from "../framework/index.ts";
+import { withGameE2E } from "../framework/index.ts";
 
 async function main() {
 	console.log("File Detective E2E Sandbox");
@@ -9,14 +8,10 @@ async function main() {
 	console.log("This sandbox lets you interact with the File Detective game.");
 	console.log("Modify this file to experiment with different game flows.\n");
 
-	await withE2E(
+	await withGameE2E(
 		{
-			game: {
-				id: "file-detective",
-				plugin: FileDetective,
-				config: FILE_DETECTIVE_TEST_CONFIG,
-			},
-			adapter: fileDetectiveAdapter,
+			GameComponent: FileDetectiveComponent,
+			config: FILE_DETECTIVE_TEST_CONFIG,
 		},
 		async (e2e) => {
 			e2e.debug("Initial State - Evidence Board");

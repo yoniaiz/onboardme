@@ -200,12 +200,12 @@ All game elements use code-themed naming (TODOs instead of levels, FIXME instead
 - **Language**: TypeScript
 - **CLI Framework**: Commander.js or Oclif
 - **Terminal UI**: Ink (React for CLI)
-- **Testing**: Vitest
-- **Build**: tsup or esbuild
+- **Testing**: Bun test
+- **Build**: Bun build
 
 ### Game Architecture
 
-Games are modular, isolated, and extensible. Each game extends `BaseGame` and can be developed, tested, and run independently. See [ARCHITECTURE.md](./context/ARCHITECTURE.md) for the complete game template architecture, registry system, and testing approach.
+Games are modular, isolated, and extensible. Each game is a React component exported via a typed `defineGame()` factory and orchestrated by a React-based `GameOrchestrator`. Teams configure which games run (and in what order) via `.onboardme/config.ts` using `defineConfig()`. See [ARCHITECTURE.md](./context/ARCHITECTURE.md) for the current architecture and testing approach.
 
 ---
 
@@ -246,12 +246,11 @@ The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy 
 ### Core Commands
 
 ```bash
-onboardme init                    # Setup .onboardme/, install skill
-onboardme start                   # Validate prepared/, run games
+onboardme init                    # Setup .onboardme/ folder structure
+onboardme game:new <id>           # Scaffold a new game in src/games/
+onboardme start                   # Load config + run games (interactive terminal)
 onboardme status                  # Show current progress
 onboardme validate                # Check prepared/ structure, output errors
-onboardme template                # Create starter template
-onboardme template build          # Compile TypeScript template
 onboardme knowledge [topic]       # View unlocked knowledge
 onboardme memories                # View unlocked memory logs
 onboardme reset [--hard]          # Reset progress
@@ -282,7 +281,7 @@ onboardme start
 All game data is stored in `.onboardme/` at the repository root, organized into:
 - **`context/`**: Raw codebase knowledge gathered by the "initialize context" skill (gitignored)
 - **`prepared/`**: Game-ready data structured by the "prepare game" skill (gitignored)
-- **`template/`**: User's custom template (committed, shared with team)
+- **`config.ts`**: TypeScript config defining game order + options (committed, shared with team)
 - **`state/`**: User progress, history, and unlocked knowledge (gitignored, managed by CLI)
 
 ---

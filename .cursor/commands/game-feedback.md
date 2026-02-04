@@ -169,7 +169,8 @@ e2e.lastFrame()         // Get screen as string
 e2e.press("enter")      // Keys: enter, up, down, left, right, escape, tab, backspace
 e2e.type("text")        // Type text input
 e2e.waitFor(fn)         // Wait for condition
-e2e.engine              // Access GameEngine for state inspection
+e2e.getResults()        // Captured AnswerResult[]
+e2e.getGameResult()     // Final GameResult (null until complete)
 ```
 
 ## Dimension Quick Reference

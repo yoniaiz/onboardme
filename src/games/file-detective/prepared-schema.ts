@@ -72,7 +72,7 @@ const FileDetectiveConfigSchema = z
 		{ message: "evidence must include all 5 category IDs" },
 	);
 
-export const FileDetectivePreparedDataSchema = z.object({
+const fileDetectivePreparedDataSchema = z.object({
 	config: FileDetectiveConfigSchema,
 	questions: z.array(z.unknown()),
 });
@@ -113,7 +113,7 @@ export async function validatePreparedData(
 		};
 	}
 
-	const result = FileDetectivePreparedDataSchema.safeParse(data);
+	const result = fileDetectivePreparedDataSchema.safeParse(data);
 
 	if (!result.success) {
 		const errors = result.error.issues.map((issue) => ({

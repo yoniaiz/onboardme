@@ -1,6 +1,6 @@
-import type { GameResult } from "@/core/types.ts";
 import { readJson, writeJson } from "@/lib/fs.ts";
 import { getProgressPath } from "@/lib/paths.ts";
+import type { GameResult } from "@/types/game.ts";
 import { createInitialProgress, type Progress } from "@/types/state.ts";
 
 export async function readProgress(rootDir: string): Promise<Progress | null> {

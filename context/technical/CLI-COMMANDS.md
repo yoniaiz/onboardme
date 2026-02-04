@@ -1,26 +1,25 @@
 # CLI Commands
 
-> **The CLI is a runner—it validates prepared data and runs games. AI work happens through skills.**
+> **The CLI is a runner—it loads `.onboardme/config.ts`, runs games, and can validate prepared data. AI work happens through skills.**
 
 ## Quick Reference
 
 ```bash
 # Setup
-onboardme init                    # Setup .onboardme/, install skill
+onboardme init                    # Setup .onboardme/ folder structure
+onboardme game:new <id>           # Scaffold a new game in src/games/
 
 # Playing
-onboardme start                   # Validate prepared/, run games
+onboardme start                   # Run games from .onboardme/config.ts (TTY required)
 onboardme status                  # Show current progress
 
-# Templates
-onboardme template                # Create starter template
-onboardme template build          # Compile TypeScript template
-
 # Utilities
-onboardme validate                # Check prepared/ structure
-onboardme knowledge [topic]       # View unlocked knowledge
-onboardme memories                # View unlocked memory logs
-onboardme reset [--hard]          # Reset progress
+onboardme validate                # Validate prepared/ structure (JSON output)
+
+# Planned (not implemented yet)
+# onboardme knowledge [topic]       # View unlocked knowledge
+# onboardme memories                # View unlocked memory logs
+# onboardme reset [--hard]          # Reset progress
 ```
 
 ## Workflow Overview
@@ -28,16 +27,16 @@ onboardme reset [--hard]          # Reset progress
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  1. onboardme init                                              │
-│     Creates .onboardme/, installs skill                         │
+│     Creates .onboardme/ folder structure                         │
 ├─────────────────────────────────────────────────────────────────┤
-│  2. In AI platform: "Run initialize context"                    │
+│  2. Optional: In AI platform: "Run initialize context"          │
 │     Skill scans repo → writes to .onboardme/context/            │
 ├─────────────────────────────────────────────────────────────────┤
-│  3. In AI platform: "Run prepare game"                          │
-│     Skill reads template → writes to .onboardme/prepared/       │
+│  3. Optional: In AI platform: "Run prepare game"                │
+│     Skill writes to .onboardme/prepared/ (validated via CLI)    │
 ├─────────────────────────────────────────────────────────────────┤
 │  4. onboardme start                                             │
-│     CLI validates prepared/ → runs games → saves state          │
+│     CLI loads .onboardme/config.ts → runs games (interactive)   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -103,84 +102,38 @@ The Monster awaits.
 
 ---
 
-### `onboardme start`
+### `onboardme game:new`
 
-**What it does:** Validates the prepared game data and starts (or resumes) the game.
+**What it does:** Scaffolds a new game under `src/games/<id>/` (React component + `defineGame` export + types + AI context stub).
 
 **Usage:**
 ```bash
-onboardme start                   # Start or resume
-onboardme start --game=2          # Jump to specific game (if unlocked)
+onboardme game:new my-game
 ```
 
-**If validation passes:**
+**Output:**
 ```
-$ onboardme start
-
-Validating prepared data...
-  ✓ manifest.json valid
-  ✓ file-detective: 6 questions ready
-  ✓ flow-trace: 4 journeys ready
-  ✓ spaghetti-monster: 3 phases ready
-
-╔════════════════════════════════════════════════════════════════╗
-║                                                                ║
-║                    ░█████╗░███╗░░██╗██████╗░                   ║
-║                    ██╔══██╗████╗░██║██╔══██╗                   ║
-║                    ██║░░██║██╔██╗██║██████╦╝                   ║
-║                    ██║░░██║██║╚████║██╔══██╗                   ║
-║                    ╚█████╔╝██║░╚███║██████╦╝                   ║
-║                    ░╚════╝░╚═╝░░╚══╝╚═════╝░                   ║
-║                                                                ║
-║                    ══════════════════════                      ║
-║                       THE QUEST BEGINS                         ║
-║                    ══════════════════════                      ║
-║                                                                ║
-║  Your mission: Understand this codebase. Document the Monster. ║
-║                                                                ║
-║  CRITICAL TODOs:                                               ║
-║    □ TODO #0: // understand what we have                       ║
-║    □ TODO #1: // trace flows and run the app                   ║
-║    □ TODO #2: // find bugs and plan features                   ║
-║    ▣ FIXME:   // the monster itself                            ║
-║                                                                ║
-║  *kzzzt*                                                       ║
-║                                                                ║
-║  "So. You're the new one."                                     ║
-║  "Let's see how long you last."                                ║
-║                                                                ║
-║  *slrrrrp*                                                     ║
-║                                                                ║
-║                      [PRESS ENTER TO BEGIN]                    ║
-║                                                                ║
-╚════════════════════════════════════════════════════════════════╝
+Created game scaffold in src/games/my-game
 ```
 
-**If validation fails:**
+**Next steps:**
+- Add the game to `.onboardme/config.ts`
+- Optionally re-export the game factory from `src/games/index.ts` for convenience
+
+---
+
+### `onboardme start`
+
+**What it does:** Loads `.onboardme/config.ts` (or falls back to the built-in default config) and runs games in an interactive terminal.
+
+**Usage:**
+```bash
+onboardme start
 ```
-$ onboardme start
 
-Validating prepared data...
-  ✗ flow-trace: Missing required field 'journeys[0].entryPoint'
-
-❌ VALIDATION FAILED
-
-{
-  "valid": false,
-  "errors": [
-    {
-      "game": "flow-trace",
-      "field": "journeys[0].entryPoint",
-      "error": "Missing required field",
-      "expected": "string",
-      "received": "undefined"
-    }
-  ],
-  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
-}
-
-Show this error to your AI and ask it to fix the prepared data.
-```
+**Notes:**
+- Requires a TTY (interactive terminal). Running via scripts/subprocesses will exit with an error.
+- `onboardme start` does not currently block on prepared-data validation. Use `onboardme validate` to check `.onboardme/prepared/`.
 
 ---
 
@@ -290,66 +243,18 @@ $ onboardme validate --json
 
 ---
 
-### `onboardme template`
+### Game configuration (`.onboardme/config.ts`)
 
-**What it does:** Creates a starter template for customization.
+**What it does:** Defines which games to run (and in what order). This replaces the legacy template system (`template.json` / `template.ts`).
 
-**Usage:**
-```bash
-onboardme template                # Create template.json
-onboardme template --typescript   # Create template.ts
-```
+**Example:**
+```typescript
+// .onboardme/config.ts
+import { defineConfig, FileDetective } from "onboardme/games";
 
-**Output:**
-```
-$ onboardme template
-
-Creating template at .onboardme/template/template.json...
-
-✅ Template created!
-
-{
-  "games": [
-    { "id": "file-detective" },
-    { "id": "flow-trace" },
-    { "id": "grep-hunt" },
-    { "id": "spaghetti-monster" }
-  ]
-}
-
-Edit this file to customize which games are included.
-Then re-run 'prepare game' skill to regenerate.
-```
-
----
-
-### `onboardme template build`
-
-**What it does:** Compiles a TypeScript template.
-
-**Usage:**
-```bash
-onboardme template build
-```
-
-**Output:**
-```
-$ onboardme template build
-
-Building .onboardme/template/template.ts...
-
-  ✓ TypeScript compiled
-  ✓ Template validated
-  ✓ 3 games registered
-
-✅ Template built successfully!
-
-Games in template:
-  1. file-detective
-  2. my-custom-game (custom)
-  3. spaghetti-monster
-
-Re-run 'prepare game' skill to use the new template.
+export default defineConfig({
+  games: [FileDetective()],
+});
 ```
 
 ---

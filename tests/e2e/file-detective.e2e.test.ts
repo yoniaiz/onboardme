@@ -1,19 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import { FileDetective } from "@/games/file-detective/index.ts";
-import { fileDetectiveAdapter } from "./adapters/file-detective.ts";
+import { FileDetectiveComponent } from "@/games/file-detective/component.tsx";
 import { FILE_DETECTIVE_TEST_CONFIG } from "./configs/file-detective.ts";
-import { withE2E } from "./framework/index.ts";
+import { withGameE2E } from "./framework/index.ts";
 
 describe("E2E: File Detective Game", () => {
 	it("plays through the game with interactions", async () => {
-		await withE2E(
+		await withGameE2E(
 			{
-				game: {
-					id: "file-detective",
-					plugin: FileDetective,
-					config: FILE_DETECTIVE_TEST_CONFIG,
-				},
-				adapter: fileDetectiveAdapter,
+				GameComponent: FileDetectiveComponent,
+				config: FILE_DETECTIVE_TEST_CONFIG,
 			},
 			async (e2e) => {
 				e2e.debug("1. INITIAL: Evidence Board");

@@ -1,40 +1,32 @@
 import React from "react";
-import type { GameEngine } from "@/core/engine.ts";
-import { type TestHarnessOptions, withTestHarness } from "@/testing/harness.ts";
+import type { AnswerResult, GameResult } from "@/types/game.ts";
 import { render as inkRender } from "./ink-render.ts";
 import { DEFAULT_RENDER_DELAY, KEYS } from "./keys.ts";
-import { RenderWrapper } from "./render-wrapper.tsx";
-import type { E2EOptions, GameAdapter, KeyName } from "./types.ts";
+import type { E2EHelper, E2EOptions, KeyName } from "./types.ts";
 
-export interface E2EHarnessInstance {
-	readonly engine: GameEngine;
-	readonly stdin: { write(input: string): void };
-	lastFrame(): string;
-	press(key: KeyName): Promise<void>;
-	type(text: string): Promise<void>;
-	waitFor(
-		condition: (frame: string) => boolean,
-		options?: { timeout?: number; interval?: number },
-	): Promise<void>;
-	debug(label?: string): void;
-}
-
-function createE2EHarnessInstance<TState>(
-	engine: GameEngine,
-	adapter: GameAdapter<TState>,
+function createE2EHarnessInstance<TConfig>(
+	options: E2EOptions<TConfig>,
 	renderDelay: number = DEFAULT_RENDER_DELAY,
-): E2EHarnessInstance {
+): E2EHelper {
+	const results: AnswerResult[] = [];
+	let gameResult: GameResult | null = null;
+
 	const { lastFrame, stdin } = inkRender(
-		React.createElement(RenderWrapper, { engine, adapter }),
+		React.createElement(options.GameComponent, {
+			config: options.config,
+			onAnswerResult: (result: AnswerResult) => {
+				results.push(result);
+			},
+			onGameComplete: (result: GameResult) => {
+				gameResult = result;
+			},
+		}),
 	);
 
 	const wait = (ms: number) =>
 		new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 	return {
-		engine,
-		stdin,
-
 		lastFrame(): string {
 			return lastFrame() ?? "";
 		},
@@ -78,31 +70,20 @@ function createE2EHarnessInstance<TState>(
 			console.log(frame);
 			console.log(separator);
 		},
+		getResults(): AnswerResult[] {
+			return results;
+		},
+		getGameResult(): GameResult | null {
+			return gameResult;
+		},
 	};
 }
 
-export async function withE2E<TState, TResult>(
-	options: E2EOptions<TState>,
-	fn: (harness: E2EHarnessInstance) => Promise<TResult>,
+export async function withGameE2E<TConfig, TResult>(
+	options: E2EOptions<TConfig>,
+	fn: (harness: E2EHelper) => Promise<TResult>,
 ): Promise<TResult> {
-	const harnessOptions: TestHarnessOptions = {
-		games: [
-			{
-				id: options.game.id,
-				plugin: options.game.plugin,
-				config: options.game.config,
-			},
-		],
-	};
-
-	return withTestHarness(harnessOptions, async (testHarness) => {
-		const e2eHarness = createE2EHarnessInstance(
-			testHarness.engine,
-			options.adapter,
-		);
-
-		await new Promise<void>((r) => setTimeout(r, DEFAULT_RENDER_DELAY * 2));
-
-		return fn(e2eHarness);
-	});
+	const e2eHarness = createE2EHarnessInstance(options);
+	await new Promise<void>((r) => setTimeout(r, DEFAULT_RENDER_DELAY * 2));
+	return fn(e2eHarness);
 }

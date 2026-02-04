@@ -1,1 +1,1 @@
-export { withE2E } from "./harness.ts";
+export { withGameE2E } from "./harness.ts";

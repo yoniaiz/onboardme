@@ -3,29 +3,29 @@ name: Dynamic Plugin Architecture
 overview: Refactor from class-based plugins to fully React-based game components. Games are React components with their own state (useReducer), orchestrated by a React-based GameOrchestrator. TypeScript config file (like Vite/ESLint) for game configuration - no string IDs, full type safety.
 todos:
   - id: define-game-types
-    content: Define GameProps, GameInstance, defineConfig() helper in src/types/game.ts
-    status: pending
+    content: Define GameProps, GameInstance, defineConfig(), defineGame() helpers in src/types/game.ts
+    status: completed
   - id: create-config-loader
     content: Create loadConfig() to load .onboardme/config.ts with type safety
-    status: pending
+    status: completed
   - id: create-game-exports
     content: Export game factory functions from onboardme/games
-    status: pending
+    status: completed
   - id: create-orchestrator
     content: Create GameOrchestrator component to manage game flow
-    status: pending
+    status: completed
   - id: refactor-file-detective
     content: Convert FileDetective to React component with useReducer
-    status: pending
+    status: completed
   - id: create-fd-ui
     content: Create FileDetectiveUI presentational component
-    status: pending
+    status: completed
   - id: extract-pure-logic
     content: Extract FileDetective validation/logic into pure functions
-    status: pending
+    status: completed
   - id: update-start-command
     content: Update start command to load config and use GameOrchestrator
-    status: pending
+    status: in_progress
   - id: simplify-e2e
     content: Update E2E framework to render game components directly
     status: pending
@@ -37,7 +37,7 @@ todos:
     status: pending
   - id: ai-context-schema
     content: Define ai-context.ts template with QuestionGuideline types
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -116,20 +116,6 @@ export interface GameMetadata {
   description: string;
   estimatedMinutes: number;
 }
-
-export interface GameDefinition<TConfig = unknown> {
-  metadata: GameMetadata;
-  component: GameComponent<TConfig>;
-  validateConfig: (config: unknown) => config is TConfig;
-  getAIContext: () => GameAIContext;
-}
-
-// DX Helper: Type-safe game definition (inspired by Vite's defineConfig)
-export function defineGame<TConfig>(
-  definition: GameDefinition<TConfig>
-): GameDefinition<TConfig> {
-  return definition;
-}
 ```
 
 ### 1.2 Define AI Context types
@@ -173,14 +159,36 @@ export interface OnboardMeConfig {
   games: GameInstance[];
 }
 
+// For users: configure which games to play
 export function defineConfig(config: OnboardMeConfig): OnboardMeConfig {
   return config;
 }
+
+// For game developers: create a game factory with full type inference
+export interface GameDefinition<TConfig, TOptions = Partial<TConfig>> {
+  id: string;
+  component: GameComponent<TConfig>;
+  defaultConfig: TConfig;
+  metadata: GameMetadata;
+  getAIContext: () => GameAIContext;
+}
+
+export function defineGame<TConfig, TOptions = Partial<TConfig>>(
+  definition: GameDefinition<TConfig, TOptions>
+): (options?: TOptions) => GameInstance<TConfig> {
+  return (options?: TOptions) => ({
+    id: definition.id,
+    component: definition.component,
+    config: { ...definition.defaultConfig, ...options },
+    metadata: definition.metadata,
+    getAIContext: definition.getAIContext,
+  });
+}
 ```
 
-### 2.2 Game factory functions
+### 2.2 Game factory functions using defineGame
 
-Each game exports a factory function that returns a GameInstance:
+Each game uses `defineGame()` to create a factory function:
 
 Create [src/games/index.ts](src/games/index.ts):
 
@@ -190,41 +198,38 @@ export { FileDetective } from "./file-detective/index.ts";
 export { FlowTrace } from "./flow-trace/index.ts";
 export { GrepHunt } from "./grep-hunt/index.ts";
 
-// Re-export config helper
+// Re-export config helpers for users
 export { defineConfig } from "@/types/game.ts";
+
+// Re-export defineGame for custom game developers
+export { defineGame } from "@/types/game.ts";
 ```
 
 Update [src/games/file-detective/index.ts](src/games/file-detective/index.ts):
 
 ```typescript
-import type { GameInstance } from "@/types/game.ts";
+import { defineGame } from "@/types/game.ts";
 import type { FileDetectiveConfig } from "./types.ts";
 import { FileDetectiveComponent } from "./component.tsx";
 import { getAIContext } from "./ai-context.ts";
 import { defaultConfig } from "./config.ts";
 
-export interface FileDetectiveOptions {
-  difficulty?: "easy" | "medium" | "hard";
-  categories?: string[];
-}
-
-export function FileDetective(options?: FileDetectiveOptions): GameInstance<FileDetectiveConfig> {
-  return {
+// defineGame returns a factory function with full type inference
+export const FileDetective = defineGame<FileDetectiveConfig>({
+  id: "file-detective",
+  component: FileDetectiveComponent,
+  defaultConfig,
+  metadata: {
     id: "file-detective",
-    component: FileDetectiveComponent,
-    config: {
-      ...defaultConfig,
-      ...options,
-    },
-    metadata: {
-      id: "file-detective",
-      name: "file --detective",
-      description: "Investigate a codebase to identify its project type and stack",
-      estimatedMinutes: 10,
-    },
-    getAIContext,
-  };
-}
+    name: "file --detective",
+    description: "Investigate a codebase to identify its project type and stack",
+    estimatedMinutes: 10,
+  },
+  getAIContext,
+});
+
+// FileDetective is now: (options?) => GameInstance<FileDetectiveConfig>
+// Usage: FileDetective({ difficulty: "hard" })
 ```
 
 ### 2.3 User config file
@@ -843,7 +848,7 @@ await withGameE2E({
 
 ```
 src/games/{id}/
-├── index.ts           # Factory function export
+├── index.ts           # defineGame() export
 ├── component.tsx      # React component with useReducer
 ├── types.ts           # Config types with Zod schema
 └── ai-context.ts      # AI context for question generation
@@ -852,30 +857,25 @@ src/games/{id}/
 **Generated `index.ts` template:**
 
 ```typescript
-import type { GameInstance } from "@/types/game.ts";
+import { defineGame } from "@/types/game.ts";
 import type { ${PascalId}Config } from "./types.ts";
 import { ${PascalId}Component } from "./component.tsx";
 import { getAIContext } from "./ai-context.ts";
 import { defaultConfig } from "./types.ts";
 
-export interface ${PascalId}Options {
-  difficulty?: "easy" | "medium" | "hard";
-}
-
-export function ${PascalId}(options?: ${PascalId}Options): GameInstance<${PascalId}Config> {
-  return {
+// defineGame returns a factory function: (options?) => GameInstance
+export const ${PascalId} = defineGame<${PascalId}Config>({
+  id: "${id}",
+  component: ${PascalId}Component,
+  defaultConfig,
+  metadata: {
     id: "${id}",
-    component: ${PascalId}Component,
-    config: { ...defaultConfig, ...options },
-    metadata: {
-      id: "${id}",
-      name: "${name}",
-      description: "TODO: Add description",
-      estimatedMinutes: 5,
-    },
-    getAIContext,
-  };
-}
+    name: "${name}",
+    description: "TODO: Add description",
+    estimatedMinutes: 5,
+  },
+  getAIContext,
+});
 ```
 
 **Generated `component.tsx` template:**
@@ -1019,36 +1019,36 @@ export const defaultConfig: ${PascalId}Config = {
 ## File Changes Summary
 
 
-| File                                        | Change Type | Description                             |
-| ------------------------------------------- | ----------- | --------------------------------------- |
-| `src/types/game.ts`                         | Create      | GameProps, GameInstance, defineConfig() |
-| `src/core/config.ts`                        | Create      | Config loader (replaces template.ts)    |
-| `src/games/index.ts`                        | Create      | Export game factories + defineConfig    |
-| `src/games/file-detective/component.tsx`    | Create      | React component with useReducer         |
-| `src/games/file-detective/state.ts`         | Create      | State types and createInitialState      |
-| `src/games/file-detective/reducer.ts`       | Create      | Pure reducer for state transitions      |
-| `src/games/file-detective/logic.ts`         | Create      | Pure validation functions               |
-| `src/games/file-detective/ui.tsx`           | Create      | Presentational UI component             |
-| `src/games/file-detective/index.ts`         | Modify      | Export factory function FileDetective() |
-| `src/games/file-detective/ai-context.ts`    | Create      | AI context with QuestionGuidelines      |
-| `src/ui/orchestrator/game-orchestrator.tsx` | Create      | Orchestrator component                  |
-| `src/ui/orchestrator/session-complete.tsx`  | Create      | Session complete screen                 |
-| `src/ui/screens/game-screen.tsx`            | Delete      | Replaced by orchestrator                |
-| `src/ui/screens/file-detective-game.tsx`    | Delete      | Moved to games/file-detective/ui.tsx    |
-| `src/core/engine.ts`                        | Delete      | No longer needed                        |
-| `src/core/plugin.ts`                        | Delete      | No longer needed                        |
-| `src/core/bootstrap.ts`                     | Delete      | No longer needed                        |
-| `src/core/template.ts`                      | Delete      | Replaced by config.ts                   |
-| `src/commands/start.tsx`                    | Modify      | Use loadConfig + orchestrator           |
-| `src/commands/game-new.ts`                  | Create      | CLI scaffold command                    |
-| `tests/e2e/framework/index.ts`              | Modify      | Render game components directly         |
-| `tests/e2e/adapters/`                       | Delete      | No longer needed                        |
+| File                                        | Change Type | Description                                           |
+| ------------------------------------------- | ----------- | ----------------------------------------------------- |
+| `src/types/game.ts`                         | Create      | GameProps, GameInstance, defineConfig(), defineGame() |
+| `src/core/config.ts`                        | Create      | Config loader (replaces template.ts)                  |
+| `src/games/index.ts`                        | Create      | Export game factories + defineConfig                  |
+| `src/games/file-detective/component.tsx`    | Create      | React component with useReducer                       |
+| `src/games/file-detective/state.ts`         | Create      | State types and createInitialState                    |
+| `src/games/file-detective/reducer.ts`       | Create      | Pure reducer for state transitions                    |
+| `src/games/file-detective/logic.ts`         | Create      | Pure validation functions                             |
+| `src/games/file-detective/ui.tsx`           | Create      | Presentational UI component                           |
+| `src/games/file-detective/index.ts`         | Modify      | Export factory function FileDetective()               |
+| `src/games/file-detective/ai-context.ts`    | Create      | AI context with QuestionGuidelines                    |
+| `src/ui/orchestrator/game-orchestrator.tsx` | Create      | Orchestrator component                                |
+| `src/ui/orchestrator/session-complete.tsx`  | Create      | Session complete screen                               |
+| `src/ui/screens/game-screen.tsx`            | Delete      | Replaced by orchestrator                              |
+| `src/ui/screens/file-detective-game.tsx`    | Delete      | Moved to games/file-detective/ui.tsx                  |
+| `src/core/engine.ts`                        | Delete      | No longer needed                                      |
+| `src/core/plugin.ts`                        | Delete      | No longer needed                                      |
+| `src/core/bootstrap.ts`                     | Delete      | No longer needed                                      |
+| `src/core/template.ts`                      | Delete      | Replaced by config.ts                                 |
+| `src/commands/start.tsx`                    | Modify      | Use loadConfig + orchestrator                         |
+| `src/commands/game-new.ts`                  | Create      | CLI scaffold command                                  |
+| `tests/e2e/framework/index.ts`              | Modify      | Render game components directly                       |
+| `tests/e2e/adapters/`                       | Delete      | No longer needed                                      |
 
 
 ## Migration Path
 
-1. **Phase 1**: Define types (GameProps, GameInstance, defineConfig)
-2. **Phase 2**: Create config loader and game factories
+1. **Phase 1**: Define types (GameProps, GameInstance, defineConfig, defineGame)
+2. **Phase 2**: Create config loader and game factories using defineGame
 3. **Phase 3**: Create GameOrchestrator component
 4. **Phase 4**: Convert FileDetective to React component
 5. **Phase 5**: Update start command to use config + orchestrator
@@ -1073,14 +1073,15 @@ Simple, pragmatic patterns - no over-engineering:
 ## DX Patterns from Popular Frameworks
 
 
-| Pattern             | Inspiration             | Where Used                        |
-| ------------------- | ----------------------- | --------------------------------- |
-| `defineConfig()`    | Vite's `defineConfig()` | Config helper with type inference |
-| Factory functions   | ESLint flat config      | `FileDetective({ options })`      |
-| Import what you use | Tailwind, ESLint        | No string IDs, direct imports     |
-| Type inference      | tRPC, Zod               | Config types inferred from schema |
-| Minimal boilerplate | TanStack                | 4-file scaffold vs 8 files        |
-| Schema validation   | Zod                     | Config validation with safeParse  |
+| Pattern             | Inspiration             | Where Used                          |
+| ------------------- | ----------------------- | ----------------------------------- |
+| `defineConfig()`    | Vite's `defineConfig()` | User config with type inference     |
+| `defineGame()`      | Vite plugins            | Game definition with type inference |
+| Factory functions   | ESLint flat config      | `FileDetective({ options })`        |
+| Import what you use | Tailwind, ESLint        | No string IDs, direct imports       |
+| Type inference      | tRPC, Zod               | Config types inferred from schema   |
+| Minimal boilerplate | TanStack                | 4-file scaffold vs 8 files          |
+| Schema validation   | Zod                     | Config validation with safeParse    |
 
 
 ## Benefits of New Architecture

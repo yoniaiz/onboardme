@@ -65,7 +65,12 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 				{
 					id: "cf-1",
 					prompt: "TypeScript config file?",
-					options: ["tsconfig.json", "typescript.json", "ts.config.js", ".tsrc"],
+					options: [
+						"tsconfig.json",
+						"typescript.json",
+						"ts.config.js",
+						".tsrc",
+					],
 					correctAnswer: "tsconfig.json",
 				},
 			],
