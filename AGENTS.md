@@ -128,8 +128,13 @@ tests/
 ├── integration/     # Full flow tests
 │   ├── cli.test.ts
 │   └── games/
-└── unit/            # Critical module tests
-    └── scoring.test.ts
+├── unit/            # Critical module tests
+│   └── scoring.test.ts
+└── e2e/             # End-to-end UI tests
+    ├── framework/   # E2E testing framework
+    ├── adapters/    # Game-specific adapters
+    ├── configs/     # Test configurations
+    └── sandbox/     # Experimentation area
 ```
 
 ### Test Guidelines
@@ -138,6 +143,75 @@ tests/
 - Use descriptive test names that explain the behavior
 - Avoid mocking unless absolutely necessary
 - Tests should be fast and deterministic
+
+---
+
+## E2E Testing Framework
+
+The E2E framework allows testing game UIs with real interactions. It renders Ink components in memory and simulates keyboard input.
+
+### When to Use E2E Tests
+
+- Testing game UI flows and state transitions
+- Verifying visual output matches expectations
+- Debugging game interactions
+- Understanding how games work
+
+### Quick Start
+
+```typescript
+import { withE2E } from "./framework/index.ts";
+import { fileDetectiveAdapter } from "./adapters/file-detective.ts";
+import { FILE_DETECTIVE_TEST_CONFIG } from "./configs/file-detective.ts";
+import { FileDetective } from "@/games/file-detective/index.ts";
+
+await withE2E({
+  game: {
+    id: "file-detective",
+    plugin: FileDetective,
+    config: FILE_DETECTIVE_TEST_CONFIG,
+  },
+  adapter: fileDetectiveAdapter,
+}, async (e2e) => {
+  e2e.debug("Initial");           // Print current screen
+  await e2e.press("enter");       // Press Enter key
+  await e2e.type("package.json"); // Type text
+  await e2e.press("enter");       // Submit
+  expect(e2e.lastFrame()).toContain("✓");
+});
+```
+
+### Available Methods
+
+| Method | Description |
+|--------|-------------|
+| `e2e.debug(label)` | Print current screen with label |
+| `e2e.lastFrame()` | Get current screen as string |
+| `e2e.press(key)` | Press key: `enter`, `up`, `down`, `left`, `right`, `escape`, `tab`, `backspace` |
+| `e2e.type(text)` | Type text input |
+| `e2e.waitFor(fn)` | Wait for condition to be true |
+| `e2e.engine` | Access the underlying GameEngine |
+
+### Sandbox for Experimentation
+
+Use `tests/e2e/sandbox/` for experimenting with games without modifying actual tests:
+
+```bash
+bun run tests/e2e/sandbox/file-detective.sandbox.ts
+```
+
+The sandbox is ideal for:
+- Understanding game flow before writing tests
+- Debugging UI issues
+- Exploring state transitions
+- Learning how games work
+
+### Adding E2E Tests for New Games
+
+1. Create adapter in `tests/e2e/adapters/`
+2. Create config in `tests/e2e/configs/`
+3. Create test file as `tests/e2e/{game-name}.e2e.test.ts`
+4. Optionally create sandbox file for experimentation
 
 ---
 

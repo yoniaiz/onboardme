@@ -1001,7 +1001,98 @@ The Spaghetti Code Monster has been documented.
 
 ---
 
-## 13. Enhanced Experience Features
+## 13. E2E Testing Framework
+
+OnboardMe includes a custom E2E testing framework for testing game UIs with simulated interactions.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        E2E Test                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   withE2E(options, async (e2e) => {                                │
+│     e2e.debug("Screen");                                           │
+│     await e2e.press("enter");                                      │
+│     await e2e.type("answer");                                      │
+│   });                                                               │
+│                                                                     │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    E2E Harness                                       │
+│  • Wraps GameTestHarness (engine setup, cleanup)                    │
+│  • Wraps ink render (mock stdout/stdin/stderr)                      │
+│  • Provides interaction helpers (press, type, debug)                │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Game Adapter                                      │
+│  • extractState(engine) → Game-specific state                       │
+│  • createCallbacks() → Event handlers                               │
+│  • render(props) → React element                                    │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Ink Render (Local)                               │
+│  • MockStdout → Captures rendered frames                            │
+│  • MockStdin → Emits keyboard events                                │
+│  • No external dependencies                                          │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `withE2E` | `tests/e2e/framework/harness.ts` | Main entry point for E2E tests |
+| `ink-render.ts` | `tests/e2e/framework/ink-render.ts` | Local ink testing utilities |
+| `render-wrapper.tsx` | `tests/e2e/framework/render-wrapper.tsx` | Generic game screen component |
+| Game Adapters | `tests/e2e/adapters/` | Game-specific state and rendering |
+| Configs | `tests/e2e/configs/` | Test data configurations |
+| Sandbox | `tests/e2e/sandbox/` | Experimentation scripts |
+
+### File Structure
+
+```
+tests/e2e/
+├── framework/
+│   ├── index.ts           # Public API
+│   ├── harness.ts         # E2EHarness implementation
+│   ├── ink-render.ts      # Local ink testing utilities
+│   ├── render-wrapper.tsx # Generic game renderer
+│   ├── types.ts           # TypeScript interfaces
+│   └── keys.ts            # Keyboard key codes
+├── adapters/
+│   └── file-detective.ts  # FileDetective game adapter
+├── configs/
+│   └── file-detective.ts  # Test configuration
+├── sandbox/
+│   └── file-detective.sandbox.ts  # Experimentation script
+└── file-detective.e2e.test.ts     # E2E tests
+```
+
+### Adding Support for New Games
+
+1. **Create adapter** (`tests/e2e/adapters/{game}.ts`):
+   - Implement `GameAdapter<TState>` interface
+   - `extractState()` gets game-specific state from engine
+   - `createCallbacks()` creates event handlers
+   - `render()` returns the game's UI component
+
+2. **Create config** (`tests/e2e/configs/{game}.ts`):
+   - Export test data matching game's prepared data schema
+
+3. **Create tests** (`tests/e2e/{game}.e2e.test.ts`):
+   - Use `withE2E` with your adapter and config
+
+---
+
+## 14. Enhanced Experience Features
 
 The architecture supports several enhanced features that transform the experience from "quiz" to "interactive thriller":
 
