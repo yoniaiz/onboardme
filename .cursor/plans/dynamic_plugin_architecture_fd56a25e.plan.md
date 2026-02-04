@@ -25,16 +25,16 @@ todos:
     status: completed
   - id: update-start-command
     content: Update start command to load config and use GameOrchestrator
-    status: in_progress
+    status: completed
   - id: simplify-e2e
     content: Update E2E framework to render game components directly
-    status: pending
+    status: completed
   - id: remove-plugin-classes
     content: Remove GamePlugin base class, GameEngine, template.ts and related code
-    status: pending
+    status: completed
   - id: cli-game-new
     content: Create game:new command with minimal scaffold
-    status: pending
+    status: completed
   - id: ai-context-schema
     content: Define ai-context.ts template with QuestionGuideline types
     status: completed

@@ -13,7 +13,6 @@ Read the evaluation framework first:
 
 Determine which game to evaluate:
 - Check `tests/e2e/sandbox/` for available game sandboxes
-- Check `tests/e2e/adapters/` for game adapters
 - Check `tests/e2e/configs/` for game test configs
 
 Default: `file-detective` if not specified.

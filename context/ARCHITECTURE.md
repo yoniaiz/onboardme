@@ -11,7 +11,7 @@ This document covers the high-level architecture, skill-based workflow, plugin s
 1. [High-Level Architecture](#1-high-level-architecture)
 2. [Key Architectural Decisions](#2-key-architectural-decisions)
 3. [Skill-Based Workflow](#3-skill-based-workflow)
-4. [Plugin Architecture](#4-plugin-architecture)
+4. [Game Architecture](#4-game-architecture-react-based)
 5. [Tech Stack](#5-tech-stack)
 6. [Project Structure](#6-project-structure)
 7. [File System Structure](#7-file-system-structure)
@@ -46,19 +46,20 @@ OnboardMe uses a **skill-based architecture** where AI-powered context gathering
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        .onboardme/                                  │
+│  ├── config.ts          (game selection + options - committed)       │
 │  ├── context/           (gathered codebase knowledge)               │
 │  ├── prepared/          (game-ready structured data)                │
-│  ├── template/          (user's game template - optional)           │
-│  └── state/             (progress, history - managed by CLI)        │
+│  ├── state/             (progress, history - managed by CLI)        │
+│  └── template/          (legacy - unused)                           │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     OnboardMe CLI                                   │
 │  • onboardme init     → Sets up .onboardme, installs skill          │
-│  • onboardme start    → Validates prepared/, runs games             │
+│  • onboardme game:new → Scaffolds a new game                        │
+│  • onboardme start    → Loads config, runs games                    │
 │  • onboardme status   → Shows progress                              │
-│  • onboardme template → Creates/builds user template                │
 │  • onboardme validate → Checks prepared/ structure                  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -74,8 +75,8 @@ OnboardMe uses a **skill-based architecture** where AI-powered context gathering
 | AI Backend | User's AI platform | Platform agnostic—works with Cursor, Claude, any skill-supporting tool |
 | State | Local filesystem | Simple, portable, no accounts needed |
 | Game Logic | Deterministic | Predictable, testable, doesn't require AI for core loop |
-| Games | Plugin-based | Composable, extensible, users can customize or create games |
-| Templates | User-configurable | Users define which games to include and their order |
+| Games | React component-based | Games are Ink/React components with local state (e.g. `useReducer`) |
+| Game selection | TypeScript config file | `.onboardme/config.ts` via `defineConfig()` enables type-safe composition |
 
 ---
 
@@ -113,8 +114,8 @@ OnboardMe uses two AI skills that users run from their AI platform:
 **When to run:** After context initialization, or after template changes.
 
 **What it does:**
-1. Reads template (user's custom or default)
-2. For each game in template:
+1. Reads `.onboardme/config.ts` (or default config)
+2. For each game in config:
    - Reads game's required context schema
    - Transforms raw context into game-specific structure
    - Generates questions/challenges
@@ -146,140 +147,78 @@ Skill reads template + context → writes to .onboardme/prepared/
 User runs: onboardme start
        │
        ▼
-CLI validates prepared/ → runs games → saves state
+CLI loads config.ts → runs games (interactive)
 ```
 
 ---
 
-## 4. Plugin Architecture
+## 4. Game Architecture (React-Based)
 
-Games are **plugins**—modular, composable units that can be mixed, matched, and customized.
+Games are React components (Ink UI) exported via typed factories. This keeps state visible, testable, and aligned with the UI.
 
-### Plugin Schema
+### Game component contract
 
-Each game plugin defines its schema:
+Every game component receives `GameProps<TConfig>` (from `src/types/game.ts`):
 
-```typescript
-interface GamePluginSchema {
-  id: string;                     // e.g., "file-detective"
-  name: string;                   // e.g., "file --detective"
-  description: string;
-  estimatedTime: number;          // minutes
-  
-  // What context this game needs (for skill to generate)
-  requiredContext: ContextRequirement[];
-}
+- `config`: typed game config
+- `onAnswerResult(result)`: report answer correctness + commits earned
+- `onGameComplete(result)`: report completion
 
-interface ContextRequirement {
-  key: string;                    // e.g., "projectType", "techStack"
-  source: string;                 // Which context file to read from
-  schema: JSONSchema;             // Expected output schema
-}
-```
+`AnswerResult.isNavigation = true` marks UI navigation events (e.g., selecting an evidence category) that should not affect scoring.
 
-### Game Plugin Interface
+### Game definition (`defineGame`) and config (`defineConfig`)
+
+Games are defined with `defineGame()` and returned as factory functions:
 
 ```typescript
-abstract class GamePlugin {
-  abstract schema: GamePluginSchema;
-  
-  // Lifecycle (called by CLI)
-  abstract initialize(preparedData: GamePreparedData): Promise<void>;
-  abstract start(): Promise<void>;
-  abstract getCurrentQuestion(): GameQuestion;
-  abstract submitAnswer(answer: string): Promise<AnswerResult>;
-  abstract end(): GameResult;
-  
-  // Optional hooks
-  onCorrectAnswer?(question: GameQuestion): void;
-  onWrongAnswer?(question: GameQuestion): void;
-  onHintUsed?(question: GameQuestion): void;
-}
+// src/games/file-detective/index.ts
+export const FileDetective = defineGame<FileDetectiveConfig>({
+  id: "file-detective",
+  component: FileDetectiveComponent,
+  defaultConfig,
+  metadata: {
+    id: "file-detective",
+    name: "file --detective",
+    description: "Investigate a codebase to identify its project type and stack",
+    estimatedMinutes: 10,
+  },
+  getAIContext,
+});
 ```
 
-### Template System
-
-Templates define which games to include and their order. **Position in array = TODO level.**
-
-**Default template (bundled):**
+Users configure which games run (and in what order) via `.onboardme/config.ts`:
 
 ```typescript
-// Built into onboardme package
-export const defaultTemplate = [
-  FileDetective,        // Position 0 → TODO #0
-  FlowTrace,            // Position 1 → TODO #1
-  GrepHunt,             // Position 2 → TODO #2
-  SpaghettiMonster,     // Last → FIXME (boss)
-];
+// .onboardme/config.ts
+import { defineConfig, FileDetective } from "onboardme/games";
+
+export default defineConfig({
+  games: [FileDetective()],
+});
 ```
 
-**User's custom template:**
+The CLI loads this file via `loadConfig(rootDir)` in `src/core/config.ts` and falls back to the built-in default config when absent or invalid.
 
-```typescript
-// .onboardme/template/template.ts
-import { FileDetective, FlowTrace, GrepHunt, SpaghettiMonster } from 'onboardme';
+### Orchestration (`GameOrchestrator`)
 
-export const template = [
-  FileDetective,
-  FlowTrace,
-  // GrepHunt removed - team doesn't want this game
-  SpaghettiMonster,
-];
-```
+`src/ui/orchestrator/game-orchestrator.tsx`:
 
-**Or JSON format:**
+- Renders the current game from `config.games[index]` (no registry lookup)
+- Aggregates session stats (commits, accuracy, streak)
+- Advances to the next game on `onGameComplete`
 
-```json
-{
-  "games": [
-    { "id": "file-detective" },
-    { "id": "flow-trace" },
-    { "id": "spaghetti-monster" }
-  ]
-}
-```
+### Custom games
 
-### Adding Custom Games
+Because `.onboardme/config.ts` is TypeScript, teams can import local games directly (relative path) and mix them with built-ins without string IDs or registration steps.
 
-Users can create their own games:
+### Scaffolding (`onboardme game:new`)
 
-1. Create game class extending `GamePlugin`
-2. Define schema with required context
-3. Add to template
-4. Run `onboardme template build` (if TypeScript)
+`onboardme game:new <id>` scaffolds the standard game folder with:
 
-```typescript
-// .onboardme/template/games/my-custom-game.ts
-import { GamePlugin } from 'onboardme';
-
-export class MyCustomGame extends GamePlugin {
-  schema = {
-    id: 'my-custom-game',
-    name: 'custom --game',
-    description: 'My team-specific onboarding game',
-    estimatedTime: 10,
-    requiredContext: [
-      {
-        key: 'customData',
-        source: 'features.json',
-        schema: { type: 'array', items: { type: 'object' } }
-      }
-    ]
-  };
-  
-  // ... implement methods
-}
-
-// Add to template
-import { FileDetective, SpaghettiMonster } from 'onboardme';
-import { MyCustomGame } from './games/my-custom-game';
-
-export const template = [
-  FileDetective,
-  MyCustomGame,      // Custom game at position 1
-  SpaghettiMonster,
-];
-```
+- `index.ts` (defineGame export)
+- `component.tsx` (React component stub)
+- `types.ts` (config schema/types stub)
+- `ai-context.ts` (AI context stub)
 
 ---
 
@@ -287,12 +226,14 @@ export const template = [
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
-| Language | TypeScript | Type safety, good CLI tooling |
-| CLI Framework | Commander.js or Oclif | Mature, well-documented |
-| Terminal UI | Ink (React for CLI) | Rich terminal UI, React patterns |
-| Testing | Vitest | Fast, modern |
-| Build | tsup or esbuild | Fast builds |
-| Package | npm | Standard distribution |
+| Runtime | Bun | Fast TypeScript/JS runtime and bundler |
+| Language | TypeScript (strict) | Type safety and refactor confidence |
+| CLI Framework | Commander.js | Mature CLI ergonomics |
+| Terminal UI | Ink + React | Declarative UI with good composability |
+| Validation | Zod | Runtime schema validation for prepared data |
+| Lint/Format | Biome | Fast, consistent code style |
+| Tests | Bun test | Simple, fast test runner |
+| Dependency checking | Knip | Keep exports/files clean |
 
 ---
 
@@ -301,193 +242,115 @@ export const template = [
 ```
 onboardme/
 ├── src/
-│   ├── cli/                    # CLI command handlers
-│   │   ├── init.ts             # Setup .onboardme, install skill
-│   │   ├── start.ts            # Validate & run games
-│   │   ├── status.ts           # Show progress
-│   │   ├── template.ts         # Template management
-│   │   └── validate.ts         # Validate prepared/ structure
-│   ├── core/                   # Core game engine
-│   │   ├── engine.ts           # Main game loop
-│   │   ├── state.ts            # State management
-│   │   ├── scoring.ts          # Commits/streak calculation
-│   │   ├── documentation.ts    # Documentation unlock system
-│   │   ├── pacing.ts           # Emotional pacing & valleys
-│   │   ├── behavioral.ts       # Player behavior tracking
-│   │   └── rendering.ts        # Text animation & typing speeds
-│   ├── games/                  # Game plugin implementations
-│   │   ├── base/               # Base classes & interfaces
-│   │   │   ├── GamePlugin.ts   # Abstract plugin class
-│   │   │   ├── types.ts        # Shared types
-│   │   │   └── schemas.ts      # JSON schemas for validation
+│   ├── commands/                 # CLI commands
+│   │   ├── game-new.ts
+│   │   ├── init.tsx
+│   │   ├── start.tsx
+│   │   ├── status.tsx
+│   │   └── validate.ts
+│   ├── core/                     # Core helpers (config, scoring, prepared paths)
+│   │   ├── config.ts
+│   │   ├── constants.ts
+│   │   ├── loader.ts
+│   │   └── scoring.ts
+│   ├── games/                    # Built-in games
 │   │   ├── file-detective/
-│   │   │   ├── index.ts
-│   │   │   └── schema.json
-│   │   ├── flow-trace/
-│   │   │   ├── index.ts
-│   │   │   └── schema.json
-│   │   ├── grep-hunt/
-│   │   │   ├── index.ts
-│   │   │   └── schema.json
-│   │   └── spaghetti-monster/
-│   │       ├── index.ts
-│   │       └── schema.json
-│   ├── template/               # Template handling
-│   │   ├── loader.ts           # Load user/default template
-│   │   ├── builder.ts          # Build TypeScript templates
-│   │   └── default.ts          # Default game template
-│   ├── validation/             # Prepared data validation
-│   │   ├── validator.ts        # Validate against schemas
-│   │   └── errors.ts           # Structured error output
-│   ├── state/                  # State persistence
-│   │   ├── progress.ts
-│   │   ├── history.ts
-│   │   └── documentation.ts
-│   ├── ui/                     # Terminal UI components
-│   │   ├── components/         # Reusable UI elements
-│   │   │   ├── dialogue-choice.tsx
-│   │   │   └── memory-log.tsx
-│   │   ├── screens/            # Full-screen layouts
-│   │   │   ├── cold-open.tsx
-│   │   │   ├── loading.tsx
-│   │   │   └── victory.tsx
-│   │   ├── animations/         # Animation helpers
-│   │   │   ├── glitch.ts
-│   │   │   └── typewriter.ts
-│   │   └── theme.ts
-│   └── utils/
-│       ├── fs.ts
-│       ├── git.ts
-│       └── prompt.ts
-├── skill/                      # OnboardMe skill (installed to user's project)
-│   ├── SKILL.md                # Main skill instructions
-│   └── references/
-│       ├── context-schema.md   # What to gather
-│       └── game-schemas/       # Per-game requirements
-│           ├── file-detective.md
-│           ├── flow-trace.md
-│           └── ...
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   ├── games/
-│   └── fixtures/
-├── package.json
-├── tsconfig.json
-└── README.md
+│   │   └── index.ts
+│   ├── lib/                      # fs/paths/errors
+│   ├── services/                 # state + manifest validation
+│   ├── types/                    # shared types
+│   │   └── game.ts
+│   └── ui/                       # Ink UI components + orchestrator
+│       ├── components/
+│       ├── orchestrator/
+│       ├── screens/
+│       ├── render.tsx
+│       └── theme.tsx
+├── context/                      # Product/design docs
+└── tests/
+    ├── e2e/
+    ├── integration/
+    └── unit/
 ```
 
 ---
 
 ## 7. File System Structure
 
-All game data stored in `.onboardme/` at repository root.
+All runtime data lives in `.onboardme/` at the repository root.
 
 ```
 .onboardme/
-├── context/                      # Raw gathered context (from skill)
-│   ├── meta.json                 # Project metadata
-│   ├── structure.json            # Directory structure, entry points
-│   ├── services.json             # Service map
-│   ├── flows.json                # Data flows and user journeys
-│   ├── domain.json               # Terms, acronyms, business logic
-│   ├── features.json             # Feature areas
-│   ├── debt.json                 # Technical debt analysis
-│   ├── tests.json                # Test framework, test files
-│   ├── docs.json                 # Documentation summary
-│   └── history.json              # Git history analysis
-├── prepared/                     # Game-ready data (from skill)
-│   ├── manifest.json             # Which games, in what order
-│   ├── games/
-│   │   ├── file-detective/
-│   │   │   ├── config.json
-│   │   │   └── questions.json
-│   │   ├── flow-trace/
-│   │   │   ├── config.json
-│   │   │   └── journeys.json
-│   │   └── spaghetti-monster/
-│   │       ├── config.json
-│   │       └── phases.json
-│   └── narrative/
-│       ├── monster.json          # Generated monster personality
-│       └── memory-logs.json      # Backstory fragments
-├── template/                     # User's custom template (optional)
-│   ├── template.ts               # or template.json
-│   └── games/                    # Custom game implementations
-│       └── my-custom-game.ts
-├── state/                        # Game state (managed by CLI)
-│   ├── progress.json             # Current game, question
-│   ├── history.json              # All answers with timestamps
-│   ├── knowledge.json            # Unlocked knowledge entries
-│   └── achievements.json         # Badges & milestones
+├── config.ts                 # committed: game order + options (TypeScript)
+├── context/                  # gitignored: raw gathered context (from skill)
+├── prepared/                 # gitignored: prepared game data (from skill)
+│   └── games/
+│       └── file-detective/
+│           └── data.json
+├── state/                    # gitignored: progress/state managed by CLI
+│   └── progress.json
+├── template/                 # legacy (currently unused)
 └── .gitignore
 ```
 
 ### What to Gitignore
 
 ```gitignore
-# .onboardme/.gitignore
-
 # Generated by skills (regenerate with skills)
 context/
 prepared/
 
 # User-specific state (don't commit)
 state/
-
-# Keep these (commit to share with team)
-# template/   - Custom game templates
 ```
 
 **Rationale:**
-- `context/` — Regenerated by "initialize context" skill, can be large
-- `prepared/` — Regenerated by "prepare game" skill
-- `state/` — User-specific progress, never commit
-- `template/` — Custom templates should be committed so team shares same games
+
+- `context/` and `prepared/` are regenerated by skills
+- `state/` is user-specific and should not be committed
+- `config.ts` is committed so teams share a common game lineup and configuration
 
 ---
 
 ## 8. CLI Commands
 
-The CLI is a **runner**—it validates prepared data and runs games. AI work happens through skills.
+The CLI is a **runner**—it loads config and runs games. Validation and AI work happen through skills.
 
 ### Core Commands
 
 | Command | Purpose |
 |---------|---------|
-| `onboardme init` | Setup `.onboardme/`, install skill, update `.gitignore` |
-| `onboardme start` | Validate `prepared/`, run games, save state |
+| `onboardme init` | Create `.onboardme/` folder structure and starter state |
+| `onboardme game:new <id>` | Scaffold a new game in `src/games/<id>/` |
+| `onboardme start` | Load `.onboardme/config.ts` and run games (interactive terminal) |
 | `onboardme status` | Show current progress |
-| `onboardme validate` | Check if `prepared/` is valid, output errors for AI to fix |
-| `onboardme template` | Create starter template for customization |
-| `onboardme template build` | Compile TypeScript template |
+| `onboardme validate` | Validate prepared data and output JSON errors for AI to fix |
 
 ### Error Output for AI
 
-When validation fails, CLI outputs structured errors that can be shown to AI:
+When validation fails, the CLI outputs structured errors that can be shown to AI:
 
 ```json
 {
   "valid": false,
   "errors": [
     {
-      "game": "flow-trace",
-      "field": "journeys[0].entryPoint",
-      "error": "Missing required field",
-      "expected": "string",
-      "received": "undefined"
+      "game": "file-detective",
+      "field": "config.evidence",
+      "error": "evidence must include all 5 category IDs"
     }
   ],
-  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
+  "suggestion": "Re-run 'prepare game' skill to regenerate file-detective data"
 }
 ```
 
 **Workflow for fixing:**
-1. User runs `onboardme start`
+
+1. User runs `onboardme validate`
 2. CLI outputs validation error
 3. User shows error to AI
-4. AI re-runs prepare skill to fix
-5. User runs `onboardme start` again
+4. AI re-runs the prepare skill to fix
+5. User re-runs `onboardme validate`
 
 ---
 
@@ -1003,7 +866,7 @@ The Spaghetti Code Monster has been documented.
 
 ## 13. E2E Testing Framework
 
-OnboardMe includes a custom E2E testing framework for testing game UIs with simulated interactions.
+OnboardMe includes a lightweight E2E framework for testing Ink game UIs with simulated keyboard input.
 
 ### Architecture
 
@@ -1012,28 +875,12 @@ OnboardMe includes a custom E2E testing framework for testing game UIs with simu
 │                        E2E Test                                      │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│   withE2E(options, async (e2e) => {                                │
-│     e2e.debug("Screen");                                           │
-│     await e2e.press("enter");                                      │
-│     await e2e.type("answer");                                      │
-│   });                                                               │
+│   withGameE2E({ GameComponent, config }, async (e2e) => {           │
+│     e2e.debug("Screen");                                            │
+│     await e2e.press("enter");                                       │
+│     await e2e.type("answer");                                       │
+│   });                                                                │
 │                                                                     │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    E2E Harness                                       │
-│  • Wraps GameTestHarness (engine setup, cleanup)                    │
-│  • Wraps ink render (mock stdout/stdin/stderr)                      │
-│  • Provides interaction helpers (press, type, debug)                │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Game Adapter                                      │
-│  • extractState(engine) → Game-specific state                       │
-│  • createCallbacks() → Event handlers                               │
-│  • render(props) → React element                                    │
 └──────────────────────────┬──────────────────────────────────────────┘
                            │
                            ▼
@@ -1041,7 +888,14 @@ OnboardMe includes a custom E2E testing framework for testing game UIs with simu
 │                    Ink Render (Local)                               │
 │  • MockStdout → Captures rendered frames                            │
 │  • MockStdin → Emits keyboard events                                │
-│  • No external dependencies                                          │
+│  • No external dependencies                                         │
+└──────────────────────────┬──────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Game Component                                   │
+│  • Receives GameProps<TConfig>                                      │
+│  • Calls onAnswerResult / onGameComplete                            │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1049,11 +903,11 @@ OnboardMe includes a custom E2E testing framework for testing game UIs with simu
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| `withE2E` | `tests/e2e/framework/harness.ts` | Main entry point for E2E tests |
-| `ink-render.ts` | `tests/e2e/framework/ink-render.ts` | Local ink testing utilities |
-| `render-wrapper.tsx` | `tests/e2e/framework/render-wrapper.tsx` | Generic game screen component |
-| Game Adapters | `tests/e2e/adapters/` | Game-specific state and rendering |
-| Configs | `tests/e2e/configs/` | Test data configurations |
+| `withGameE2E` | `tests/e2e/framework/harness.ts` | Main entry point for E2E tests |
+| `ink-render.ts` | `tests/e2e/framework/ink-render.ts` | Local Ink render utilities (mock stdin/stdout) |
+| `keys.ts` | `tests/e2e/framework/keys.ts` | Keyboard key codes |
+| `types.ts` | `tests/e2e/framework/types.ts` | TypeScript interfaces for the harness |
+| Configs | `tests/e2e/configs/` | Test configurations |
 | Sandbox | `tests/e2e/sandbox/` | Experimentation scripts |
 
 ### File Structure
@@ -1061,34 +915,25 @@ OnboardMe includes a custom E2E testing framework for testing game UIs with simu
 ```
 tests/e2e/
 ├── framework/
-│   ├── index.ts           # Public API
-│   ├── harness.ts         # E2EHarness implementation
-│   ├── ink-render.ts      # Local ink testing utilities
-│   ├── render-wrapper.tsx # Generic game renderer
-│   ├── types.ts           # TypeScript interfaces
-│   └── keys.ts            # Keyboard key codes
-├── adapters/
-│   └── file-detective.ts  # FileDetective game adapter
+│   ├── index.ts      # Public API
+│   ├── harness.ts    # withGameE2E implementation
+│   ├── ink-render.ts # Local Ink testing utilities
+│   ├── types.ts      # TypeScript interfaces
+│   └── keys.ts       # Keyboard key codes
 ├── configs/
-│   └── file-detective.ts  # Test configuration
+│   └── file-detective.ts
 ├── sandbox/
-│   └── file-detective.sandbox.ts  # Experimentation script
-└── file-detective.e2e.test.ts     # E2E tests
+│   └── file-detective.sandbox.ts
+└── file-detective.e2e.test.ts
 ```
 
 ### Adding Support for New Games
 
-1. **Create adapter** (`tests/e2e/adapters/{game}.ts`):
-   - Implement `GameAdapter<TState>` interface
-   - `extractState()` gets game-specific state from engine
-   - `createCallbacks()` creates event handlers
-   - `render()` returns the game's UI component
+1. **Create config** (`tests/e2e/configs/{game}.ts`):
+   - Export a config object matching the game’s config type
 
-2. **Create config** (`tests/e2e/configs/{game}.ts`):
-   - Export test data matching game's prepared data schema
-
-3. **Create tests** (`tests/e2e/{game}.e2e.test.ts`):
-   - Use `withE2E` with your adapter and config
+2. **Create tests** (`tests/e2e/{game}.e2e.test.ts`):
+   - Import the game component and use `withGameE2E`
 
 ---
 

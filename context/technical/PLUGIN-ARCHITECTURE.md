@@ -1,569 +1,144 @@
-# Plugin Architecture
+# Game Architecture (React-Based)
 
-> **Games are plugins—modular, composable units that can be mixed, matched, and customized.**
+> This document describes the **current** game system. The legacy class-based `GameEngine` / `GamePlugin` / template system has been removed.
 
 ## Overview
 
-The plugin architecture enables:
-- **Built-in games** — Bundled with the OnboardMe package
-- **Custom games** — Teams create their own onboarding games
-- **Templates** — Define which games to include and their order
-- **Composition** — Mix built-in and custom games freely
+OnboardMe runs games with a React-first architecture:
 
----
+- **Games are React components** rendered with Ink
+- **Game state lives in hooks** (typically `useReducer`)
+- **Games are exported as typed factories** via `defineGame()` (similar to Vite/ESLint config patterns)
+- **Users choose games via TypeScript config** in `.onboardme/config.ts` using `defineConfig()`
+- **A React orchestrator** (`GameOrchestrator`) renders games and aggregates session stats
+- **Logic stays pure** (validation/state transitions live in standalone functions)
 
-## Plugin Schema
+## Core Types
 
-Every game plugin must define its schema. The schema tells the skill what context data the game needs.
+The shared types live in `src/types/game.ts`:
+
+- **`GameQuestion`**: prompt + type + options (multiple-choice / text-input)
+- **`AnswerResult`**: what the orchestrator records per answer
+  - `isNavigation?: true` marks UI navigation events that should not affect score/stats
+- **`GameResult`**: game completion result
+- **`GameProps<TConfig>`**: props every game component receives
+- **`GameInstance<TConfig>`**: a configured game (component + config + metadata + AI context)
+- **`defineGame()` / `defineConfig()`**: helpers that preserve type inference
+
+## Defining a Game
+
+Recommended folder layout:
+
+```
+src/games/my-game/
+├── index.ts        # defineGame() export
+├── component.tsx   # React component (useReducer)
+├── types.ts        # Config + data types (often with Zod)
+├── state.ts        # State + actions
+├── reducer.ts      # Pure reducer
+├── logic.ts        # Pure validation/state helpers
+└── ai-context.ts   # AI context for question generation
+```
+
+### `index.ts`: export a typed factory
+
+Each game exports a factory created by `defineGame()`:
 
 ```typescript
-interface GamePluginSchema {
-  id: string;                     // Unique identifier, e.g., "file-detective"
-  name: string;                   // Display name, e.g., "file --detective"
-  description: string;            // What this game teaches
-  estimatedTime: number;          // Minutes to complete
-  
-  // What context this game needs
-  requiredContext: ContextRequirement[];
-}
+import { defineGame } from "@/types/game.ts";
+import type { MyGameConfig } from "./types.ts";
+import { MyGameComponent } from "./component.tsx";
+import { defaultConfig } from "./types.ts";
+import { getAIContext } from "./ai-context.ts";
 
-interface ContextRequirement {
-  key: string;                    // Key in prepared data, e.g., "projectType"
-  source: string;                 // Which context file to read from
-  schema: JSONSchema;             // Expected output schema
-}
+export const MyGame = defineGame<MyGameConfig>({
+  id: "my-game",
+  component: MyGameComponent,
+  defaultConfig,
+  metadata: {
+    id: "my-game",
+    name: "my --game",
+    description: "",
+    estimatedMinutes: 5,
+  },
+  getAIContext,
+});
 ```
 
-### Example: File Detective Schema
+Calling `MyGame({ ...options })` returns a `GameInstance<MyGameConfig>`.
+
+### `component.tsx`: implement the UI + callbacks
+
+Every game component receives `config`, `onAnswerResult`, and `onGameComplete`.
+
+Rules of thumb:
+
+- Call **`onAnswerResult`** every time the player submits an answer (or performs a scored action)
+- Call **`onGameComplete`** exactly once when the game is complete
+- Use `AnswerResult.isNavigation = true` for actions like “select category” that should not award commits
+
+## User Configuration (`.onboardme/config.ts`)
+
+Users configure the session with a TypeScript file:
 
 ```typescript
-// games/file-detective/schema.ts
-export const schema: GamePluginSchema = {
-  id: 'file-detective',
-  name: 'file --detective',
-  description: 'Investigate codebase to determine project type and tech stack',
-  estimatedTime: 10,
-  requiredContext: [
-    {
-      key: 'projectType',
-      source: 'meta.json',
-      schema: {
-        type: 'object',
-        properties: {
-          language: { type: 'string' },
-          framework: { type: 'string' },
-          packageManager: { type: 'string' }
-        },
-        required: ['language', 'framework']
-      }
-    },
-    {
-      key: 'evidence',
-      source: 'structure.json',
-      schema: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            file: { type: 'string' },
-            clue: { type: 'string' },
-            reveals: { type: 'string' }
-          }
-        }
-      }
-    }
-  ]
-};
+// .onboardme/config.ts
+import { defineConfig, FileDetective } from "onboardme/games";
+
+export default defineConfig({
+  games: [
+    FileDetective(),
+    // Add more games here (built-in or local)
+  ],
+});
 ```
 
----
+How it’s loaded:
 
-## Plugin Interface
+- The CLI calls `loadConfig(rootDir)` in `src/core/config.ts`
+- If `.onboardme/config.ts` does not exist (or fails to load), it falls back to `getDefaultConfig()` from `src/games/index.ts`
 
-Every game plugin extends the base `GamePlugin` class:
+Because it’s TypeScript, teams can import custom games directly from local paths or packages—no registries or string IDs needed.
 
-```typescript
-abstract class GamePlugin {
-  // Schema defines requirements
-  abstract schema: GamePluginSchema;
-  
-  // State
-  protected preparedData: GamePreparedData;
-  protected questions: GameQuestion[];
-  protected currentIndex: number = 0;
-  
-  // Lifecycle methods (called by CLI)
-  abstract initialize(preparedData: GamePreparedData): Promise<void>;
-  abstract start(): Promise<void>;
-  abstract end(): GameResult;
-  
-  // Question flow
-  abstract getCurrentQuestion(): GameQuestion;
-  abstract submitAnswer(answer: string): Promise<AnswerResult>;
-  
-  // Optional hooks
-  onCorrectAnswer?(question: GameQuestion): void;
-  onWrongAnswer?(question: GameQuestion): void;
-  onHintUsed?(question: GameQuestion): void;
-  onSkip?(question: GameQuestion): void;
-}
+## Orchestration (`GameOrchestrator`)
 
-interface GameQuestion {
-  id: string;
-  type: 'multiple-choice' | 'text-input' | 'marker' | 'timed';
-  prompt: string;
-  context?: string;
-  hints: string[];
-  timeLimit?: number;
-  validation: ValidationRule;
-}
+`src/ui/orchestrator/game-orchestrator.tsx` is responsible for:
 
-interface AnswerResult {
-  correct: boolean;
-  feedback: string;
-  knowledgeUnlocked?: string[];
-  commitsEarned: number;
-}
+- Selecting the current game (`config.games[index]`)
+- Rendering the current game component
+- Tracking session stats (commits, accuracy, streak)
+- Advancing to the next game on `onGameComplete`
 
-interface GameResult {
-  completed: boolean;
-  score: number;
-  maxScore: number;
-  timeSpent: number;
-  knowledgeUnlocked: string[];
-}
-```
+## AI Context
 
----
+Each game provides `getAIContext()` which returns `GameAIContext` (also in `src/types/game.ts`).
 
-## Template System
+This is the contract for skills that generate prepared data/questions: it explains the game’s purpose, config schema, and question guidelines.
 
-Templates define which games to include and their order. **Position in array = TODO level.**
+## Testing
 
-### Default Template
+E2E tests render game components directly:
 
-```typescript
-// Bundled in onboardme package
-export const defaultTemplate = [
-  FileDetective,        // TODO #0
-  FlowTrace,            // TODO #1
-  GrepHunt,             // TODO #2
-  SpaghettiMonster,     // FIXME (always last)
-];
-```
+- `tests/e2e/framework/withGameE2E` mounts the component with a config
+- It simulates keyboard input (`press`, `type`) and captures frames (`lastFrame`)
+- It captures `AnswerResult[]` and the final `GameResult`
 
-### JSON Template
+This avoids adapters/engines and makes tests close to “real UI.”
 
-Users can create a simple JSON template:
+## Scaffolding (`onboardme game:new`)
 
-```json
-// .onboardme/template/template.json
-{
-  "games": [
-    { "id": "file-detective" },
-    { "id": "flow-trace" },
-    { "id": "spaghetti-monster" }
-  ]
-}
-```
-
-### TypeScript Template
-
-For custom games, users can create a TypeScript template:
-
-```typescript
-// .onboardme/template/template.ts
-import { FileDetective, FlowTrace, SpaghettiMonster } from 'onboardme';
-import { MyCustomGame } from './games/my-custom-game';
-
-export const template = [
-  FileDetective,
-  MyCustomGame,         // Custom game at TODO #1
-  FlowTrace,            // Moved to TODO #2
-  SpaghettiMonster,
-];
-```
-
-### Template Resolution
-
-1. CLI checks for `.onboardme/template/template.ts`
-2. If found, runs `onboardme template build` to compile
-3. Falls back to `.onboardme/template/template.json`
-4. Falls back to default template
-
----
-
-## Creating Custom Games
-
-### Step 1: Create Game Class
-
-```typescript
-// .onboardme/template/games/my-custom-game.ts
-import { GamePlugin, GamePluginSchema, GameQuestion } from 'onboardme';
-
-export class MyCustomGame extends GamePlugin {
-  schema: GamePluginSchema = {
-    id: 'my-custom-game',
-    name: 'my --custom',
-    description: 'My team-specific onboarding challenge',
-    estimatedTime: 15,
-    requiredContext: [
-      {
-        key: 'teamData',
-        source: 'features.json',
-        schema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              owner: { type: 'string' },
-              description: { type: 'string' }
-            }
-          }
-        }
-      }
-    ]
-  };
-  
-  async initialize(preparedData: GamePreparedData): Promise<void> {
-    this.preparedData = preparedData;
-    this.questions = preparedData.questions;
-  }
-  
-  async start(): Promise<void> {
-    this.currentIndex = 0;
-  }
-  
-  getCurrentQuestion(): GameQuestion {
-    return this.questions[this.currentIndex];
-  }
-  
-  async submitAnswer(answer: string): Promise<AnswerResult> {
-    const question = this.getCurrentQuestion();
-    const correct = this.validateAnswer(answer, question);
-    
-    if (correct) {
-      this.currentIndex++;
-    }
-    
-    return {
-      correct,
-      feedback: correct ? 'Nice work!' : 'Try again.',
-      commitsEarned: correct ? 100 : 0
-    };
-  }
-  
-  end(): GameResult {
-    return {
-      completed: this.currentIndex >= this.questions.length,
-      score: this.currentIndex * 100,
-      maxScore: this.questions.length * 100,
-      timeSpent: 0,
-      knowledgeUnlocked: []
-    };
-  }
-  
-  private validateAnswer(answer: string, question: GameQuestion): boolean {
-    // Custom validation logic
-    return true;
-  }
-}
-```
-
-### Step 2: Add to Template
-
-```typescript
-// .onboardme/template/template.ts
-import { FileDetective, SpaghettiMonster } from 'onboardme';
-import { MyCustomGame } from './games/my-custom-game';
-
-export const template = [
-  FileDetective,
-  MyCustomGame,
-  SpaghettiMonster,
-];
-```
-
-### Step 3: Build Template
+The CLI can scaffold a new game:
 
 ```bash
-onboardme template build
+onboardme game:new my-game
 ```
 
-### Step 4: Re-run Prepare Skill
+This creates `src/games/my-game/` with the standard files and minimal working boilerplate.
 
-In your AI platform, run "prepare game" to generate the prepared data for your new game.
+## Design Decisions (Why This Architecture)
 
----
+- **React components instead of classes**: state is explicit, updates are automatic, and UI+state stays together
+- **TypeScript config instead of template JSON**: full autocomplete + type inference, import-based composition, fewer runtime errors
+- **Pure logic + reducers**: deterministic behavior and straightforward tests
+- **E2E renders components directly**: no registry/engine abstraction layer needed for UI correctness
 
-## Context Schemas
-
-The skill reads these schemas to know what data to generate.
-
-### meta.json
-
-```typescript
-interface MetaContext {
-  projectName: string;
-  language: string;
-  framework: string;
-  packageManager: string;
-  totalFiles: number;
-  totalLines: number;
-  entryPoints: string[];
-}
-```
-
-### structure.json
-
-```typescript
-interface StructureContext {
-  keyDirectories: Array<{
-    path: string;
-    purpose: string;
-    contents: string[];
-  }>;
-  patterns: {
-    hasTests: boolean;
-    testPattern: string;
-    hasConfig: boolean;
-    configFiles: string[];
-  };
-}
-```
-
-### services.json
-
-```typescript
-interface ServicesContext {
-  services: Array<{
-    name: string;
-    path: string;
-    description: string;
-    entryPoint: string;
-    dependencies: string[];
-    externalDeps: string[];
-    keyFunctions: Array<{
-      name: string;
-      file: string;
-      line: number;
-      description: string;
-    }>;
-  }>;
-}
-```
-
-### flows.json
-
-```typescript
-interface FlowsContext {
-  flows: Array<{
-    name: string;
-    description: string;
-    trigger: string;
-    steps: Array<{
-      description: string;
-      file: string;
-      function: string;
-    }>;
-  }>;
-}
-```
-
-### domain.json
-
-```typescript
-interface DomainContext {
-  terms: Record<string, string>;
-  acronyms: Record<string, string>;
-  businessRules: Array<{
-    name: string;
-    description: string;
-    file: string;
-  }>;
-}
-```
-
-### features.json
-
-```typescript
-interface FeaturesContext {
-  features: Array<{
-    name: string;
-    description: string;
-    entryPoint: string;
-    relatedFiles: string[];
-  }>;
-}
-```
-
-### debt.json
-
-```typescript
-interface DebtContext {
-  monster: {
-    birthYear: number;
-    todoCount: number;
-    oldestTodo: {
-      text: string;
-      file: string;
-      line: number;
-      age: string;
-    };
-    longestFunction: {
-      name: string;
-      lines: number;
-      file: string;
-    };
-    complexityScore: number;
-  };
-}
-```
-
-### tests.json
-
-```typescript
-interface TestsContext {
-  framework: string;
-  testFiles: string[];
-  coverage: number | null;
-  patterns: {
-    unitTests: string;
-    integrationTests: string;
-    e2eTests: string;
-  };
-}
-```
-
-### docs.json
-
-```typescript
-interface DocsContext {
-  readme: {
-    exists: boolean;
-    sections: string[];
-    hasSetup: boolean;
-  };
-  additionalDocs: Array<{
-    file: string;
-    title: string;
-    type: string;
-  }>;
-}
-```
-
-### history.json
-
-```typescript
-interface HistoryContext {
-  firstCommit: {
-    date: string;
-    author: string;
-    message: string;
-  };
-  totalCommits: number;
-  contributors: number;
-  recentActivity: Array<{
-    date: string;
-    message: string;
-    files: string[];
-  }>;
-}
-```
-
----
-
-## Prepared Data Structure
-
-The skill generates prepared data for each game based on the template.
-
-```
-.onboardme/prepared/
-├── manifest.json               # Game order and metadata
-├── games/
-│   ├── file-detective/
-│   │   ├── config.json         # Game configuration
-│   │   └── questions.json      # Generated questions
-│   ├── flow-trace/
-│   │   ├── config.json
-│   │   └── journeys.json
-│   └── spaghetti-monster/
-│       ├── config.json
-│       └── phases.json
-└── narrative/
-    ├── monster.json            # Monster personality data
-    └── memory-logs.json        # Backstory fragments
-```
-
-### manifest.json
-
-```json
-{
-  "version": "1.0.0",
-  "generatedAt": "2025-02-02T10:30:00Z",
-  "games": [
-    {
-      "id": "file-detective",
-      "position": 0,
-      "ready": true
-    },
-    {
-      "id": "flow-trace",
-      "position": 1,
-      "ready": true
-    },
-    {
-      "id": "spaghetti-monster",
-      "position": 2,
-      "isBoss": true,
-      "ready": true
-    }
-  ]
-}
-```
-
----
-
-## Validation
-
-The CLI validates prepared data against game schemas before running.
-
-```typescript
-interface ValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-  suggestion?: string;
-}
-
-interface ValidationError {
-  game: string;
-  file: string;
-  field: string;
-  error: string;
-  expected: string;
-  received: string;
-  line?: number;
-}
-```
-
-### Example Validation Output
-
-```json
-{
-  "valid": false,
-  "errors": [
-    {
-      "game": "flow-trace",
-      "file": "games/flow-trace/journeys.json",
-      "field": "journeys[0].entryPoint",
-      "error": "Missing required field",
-      "expected": "string",
-      "received": "undefined"
-    }
-  ],
-  "suggestion": "Re-run 'prepare game' skill to regenerate flow-trace data"
-}
-```
-
-Users show this error to their AI platform, which can then fix and re-run the prepare skill.
