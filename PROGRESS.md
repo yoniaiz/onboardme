@@ -346,8 +346,8 @@ Playtest Chapter 4 before proceeding.
 **Goal**: Update all documentation to reflect the implemented system.
 
 **Success Criteria**:
-- [ ] PRD.md reflects agent-skills reality
-- [ ] ARCHITECTURE.md updated for skill-based system
+- [x] PRD.md reflects agent-skills reality
+- [x] ARCHITECTURE.md updated for skill-based system
 - [ ] README.md with setup instructions
 - [ ] Archive deprecated CLI documentation
 
@@ -404,4 +404,4 @@ This code may be archived or adapted for the state-manager.ts utilities.
 
 ---
 
-*Last Updated: 2026-02-05 (Agent-Skills Pivot — Milestone 1 Started)*
+*Last Updated: 2026-02-05 (Agent-Skills Pivot Complete — PRD & Architecture Rewritten)*

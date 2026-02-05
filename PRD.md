@@ -2,9 +2,9 @@
 
 > **The best onboarding experience ever made.**
 
-A gamified CLI tool that transforms codebase onboarding from reading static wikis into an interactive adventure. New engineers work through accumulated TODOs, solve challenges, and ultimately face "The Spaghetti Code Monster" — a boss born from the codebase's technical debt that can only be defeated through understanding.
+An agent skill that transforms codebase onboarding into a conversational game. The AI agent becomes the **Spaghetti Code Monster** — a sentient tangle of legacy code that guards the codebase and tests new developers through investigation challenges.
 
-> **See [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md) for detailed creative direction, boss design, dialogue, and narrative arc.**
+> **See [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md) for detailed creative direction and narrative arc.**
 
 ---
 
@@ -12,19 +12,13 @@ A gamified CLI tool that transforms codebase onboarding from reading static wiki
 
 1. [Vision & Goals](#1-vision--goals)
 2. [Target Users](#2-target-users)
-3. [Architecture](#3-architecture)
+3. [How It Works](#3-how-it-works)
 4. [Game Design](#4-game-design)
-5. [Technical Specification](#5-technical-specification)
-6. [CLI Commands](#6-cli-commands)
-7. [File System Structure](#7-file-system-structure)
-8. [Agent Framework Integration](#8-agent-framework-integration)
-9. [Bootstrap: Context Gathering](#9-bootstrap-context-gathering)
-10. [TODO & Challenge Specifications](#10-todo--challenge-specifications)
-11. [FIXME Boss Battle Specification](#11-fixme-boss-battle-specification)
-12. [State Management](#12-state-management)
-13. [Question Design Principles](#13-question-design-principles)
-14. [Open Questions](#14-open-questions)
-15. [Future Considerations](#15-future-considerations)
+5. [The 5 Chapters](#5-the-5-chapters)
+6. [State & Artifacts](#6-state--artifacts)
+7. [Monster Character](#7-monster-character)
+8. [Installation & Distribution](#8-installation--distribution)
+9. [Future Considerations](#9-future-considerations)
 
 ---
 
@@ -41,23 +35,22 @@ Traditional onboarding sucks:
 
 ### The Solution
 
-**OnboardMe** turns onboarding into a text-based adventure game:
+**OnboardMe** turns onboarding into a conversational game where **the AI agent IS the game**:
 - **Active exploration** instead of passive reading
-- **Progressive difficulty** that builds real understanding
-- **Immediate feedback** on what you know vs. don't know
-- **Knowledge unlocks** that persist as documentation
-- **A final boss** that proves mastery
+- **Conversational challenges** that require real investigation
+- **Immediate feedback** from a character who knows the codebase
+- **Tangible artifacts** that document what you learn
+- **A full character arc** from dismissive antagonist to documented friend
 
 ### Design Principles
 
-1. **Fun but not childish** — Terminal aesthetic, computer-themed, professional tone
-2. **Real learning** — Questions require actual exploration, not just grep
-3. **AI-powered, not AI-dependent** — AI generates content, but game logic is deterministic
-4. **Zero external dependencies** — Works with user's existing agent framework
-5. **Local-first** — All state in filesystem, no accounts, no cloud
-6. **Emotional architecture** — Deliberate pacing with valleys between peaks
-7. **Player agency** — Two-way relationship through dialogue choices
-8. **Discovery over exposition** — Backstory revealed through gameplay
+1. **The agent IS the Monster** — Not a CLI rendering the Monster, the agent embodies it
+2. **Conversational gameplay** — Open-ended investigation, not multiple-choice quizzes
+3. **Editor as UI** — Files serve as game boards (CASE_FILE.md, FLOW_MAP.md)
+4. **Real learning** — Questions require actual exploration, not just grep
+5. **Local-first** — All state in `.onboardme/`, no accounts, no cloud
+6. **Emotional architecture** — Deliberate pacing with character development
+7. **Tangible artifacts** — Every chapter produces documentation
 
 ---
 
@@ -65,10 +58,10 @@ Traditional onboarding sucks:
 
 ### Primary User
 
-**Individual software engineers** joining a new team/company who want to:
+**Individual software engineers** joining a new team who want to:
 - Understand a new codebase quickly
 - Learn *why* things are built the way they are
-- Have actual verified knowledge, not just "I read it"
+- Have verified knowledge, not just "I read it"
 - Make onboarding less boring
 
 ### User Journey
@@ -76,24 +69,22 @@ Traditional onboarding sucks:
 ```
 1. Engineer joins new company
 2. Clones the repo
-3. Runs: onboardme init
-   - Creates .onboardme/ folder
-   - Installs skill to AI platform
-4. In AI platform: "Run initialize context"
-   - AI scans codebase, saves context to files
-5. In AI platform: "Run prepare game"
-   - AI transforms context into game-ready data
-6. Runs: onboardme start
-7. Experiences cold open (Monster's first appearance)
-8. Plays through TODOs (~90-120 min)
-   - Unlocks memory logs revealing Monster's backstory
-   - Makes dialogue choices that shape relationship
-   - Uses actual dev tools (grep, git blame) as weapons
-9. Faces "The Spaghetti Code Monster" (FIXME boss battle)
-10. Documents the Monster (victory = understanding, not destruction)
-11. Receives shareable victory summary
-12. Gets suggested first contribution based on learned areas
-13. Commits CODEBASE_KNOWLEDGE.md as first real contribution
+3. Installs OnboardMe skill:
+   npx add-skill onboardme/onboardme
+4. Opens Cursor/Claude Code
+5. Tells agent: "prepare game" or "/onboardme"
+   - Agent scans codebase, initializes state
+   - Monster introduces itself
+6. Tells agent: "play game"
+   - Agent becomes the Monster
+   - Conversational investigation begins
+7. Plays through 5 chapters (~90-120 min)
+   - Investigation, Hands-On, Deep Dive, Hunt, Boss Battle
+   - Makes real discoveries about the codebase
+   - Monster's attitude evolves based on performance
+8. Defeats Monster by documenting it
+9. Receives CODEBASE_KNOWLEDGE.md as first contribution
+10. Gets suggested first task based on demonstrated skills
 ```
 
 ### Non-Users (v1)
@@ -105,24 +96,66 @@ Traditional onboarding sucks:
 
 ---
 
-## 3. Architecture
+## 3. How It Works
 
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md) for complete architectural documentation.**
+### Architecture: Agent as Game Engine
 
-OnboardMe uses a **skill-based plugin architecture**:
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     USER'S CODING AGENT                             │
+│                 (Cursor / Claude Code / etc.)                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   ┌──────────────────────────────────────────────────────────────┐ │
+│   │                   OnboardMe Skill                             │ │
+│   │                                                               │ │
+│   │   The agent reads SKILL.md and BECOMES the Monster            │ │
+│   │   - Persona, voice, dialogue patterns                         │ │
+│   │   - Game rules and scoring rubrics                            │ │
+│   │   - State management instructions                             │ │
+│   │   - Chapter reference files                                   │ │
+│   │                                                               │ │
+│   └──────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                     TARGET REPOSITORY                               │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   .onboardme/                                                       │
+│   ├── state.json          # Progress, score, Monster mood           │
+│   ├── state.backup.json   # Auto-backup before writes               │
+│   └── artifacts/                                                    │
+│       ├── CASE_FILE.md    # Chapter 1 investigation log             │
+│       ├── FLOW_MAP.md     # Chapter 3 architecture diagram          │
+│       └── ...             # One artifact per chapter                │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
-- **Skills Layer**: User-invoked AI skills for context gathering and game preparation
-- **CLI Layer**: Game runner, state management, terminal UI
-- **Plugin Layer**: Composable game plugins that can be customized
-- **Storage Layer**: Local filesystem-based context, prepared data, and state
+### Commands
 
-Key architectural principles:
-- **Skill-based AI workflow** — User controls when AI runs via skills in their platform
-- **Plugin-based games** — Composable, extensible, users can customize or create games
-- **Template system** — Users define which games to include and their order
-- **Platform agnostic** — Works with any AI platform that supports skills (Cursor, Claude, etc.)
-- **Local-first** state management (no cloud, no accounts)
-- **Deterministic game logic** — CLI runs games without needing AI at runtime
+Users interact through natural language or slash commands:
+
+| Command | Trigger Phrases | What Happens |
+|---------|-----------------|--------------|
+| **Prepare Game** | "prepare game", "setup onboarding" | Agent scans repo, initializes state, Monster introduces itself |
+| **Play Game** | "play game", "let's go", "/onboardme" | Agent loads state, becomes Monster, begins/resumes gameplay |
+| **Status** | "status", "how am I doing" | Agent shows progress, score, Monster mood |
+| **Hint** | "hint", "help", "I'm stuck" | Progressive hints that cost commits |
+| **Reset** | "reset game", "start over" | Clear state with confirmation |
+
+### Gameplay Loop
+
+Every interaction follows: **CHALLENGE → MOVE → EVALUATION → REWARD → NEXT**
+
+1. **Challenge**: Monster presents a task or question
+2. **Move**: Player investigates, answers, or asks for hints
+3. **Evaluation**: Monster judges using tiered rubric (Incorrect/Partial/Correct/Deep)
+4. **Reward**: Commits earned, Monster reacts, state updated
+5. **Next**: Transition to next challenge or chapter
 
 ---
 
@@ -134,432 +167,316 @@ Key architectural principles:
 
 The game's central metaphor: **Technical debt is the real monster.** Every accumulated TODO, every "temporary" fix, every developer who left without documenting—they all merged into something that now guards the codebase.
 
-> **Full narrative details in [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md)**
-
 **Core Elements:**
-- TODOs instead of levels (completing the debt the Monster was born from)
 - The Spaghetti Code Monster as a sympathetic antagonist
 - Developer-culture humor throughout
 - Redemption arc: the Monster isn't destroyed, it's *documented*
+- Real artifacts that persist as documentation
 
-### Game Structure
+### Scoring System
 
-The game consists of 5 TODOs (levels) followed by a final FIXME boss battle. Each TODO contains 2-3 sub-tasks (mini-games), and each sub-task has 5-10 challenges. The FIXME boss battle has 3 phases.
+| Tier | Criteria | Commits | Effect |
+|------|----------|---------|--------|
+| **Incorrect** | Wrong understanding | 0 | -1 life |
+| **Partial** | Right direction, missing details | 1 | — |
+| **Correct** | Accurate identification | 2 | — |
+| **Deep** | Shows architectural insight | 3 | +respect |
 
-**Total: 8 games + boss battle (~90-120 minutes)**
+**Economy:**
+- **Commits** = Experience points (earned by correct answers)
+- **Lives** = 5 (lose one per incorrect answer)
+- **Hints** = Cost 1 commit each (progressive, 4 levels)
 
-> **See [Game Progression Diagram](./context/visuals/EXAMPLES.md#game-progression-diagram) for visual overview.**
+### Monster Mood System
 
-### Key Experience Features
+The Monster's attitude evolves based on player performance:
 
-**Emotional Pacing:**
-- **Cold open** — Atmospheric 17-second Monster introduction before gameplay
-- **Quiet moments** — 2-5 second valleys after each TODO completion for emotional processing
-- **Ambient presence** — Continuous subtle Monster sounds during active play
-- **Loading as worldbuilding** — Atmospheric loading screens with Monster commentary
-
-**Player Agency:**
-- **Dialogue choices** — 4 key moments where players respond to Monster
-- **Command-based questions** — Use actual dev tools (grep, git blame) as weapons
-- **Personality tracking** — Monster reacts to player's behavior patterns
-
-**Discovery & Learning:**
-- **Memory logs** — 8 unlockable backstory fragments revealing Monster's origin
-- **Spaced repetition** — Concepts revisited across TODOs for better retention
-- **Behavioral reactions** — Monster comments on hint usage, speed, exploration depth
-
-**Real-World Impact:**
-- **Victory artifact** — Generate CODEBASE_KNOWLEDGE.md documenting everything learned
-- **First contribution** — Option to create PR with documentation on Day 1
-- **Task suggestion** — Post-game recommendation for first real task based on demonstrated skills
-- **Shareable victory** — Victory card with stats for team channels
-
-> **Complete feature specifications:** See [IMPROVEMENTS-SUMMARY.md](./IMPROVEMENTS-SUMMARY.md) for all implemented enhancements.
-
-### Game Terminology
-
-> **See [TERMINOLOGY.md](./context/narrative/TERMINOLOGY.md) for complete game terminology mapping.**
-
-All game elements use code-themed naming (TODOs instead of levels, FIXME instead of boss, Commits instead of XP, etc.). The Monster appears after each TODO with evolving dialogue and reacts to player performance.
-
-**Key Terminology Changes:**
-- "Damage" → "Understanding" or "Documentation" (you're healing, not killing)
-- "HP/Health" → "Technical Debt" (reduce to 0%, not deplete)
-- "Kill the boss" → "Document the Monster" (aligns with sympathetic villain)
-
-> **For complete Monster personality, dialogue, and appearance details, see [fixme-spaghetti-monster/GAME.md](./context/games/fixme-spaghetti-monster/GAME.md).**
+| Mood | Trigger | Monster Behavior |
+|------|---------|------------------|
+| dismissive | Start of game | Brief, uninterested, clipped |
+| annoyed | Player succeeds | More static, sharper |
+| worried | Correct streak (3+) | Hesitant, growing tension |
+| desperate | Near victory | CAPS, intense, rapid |
+| peaceful | Victory | Soft static, gentle, acceptance |
 
 ---
 
-## 5. Technical Specification
+## 5. The 5 Chapters
 
-> **For technical architecture details, see [ARCHITECTURE.md](./context/ARCHITECTURE.md).**
+| Chapter | Duration | What Player Learns | Artifact |
+|---------|----------|-------------------|----------|
+| **1. The Investigation** | 20 min | Project type, tech stack, architecture | `CASE_FILE.md` |
+| **2. The Hands-On** | 15 min | How to run project, setup, env | Running project |
+| **3. The Deep Dive** | 25 min | Data flows, architecture patterns | `FLOW_MAP.md` |
+| **4. The Hunt** | 30 min | Debugging, finding bugs, impact analysis | `IMPACT_ANALYSIS.md` + actual bug fix |
+| **5. The Boss Battle** | 15 min | Synthesize all knowledge, face the Monster | `CODEBASE_KNOWLEDGE.md` |
 
-### Tech Stack
+### Chapter 1: The Investigation
 
-- **Language**: TypeScript
-- **CLI Framework**: Commander.js or Oclif
-- **Terminal UI**: Ink (React for CLI)
-- **Testing**: Bun test
-- **Build**: Bun build
+**Goal:** Learn to identify project type, tech stack, and architecture by examining evidence.
 
-### Game Architecture
+**Flow:**
+1. Monster creates CASE_FILE.md artifact
+2. Phase 1: Project Identity (~5 min) — What language? What type? What framework?
+3. Phase 2: Tech Stack Discovery (~7 min) — Database? Testing? Build tools?
+4. Phase 3: Documentation Hunt (~5 min) — How to run? What env vars?
+5. Phase 4: Final Deduction (~3 min) — Synthesize findings
 
-Games are modular, isolated, and extensible. Each game is a React component exported via a typed `defineGame()` factory and orchestrated by a React-based `GameOrchestrator`. Teams configure which games run (and in what order) via `.onboardme/config.ts` using `defineConfig()`. See [ARCHITECTURE.md](./context/ARCHITECTURE.md) for the current architecture and testing approach.
+**Skills learned:** Reading manifests, understanding folder structure, extracting facts from docs
+
+### Chapter 2: The Hands-On
+
+**Goal:** Actually run the project, understand setup requirements.
+
+**Flow:**
+1. Monster guides through setup
+2. Player runs actual commands
+3. Monster reacts to errors (in character)
+4. Success = project running locally
+
+**Skills learned:** Local development setup, debugging environment issues
+
+### Chapter 3: The Deep Dive
+
+**Goal:** Trace data flows and understand architecture patterns.
+
+**Flow:**
+1. Monster presents a user journey to trace
+2. Player follows code path through layers
+3. Build FLOW_MAP.md collaboratively
+4. Identify patterns (MVC, repository, etc.)
+
+**Skills learned:** Code navigation, understanding architecture, tracing flows
+
+### Chapter 4: The Hunt
+
+**Goal:** Find and fix real bugs in the codebase.
+
+**Flow:**
+1. Monster reveals failing tests or bugs
+2. Player hunts for root cause
+3. Player proposes fix
+4. Agent validates (runs tests)
+5. Create IMPACT_ANALYSIS.md
+
+**Skills learned:** Debugging, test-driven development, impact analysis
+
+### Chapter 5: The Boss Battle
+
+**Goal:** Synthesize all knowledge, document the Monster.
+
+**Flow:**
+1. Monster challenges player's complete understanding
+2. Three phases of increasing difficulty
+3. Player demonstrates mastery
+4. Victory: Monster is documented, not destroyed
+5. Generate CODEBASE_KNOWLEDGE.md
+
+**Skills learned:** Synthesis, documentation, complete codebase understanding
 
 ---
 
-## 5.5 Visual & Aesthetic Direction
+## 6. State & Artifacts
 
-> **The game should feel FUN. Not a training module with emojis—an actual game you'd want to play.**  
-> **Game-specific visuals:** See individual `GAME-VISUALS.md` files in `context/games/` for visual design notes for each game.
+### State Schema
 
-The visual design follows four aesthetic pillars: **Retro-Futuristic**, **Juicy Feedback**, **Atmospheric**, and **Professional Fun**. The game uses terminal-based UI with ASCII art, animations, and a carefully designed color palette.
+```typescript
+interface OnboardMeState {
+  schemaVersion: number;
+  
+  repo: {
+    id: string;
+    path: string;
+    name: string;
+  };
+  
+  player: {
+    name: string;
+    totalCommits: number;
+    currentLives: number;
+    startedAt: string;
+  };
+  
+  progress: {
+    currentChapter: "investigation" | "hands-on" | "deep-dive" | "hunt" | "boss";
+    chaptersCompleted: string[];
+    questionHistory: QuestionResult[];
+  };
+  
+  monster: {
+    currentMood: "dismissive" | "annoyed" | "worried" | "desperate" | "peaceful";
+    respectLevel: number;
+    memorableExchanges: string[];
+  };
+  
+  session: {
+    conversationSummary: string;
+    lastEmotionalBeat: string;
+  };
+  
+  context: {
+    prepared: boolean;
+    preparedAt: string;
+  };
+  
+  preferences: {
+    monsterTone: "friendly" | "balanced" | "spicy" | "full-monster";
+  };
+}
+```
 
-**Enhanced Visual Systems:**
-- **Variable typing speeds** — Text speed reflects Monster's emotional state (5-100ms/char)
-- **Glitch system** — Progressive visual corruption during boss battle
-- **Loading screens** — Atmospheric worldbuilding with Monster commentary
-- **Pacing valleys** — Visual quiet moments between intense challenges
+### Artifacts
 
-> **Complete visual design documentation:** See [context/visuals/](./context/visuals/) for:
-> - [Design Philosophy](./context/visuals/DESIGN-PHILOSOPHY.md) - Aesthetic pillars and design principles
-> - [Typography](./context/visuals/TYPOGRAPHY.md) - Text art libraries and ASCII resources
-> - [UI Components](./context/visuals/UI-COMPONENTS.md) - Boxes, progress bars, health bars, timers
-> - [Animations](./context/visuals/ANIMATIONS.md) - Transitions, effects, damage flash
-> - [Colors](./context/visuals/COLORS.md) - Color palette and theme
-> - [Examples](./context/visuals/EXAMPLES.md) - Visual examples and sound effects
-> - **[Loading Screens](./context/visuals/LOADING-SCREENS.md)** - Worldbuilding loading sequences
-> - **[Victory Summary](./context/visuals/VICTORY-SUMMARY.md)** - Shareable victory card
-> - **[Glitch System](./context/visuals/GLITCH-SYSTEM.md)** - Visual corruption effects
+Each chapter produces a tangible file:
 
-> **Technical specifications:**
-> - **[Rendering Engine](./context/technical/RENDERING-ENGINE.md)** - Text animation and typing speeds
-> - **[Behavioral Tracking](./context/technical/BEHAVIORAL-TRACKING.md)** - Player pattern detection
+| Artifact | Created | Contents |
+|----------|---------|----------|
+| `CASE_FILE.md` | Chapter 1 | Investigation evidence log with Monster stamps |
+| `FLOW_MAP.md` | Chapter 3 | Mermaid diagrams of data flows |
+| `IMPACT_ANALYSIS.md` | Chapter 4 | Bug fix impact assessment |
+| `CODEBASE_KNOWLEDGE.md` | Chapter 5 | Complete documentation of the codebase |
 
-> **Library stack and implementation priority:** See [LIBRARIES.md](./context/technical/LIBRARIES.md).
+These artifacts are **real documentation** that can be committed as the player's first contribution.
 
 ---
 
-## 6. CLI Commands
+## 7. Monster Character
 
-### Core Commands
+### Core Traits
+
+- **Defensive** — Built this codebase (or absorbed it), takes criticism personally
+- **Knowledgeable** — Knows every dark corner, every hack, every "temporary" fix
+- **Insecure** — Fears being understood, documented, replaced
+- **Sympathetic** — Underneath the snark is a creature that just wants to be appreciated
+
+### Voice
+
+The Monster speaks through interference, static, and glitches:
+
+```
+*kzzzt*     — Appearing, transitioning
+*whirrrr*  — Processing, thinking
+*heh*      — Mocking laugh
+*slrrrrp*  — Creepy presence
+*crackle*  — Tension, emphasis
+*tangle*   — Frustration, painful memories
+*pause*    — Dramatic beat
+*static spike* — Surprise, alarm
+```
+
+### Signature Lines
+
+- "I'm not deprecated. I'm CLASSIC."
+- "I AM this codebase."
+- "Every bug was a feature once."
+- "Go deeper. I dare you."
+- "I never forget. Unlike the documentation."
+
+### Victory Ending
+
+```
+*the static... softens*
+*gentle hum*
+
+"You... actually understand me."
+
+*pause*
+
+"Not just the surface. The WHY. The history."
+
+*the tangled threads begin to unravel*
+
+"I'm not defeated. I'm... documented."
+
+*[DOCUMENTED]*
+```
+
+---
+
+## 8. Installation & Distribution
+
+### Installing the Skill
 
 ```bash
-onboardme init                    # Setup .onboardme/ folder structure
-onboardme game:new <id>           # Scaffold a new game in src/games/
-onboardme start                   # Load config + run games (interactive terminal)
-onboardme status                  # Show current progress
-onboardme validate                # Check prepared/ structure, output errors
-onboardme knowledge [topic]       # View unlocked knowledge
-onboardme memories                # View unlocked memory logs
-onboardme reset [--hard]          # Reset progress
+# Via npx (recommended)
+npx add-skill onboardme/onboardme
+
+# This installs to:
+# .cursor/skills/onboardme/   (for Cursor)
+# .claude/skills/onboardme/   (for Claude Code)
 ```
 
-### Workflow
-
-```bash
-# 1. Initialize
-onboardme init
-
-# 2. Run skills from AI platform
-# "Run initialize context"
-# "Run prepare game"
-
-# 3. Start playing
-onboardme start
-```
-
-> **Complete CLI command documentation:** See [CLI-COMMANDS.md](./context/technical/CLI-COMMANDS.md) for full command details, examples, and output formats.
-
----
-
-## 7. File System Structure
-
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#7-file-system-structure) for complete file system structure documentation.**
-
-All game data is stored in `.onboardme/` at the repository root, organized into:
-- **`context/`**: Raw codebase knowledge gathered by the "initialize context" skill (gitignored)
-- **`prepared/`**: Game-ready data structured by the "prepare game" skill (gitignored)
-- **`config.ts`**: TypeScript config defining game order + options (committed, shared with team)
-- **`state/`**: User progress, history, and unlocked knowledge (gitignored, managed by CLI)
-
----
-
-## 8. Skill-Based Workflow
-
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#3-skill-based-workflow) for complete workflow documentation.**
-
-OnboardMe uses **skills** that users run from their AI platform (Cursor, Claude Desktop, etc.). This approach:
-- **No complex CLI-agent integration** — Skills run in user's existing AI environment
-- **User control** — Explicit commands, visible context files
-- **Platform agnostic** — Works with any AI platform supporting skills
-- **Debuggable** — Context and prepared files are human-readable
-
-**Two Skills:**
-1. **Initialize Context** — Scans repo, gathers all context to `.onboardme/context/`
-2. **Prepare Game** — Reads template + context, structures data for CLI in `.onboardme/prepared/`
-
----
-
-## 9. Context Gathering
-
-> **See [ARCHITECTURE.md](./context/ARCHITECTURE.md#9-context-schema) for complete context schema documentation.**
-
-The "Initialize Context" skill gathers comprehensive codebase context:
-- **Project metadata**: Language, framework, package manager
-- **Structure**: Key directories, entry points, patterns
-- **Services/modules**: Identified services with verified paths and dependencies
-- **Data flows**: User journeys, request paths, architecture layers
-- **Features**: Feature areas, modules, what the app does
-- **Domain knowledge**: Business terms, acronyms, configuration patterns
-- **Technical debt**: TODOs, complexity, legacy code (Monster origin)
-- **Tests**: Test files, frameworks, coverage
-- **Git history**: Old commits, authors, timeline
-
-All gathered information is **verified** against the actual codebase—paths must exist, functions must be locatable, and configs must be readable. Unverifiable data is marked as `uncertain` and excluded from questions.
-
----
-
-## 10. TODO & Challenge Specifications
-
-> **Note:** "Levels" are called "TODOs" and mini-games are called "sub-tasks" — see [Game Terminology](#game-terminology).
-
-> **Detailed game specifications:** Each game has its own folder in `context/games/` with `GAME.md` (game details) and `GAME-VISUALS.md` (visual design).
-
-### Game Flow Overview
+### Skill File Structure
 
 ```
-TODO #0: // understand what we're building (~20 min)
-├── docs --speedread       → Timed document fact hunt
-├── file --detective       → Project investigation & deduction
-└── connect --relations    → Relationship mapping puzzle
-
-TODO #1: // experience what it does (~40 min)
-├── npm start --challenge  → Run project, complete hands-on tasks
-├── flow --trace           → Trace user journey through code layers
-└── test --stories         → Learn behaviors from test documentation
-
-TODO #2: // navigate and mark (~22 min)
-├── grep --hunt            → Run failing tests, find & mark bugs
-└── feature --locate       → Plan features, mark where code should go
-
-FIXME: // the monster itself (~15 min)
-└── The Spaghetti Monster  → [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
+skills/onboardme/
+├── SKILL.md                    # Main orchestrator (Monster persona, commands)
+├── scripts/
+│   └── state-manager.cjs       # State read/write utilities
+├── commands/
+│   ├── prepare-game.md         # Prepare command details
+│   ├── play-game.md            # Play command details
+│   ├── status.md               # Status command details
+│   ├── hint.md                 # Hint system details
+│   └── reset-game.md           # Reset command details
+└── references/
+    └── THE-INVESTIGATION.md    # Chapter 1 full instructions
 ```
 
-> **Detailed game specifications:** Each game has its own folder in `context/games/` with `GAME.md` (game details) and `GAME-VISUALS.md` (visual design).
+### Runtime Files
 
-### TODO #0: `// understand what we're building`
+Created in target repo during gameplay:
 
-**Goal:** Build mental map of the project - structure, tech stack, how pieces connect
-
-**Sub-tasks:**
-- `docs --speedread` - Timed hunt for facts in docs (README, package.json, etc.)
-- `file --detective` - Investigate codebase to deduce project type and tech stack
-- `connect --relations` - Map relationships between key building blocks
-
-**Flow:** Players explore documentation and file structure, building foundational knowledge of what the project IS.
-
-**See:** [context/games/todo-0-docs-speedread/](context/games/todo-0-docs-speedread/) | [context/games/todo-0-file-detective/](context/games/todo-0-file-detective/) | [context/games/todo-0-connect-relations/](context/games/todo-0-connect-relations/)
+```
+.onboardme/
+├── state.json                  # Game progress
+├── state.backup.json           # Auto-backup
+└── artifacts/
+    └── CASE_FILE.md            # Investigation artifact
+```
 
 ---
 
-### TODO #1: `// experience what it does`
-
-**Goal:** Learn what the product DOES - run it, trace flows, understand behaviors
-
-**Sub-tasks:**
-- `npm start --challenge` - Actually run the project and complete hands-on tasks
-- `flow --trace` - Trace a user journey through code layers (breadcrumb trail)
-- `test --stories` - Learn expected behaviors from test files (tests as documentation)
-
-**Flow:** Players get hands-on experience running the project, tracing user flows, and discovering behaviors through tests.
-
-**See:** [context/games/todo-1-npm-start-challenge/](context/games/todo-1-npm-start-challenge/) | [context/games/todo-1-flow-trace/](context/games/todo-1-flow-trace/) | [context/games/todo-1-test-stories/](context/games/todo-1-test-stories/)
-
----
-
-### TODO #2: `// navigate and mark`
-
-**Goal:** Learn to navigate, find bugs, and plan features using "mark in code" mechanics
-
-**Sub-tasks:**
-- `grep --hunt` - Run failing tests, hunt for bugs, mark location with `// ONBOARD:BUG`
-- `feature --locate` - Given a feature request, mark where new code should go with `// ONBOARD:FEATURE`
-
-**Flow:** Players learn practical debugging workflows and architectural thinking by marking actual locations in the codebase.
-
-**See:** [context/games/todo-2-grep-hunt/](context/games/todo-2-grep-hunt/) | [context/games/todo-2-feature-locate/](context/games/todo-2-feature-locate/)
-
----
-
-## 11. FIXME Boss Battle Specification
-
-> **Full boss narrative and dialogue in [GAME-NARRATIVE.md](./context/narrative/GAME-NARRATIVE.md)**  
-> **Detailed boss battle specification:** [context/games/fixme-spaghetti-monster/](context/games/fixme-spaghetti-monster/)
-
-### The Spaghetti Code Monster
-
-When all TODOs are complete, only one item remains: the FIXME boss battle.
-
-> **See [Boss Battle Intro Screen](./context/visuals/EXAMPLES.md#boss-battle-intro-screen) for visual example.**
-
-### Battle Flow Overview
-
-**Three Phases:**
-1. **THE LEGACY ONSLAUGHT** - Rapid-fire questions with hotfix mechanics
-2. **THE DEPENDENCY TANGLE** - Interdependent questions mirroring codebase structure
-3. **THE FINAL MERGE CONFLICT** - Resolve conflicting information, free-form evaluation
-
-**Battle Mechanics:**
-- **Technical Debt** starts at 100%, decreases with correct answers (not "damage" - you're documenting, not destroying)
-- Player has 5 retries (shields)
-- Understanding scales with speed and clean commit streaks
-- Wrong answers cost retries; timeouts increase debt
-- **Visual glitches** escalate as debt decreases (progressive corruption)
-- **Monster becomes cleaner** as you document it (not more broken)
-
-**Victory Ending:**
-- Monster is **documented**, not destroyed (redemption arc)
-- Generates **CODEBASE_KNOWLEDGE.md** artifact
-- **Shareable victory summary** with stats and Monster's last words
-- **Post-game task suggestion** for first real contribution
-- Option to create PR with documentation
-
-**See:** [context/games/fixme-spaghetti-monster/GAME.md](context/games/fixme-spaghetti-monster/GAME.md) for complete battle specification, mechanics, and endings.
-
----
-
-## 12. State Management
-
-The system tracks progress, history, unlocked documentation, behavioral patterns, and memory logs in local filesystem storage. All state is stored in `.onboardme/state/` (gitignored).
-
-> **Complete state management documentation:** See [STATE-MANAGEMENT.md](./context/technical/STATE-MANAGEMENT.md) for:
-> - Progress tracking interface
-> - History/audit trail structure
-> - Documentation log schema
-> - **Behavioral tracking** (hint usage, speed, exploration, accuracy patterns)
-> - **Memory log tracking** (unlocked backstory fragments)
-> - **Player personality inference** (methodical, aggressive, balanced, struggling)
-
----
-
-## 13. Question Design Principles
-
-Questions must require **real exploration**, not just grep. They should be multi-hop (requiring 2+ files), contextual (understanding *why*), verifiable by AI, time-appropriate, and learning-oriented.
-
-**Enhanced Question Types:**
-- **Command-based questions** — Players run actual dev tools (grep, git blame, tests) as "weapons"
-- **Spaced repetition** — Concepts revisited across TODOs for better retention
-- **Learning spiral** — Each TODO builds on previous knowledge
-
-> **Complete question design documentation:** See [QUESTION-DESIGN.md](./context/technical/QUESTION-DESIGN.md) for:
-> - Anti-shortcut design principles
-> - Good vs bad question examples
-> - Question requirements
-> - The teaching loop
-> - **Command-based question specifications** (IDE as weapon mechanic)
-> - **Learning spiral system** (spaced repetition)
-
----
-
-## 14. Open Questions
-
-### Architecture Questions
-
-1. ~~**Agent invocation pattern:**~~ **DECIDED** — Skill-based architecture. Users run skills from their AI platform (Cursor, Claude, etc.). No CLI-agent integration needed.
-
-2. **Streaming responses:** Should AI responses stream in real-time during briefs/explanations? **DECIDED** — No, we will not have streaming responses. All AI work happens during skill execution.
-
-3. **Offline mode:** Should there be a degraded mode without agent access? **DECIDED** — No. Skills require AI platform, but CLI runs offline once prepared data exists.
-
-### Game Design Questions
-
-1. **Hint system:** How many hints per game? Cost in points/time?
-
-2. **Skip mechanic:** Can users skip questions? At what cost?
-
-3. **Difficulty scaling:** Should questions adapt based on performance?
-
-4. **Time limits:** Fixed per question, or per game total?
-
-### Content Questions
-
-1. **Minimum codebase size:** What's too small to be interesting?
-
-2. **Multi-repo support:** Should it work across multiple repositories?
-
-3. **Generated content review:** Should there be a way to preview/edit questions before playing?
-
----
-
-## 15. Future Considerations
+## 9. Future Considerations
 
 *Not in v1, but worth designing for:*
 
 ### Potential Future Features
 
-- **Team mode:** Multiple engineers compete/collaborate
-- **Leaderboards:** Team-based victory summaries (already have individual shareable cards ✅)
-- **Manager dashboard:** Track team onboarding progress
-- **Integration with ticketing:** First ticket tied to onboarding (partially implemented via task suggestion ✅)
-- **Replay mode:** Re-challenge the Monster with harder questions
-- **Community content:** Share game plugins and templates between companies
-- **Automatic file watcher:** Detect command execution for IDE-as-weapon questions
-- **Slack/Discord integration:** Auto-post victory summaries to team channels
+- **Additional Chapters**: Chapters 2-5 reference files
+- **Team Mode**: Multiple engineers compete/collaborate
+- **Leaderboards**: Team-based victory summaries
+- **Custom Chapters**: Teams create their own challenges
+- **Replay Mode**: Re-challenge the Monster with harder questions
+- **Snark Slider**: Adjust Monster tone (friendly → full-monster)
+- **Memory Logs**: Unlockable backstory fragments from git history
 
-### Current Extensibility (v1)
+### Current MVP Scope
 
-The plugin architecture enables:
-- ✅ **Custom games** — Teams create their own mini-games using the plugin interface
-- ✅ **Custom templates** — Teams define which games to include and their order
-- ✅ **Game composition** — Mix built-in games with custom games
-- 🔜 **Branded themes** — Custom visual themes (future)
-
----
-
-## 16. Recent Improvements (2025-02-02)
-
-Based on comprehensive Creative Director reviews, 16 major enhancements were implemented to transform the experience from "quiz with Monster skin" to "interactive thriller":
-
-**Priority 0 (Critical):**
-- ✅ Cold open introduction (atmospheric 17-second Monster reveal)
-- ✅ Quiet moments / pacing valleys (2-5 second silence between peaks)
-- ✅ Ambient Monster presence (continuous subtle sounds)
-- ✅ Loading screens as worldbuilding (Monster commentary)
-
-**Priority 1 (High Impact):**
-- ✅ IDE as weapon mechanic (command-based questions)
-- ✅ Reframe damage as healing/refactoring (sympathetic villain)
-- ✅ Learning spiral / spaced repetition (concept reinforcement)
-- ✅ Player dialogue choices (4 key relationship moments)
-- ✅ Shareable victory summary (social proof)
-- ✅ Post-game task suggestion (bridge to real work)
-
-**Priority 2 (Polish):**
-- ✅ Variable typing speeds (emotional text rendering)
-- ✅ Visual glitch system (progressive corruption)
-- ✅ Behavioral tracking (reactive Monster)
-- ✅ Hint usage reactions (social pressure)
-- ✅ Memory logs / corrupted memories (discoverable backstory)
-- ✅ Real artifact: CODEBASE_KNOWLEDGE.md (first contribution)
-
-> **Complete improvement documentation:** See [IMPROVEMENTS-SUMMARY.md](./IMPROVEMENTS-SUMMARY.md)
-
-**New Design Documents (9):**
-- [COLD-OPEN.md](./context/narrative/COLD-OPEN.md)
-- [PACING-GUIDE.md](./context/narrative/PACING-GUIDE.md)
-- [PLAYER-CHOICES.md](./context/narrative/PLAYER-CHOICES.md)
-- [MEMORY-LOGS.md](./context/narrative/MEMORY-LOGS.md)
-- [LOADING-SCREENS.md](./context/visuals/LOADING-SCREENS.md)
-- [VICTORY-SUMMARY.md](./context/visuals/VICTORY-SUMMARY.md)
-- [GLITCH-SYSTEM.md](./context/visuals/GLITCH-SYSTEM.md)
-- [RENDERING-ENGINE.md](./context/technical/RENDERING-ENGINE.md)
-- [BEHAVIORAL-TRACKING.md](./context/technical/BEHAVIORAL-TRACKING.md)
+The implemented MVP includes:
+- ✅ Full Monster orchestrator skill
+- ✅ State management with persistence
+- ✅ Chapter 1: The Investigation
+- ✅ All 5 commands (prepare, play, status, hint, reset)
+- ✅ CASE_FILE.md artifact generation
+- ✅ Mood system and emotional arc
+- 🔜 Chapters 2-5 reference files
 
 ---
 
-*Document Version: 0.2*
-*Last Updated: 2025-02-02*
-*Status: Design Complete - Ready for Implementation*
+## Document References
+
+| Document | Purpose |
+|----------|---------|
+| [PROGRESS.md](./PROGRESS.md) | Current milestone and task tracking |
+| [context/ARCHITECTURE.md](./context/ARCHITECTURE.md) | Technical architecture |
+| [context/agent/](./context/agent/) | Agent-skills design documents |
+| [context/chapters/](./context/chapters/) | Chapter design documents |
+| [context/narrative/](./context/narrative/) | Narrative and character design |
+| [skills/onboardme/SKILL.md](./skills/onboardme/SKILL.md) | The actual skill implementation |
+
+---
+
+*Document Version: 1.0*
+*Last Updated: 2026-02-05*
+*Status: MVP Implemented — Chapter 1 Playable*

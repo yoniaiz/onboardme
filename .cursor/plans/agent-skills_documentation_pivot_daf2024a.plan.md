@@ -52,13 +52,13 @@ todos:
     status: completed
   - id: new-progress
     content: "Phase 5: Create new PROGRESS.md with MVP-first milestones"
-    status: pending
+    status: completed
   - id: post-mvp-prd
     content: "Post-MVP: Rewrite PRD.md based on what actually works"
-    status: pending
+    status: completed
   - id: post-mvp-architecture
     content: "Post-MVP: Rewrite ARCHITECTURE.md to reflect reality"
-    status: pending
+    status: completed
 isProject: false
 ---
 
