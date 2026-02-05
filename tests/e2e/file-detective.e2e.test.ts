@@ -11,21 +11,36 @@ describe("E2E: File Detective Game", () => {
 				config: FILE_DETECTIVE_TEST_CONFIG,
 			},
 			async (e2e) => {
-				e2e.debug("1. INITIAL: Evidence Board");
+				e2e.debug("1. INITIAL: Case Briefing");
 
 				await e2e.press("enter");
-				e2e.debug("2. AFTER: Selected Root Files");
+				await e2e.waitFor((frame) => frame.includes("EVIDENCE BOARD"));
+				e2e.debug("2. AFTER: Started investigation - Evidence Board");
 
-				await e2e.type("package.json");
-				e2e.debug("3. AFTER: Typed 'package.json'");
+				for (let i = 0; i < 5; i++) {
+					await e2e.press("enter");
+					e2e.debug(`3.${i + 1}a. AFTER: Selected category ${i + 1}`);
+
+					await e2e.press("enter");
+					await e2e.waitFor((frame) => frame.includes("CORRECT"));
+					e2e.debug(`3.${i + 1}b. AFTER: Answered correctly`);
+
+					await e2e.press("enter");
+					if (i < 4) {
+						await e2e.waitFor((frame) => frame.includes("EVIDENCE BOARD"));
+						e2e.debug(`3.${i + 1}c. AFTER: Back to Evidence Board`);
+					}
+				}
+
+				await e2e.waitFor((frame) => frame.includes("FINAL DEDUCTION"));
+				e2e.debug("4. AFTER: All evidence collected, auto-started deduction");
 
 				await e2e.press("enter");
-				e2e.debug("4. AFTER: Submitted - Back to Evidence Board");
+				await e2e.waitFor((frame) => frame.includes("CASE CLOSED"));
+				e2e.debug("5. AFTER: Deduction result shown");
 
 				await e2e.press("enter");
-				e2e.debug("5. AFTER: Selected Next Category");
-
-				expect(e2e.lastFrame()).toBeTruthy();
+				expect(e2e.getGameResult()).not.toBeNull();
 			},
 		);
 	});

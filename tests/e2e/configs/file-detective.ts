@@ -1,4 +1,6 @@
-export const FILE_DETECTIVE_TEST_CONFIG = {
+import type { FileDetectiveConfig } from "@/games/file-detective/types.ts";
+
+export const FILE_DETECTIVE_TEST_CONFIG: FileDetectiveConfig = {
 	projectType: {
 		projectType: "Node.js CLI",
 		language: "TypeScript",
@@ -15,6 +17,8 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					prompt: "What file defines dependencies?",
 					options: ["package.json", "deps.txt", "requirements.txt", "Gemfile"],
 					correctAnswer: "package.json",
+					insight:
+						"package.json is the standard dependency manifest for Node.js projects.",
 				},
 			],
 		},
@@ -28,6 +32,8 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					prompt: "Where is the source code?",
 					options: ["src", "lib", "app", "source"],
 					correctAnswer: "src",
+					insight:
+						"The src/ directory is a common convention for TypeScript projects.",
 				},
 			],
 		},
@@ -41,6 +47,8 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					prompt: "What runtime is used?",
 					options: ["bun", "node", "deno", "npm"],
 					correctAnswer: "bun",
+					insight:
+						"Bun is a fast JavaScript runtime with built-in bundler and package manager.",
 				},
 			],
 		},
@@ -54,6 +62,8 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					prompt: "What runs tests?",
 					options: ["test", "check", "verify", "spec"],
 					correctAnswer: "test",
+					insight:
+						"The test script is the standard npm convention for running tests.",
 				},
 			],
 		},
@@ -72,6 +82,8 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 						".tsrc",
 					],
 					correctAnswer: "tsconfig.json",
+					insight:
+						"tsconfig.json configures TypeScript compiler options for the project.",
 				},
 			],
 		},
@@ -96,6 +108,10 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					language: "JavaScript",
 					framework: "React",
 				},
+				missedClues: [
+					"No index.html or public folder found",
+					"Ink is a CLI framework, not a web framework",
+				],
 			},
 			{
 				id: "api",
@@ -105,6 +121,10 @@ export const FILE_DETECTIVE_TEST_CONFIG = {
 					language: "TypeScript",
 					framework: "Express",
 				},
+				missedClues: [
+					"No Express or API-related dependencies",
+					"Ink is used for terminal UIs, not HTTP servers",
+				],
 			},
 		],
 		correctId: "cli",

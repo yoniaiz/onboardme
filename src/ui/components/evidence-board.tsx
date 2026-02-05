@@ -45,26 +45,32 @@ export function EvidenceBoard({
 	const examinedCount = examinedCategories.length;
 	const totalCount = categories.length;
 
+	const allEvidenceCollected = examinedCount === totalCount;
+
 	const selectableItems: SelectItem[] = categories
 		.filter((c) => !examinedCategories.includes(c.id))
 		.map((c) => {
 			const categoryIndex = categories.findIndex((cat) => cat.id === c.id) + 1;
 			const icon = CATEGORY_ICONS[c.id];
 			return {
-				label: `[${categoryIndex}] ${icon} ${c.title}`,
+				label: `[${categoryIndex}] ${icon} ${c.title} — ${c.description}`,
 				value: c.id,
 			};
 		});
 
-	selectableItems.push({
-		label: "[D] Ready to make final deduction",
-		value: "deduction",
-	});
+	if (allEvidenceCollected) {
+		selectableItems.push({
+			label: "[D] Ready to make final deduction",
+			value: "deduction",
+		});
+	}
 
 	const handleSelect = (item: SelectItem) => {
 		if (disabled) return;
 		if (item.value === "deduction") {
-			onStartDeduction();
+			if (allEvidenceCollected) {
+				onStartDeduction();
+			}
 		} else {
 			onSelectCategory(item.value as EvidenceCategoryId);
 		}
@@ -75,7 +81,7 @@ export function EvidenceBoard({
 			if (disabled) return;
 
 			const upperInput = input.toUpperCase();
-			if (upperInput === "D") {
+			if (upperInput === "D" && allEvidenceCollected) {
 				onStartDeduction();
 				return;
 			}
@@ -128,7 +134,7 @@ export function EvidenceBoard({
 						const icon = CATEGORY_ICONS[c.id];
 						return (
 							<Text key={c.id} color={colors.muted}>
-								[{categoryIndex}] {icon} {c.title}{" "}
+								[{categoryIndex}] {icon} {c.title} — {c.description}{" "}
 								<Text color={colors.primary}>{symbols.success}</Text>
 							</Text>
 						);
@@ -149,8 +155,13 @@ export function EvidenceBoard({
 			)}
 
 			<Text> </Text>
+			<Text bold color={colors.secondary}>
+				What would you like to examine?
+			</Text>
+			<Text> </Text>
 			<Text color={colors.muted}>
-				Press 1-{categories.length} to examine evidence, D for deduction
+				Use arrows + Enter to select, or press 1-{categories.length}
+				{allEvidenceCollected ? " / D for deduction" : ""}
 			</Text>
 		</Box>
 	);

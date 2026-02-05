@@ -1,7 +1,10 @@
+import { join } from "node:path";
 import { z } from "zod";
 import { getGameDataPath } from "@/core/loader.ts";
 import { fileExists, readJson } from "@/lib/fs.ts";
+import { getPreparedDir } from "@/lib/paths.ts";
 import type { ValidationResult } from "@/types/manifest.ts";
+import type { FileDetectiveConfig } from "./types.ts";
 
 const GAME_ID = "file-detective";
 
@@ -17,6 +20,8 @@ const EvidenceQuestionSchema = z.object({
 	id: z.string().min(1),
 	prompt: z.string().min(1),
 	options: z.array(z.string().min(1)).optional(),
+	correctAnswer: z.string().min(1).optional(),
+	insight: z.string().optional(),
 });
 
 const EvidenceCategorySchema = z.object({
@@ -37,6 +42,7 @@ const DeductionOptionSchema = z.object({
 	id: z.string().min(1),
 	label: z.string().min(1),
 	matches: ProjectTypeInfoSchema,
+	missedClues: z.array(z.string().min(1)).optional(),
 });
 
 const DeductionConfigSchema = z
@@ -77,10 +83,35 @@ const fileDetectivePreparedDataSchema = z.object({
 	questions: z.array(z.unknown()),
 });
 
+function getLegacyGameDataPath(rootDir: string): string {
+	return join(getPreparedDir(rootDir), GAME_ID, "data.json");
+}
+
+async function readPreparedData(rootDir: string): Promise<unknown | null> {
+	const primaryPath = getGameDataPath(rootDir, GAME_ID);
+	const primary = await readJson<unknown>(primaryPath);
+	if (primary) return primary;
+	return readJson<unknown>(getLegacyGameDataPath(rootDir));
+}
+
+export async function loadPreparedConfig(
+	rootDir: string,
+): Promise<FileDetectiveConfig | null> {
+	const data = await readPreparedData(rootDir);
+	if (!data) return null;
+
+	const parsed = fileDetectivePreparedDataSchema.safeParse(data);
+	if (!parsed.success) return null;
+
+	return parsed.data.config;
+}
+
 export async function validatePreparedData(
 	rootDir: string,
 ): Promise<ValidationResult> {
-	const dataPath = getGameDataPath(rootDir, GAME_ID);
+	const primaryPath = getGameDataPath(rootDir, GAME_ID);
+	const legacyPath = getLegacyGameDataPath(rootDir);
+	const dataPath = fileExists(primaryPath) ? primaryPath : legacyPath;
 
 	if (!fileExists(dataPath)) {
 		return {

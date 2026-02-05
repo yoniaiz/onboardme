@@ -2,6 +2,7 @@ import { defineGame } from "@/types/game.ts";
 import { getAIContext } from "./ai-context.ts";
 import { FileDetectiveComponent } from "./component.tsx";
 import { defaultConfig } from "./config.ts";
+import { loadPreparedConfig } from "./prepared-schema.ts";
 import type { FileDetectiveConfig } from "./types.ts";
 
 export const FileDetective = defineGame<FileDetectiveConfig>({
@@ -16,4 +17,5 @@ export const FileDetective = defineGame<FileDetectiveConfig>({
 		estimatedMinutes: 10,
 	},
 	getAIContext,
+	loadPreparedConfig,
 });

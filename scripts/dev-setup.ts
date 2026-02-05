@@ -90,12 +90,16 @@ async function setupDevEnvironment(): Promise<void> {
 							prompt: "What package manager config do you see?",
 							options: ["package.json", "Cargo.toml", "go.mod", "pom.xml"],
 							correctAnswer: "package.json",
+							insight:
+								"package.json is the manifest file for Node.js projects, containing metadata, dependencies, and scripts.",
 						},
 						{
 							id: "root-2",
 							prompt: "Is there a TypeScript config (tsconfig.json)?",
 							options: ["Yes", "No"],
 							correctAnswer: "Yes",
+							insight:
+								"tsconfig.json indicates this is a TypeScript project with custom compiler options.",
 						},
 					],
 				},
@@ -114,6 +118,8 @@ async function setupDevEnvironment(): Promise<void> {
 								"cmd, pkg",
 							],
 							correctAnswer: "commands, core, ui",
+							insight:
+								"The commands/core/ui structure is typical for CLI applications - separating command handlers, business logic, and terminal UI.",
 						},
 					],
 				},
@@ -127,12 +133,16 @@ async function setupDevEnvironment(): Promise<void> {
 							prompt: "What CLI/terminal framework is used?",
 							options: ["Ink", "Commander only", "Yargs", "Oclif"],
 							correctAnswer: "Ink",
+							insight:
+								"Ink is a React-based framework for building interactive CLI applications with components.",
 						},
 						{
 							id: "deps-2",
 							prompt: "What testing framework do you see?",
 							options: ["Bun test", "Jest", "Vitest", "Mocha"],
 							correctAnswer: "Bun test",
+							insight:
+								"Bun has a built-in test runner that's Jest-compatible but much faster.",
 						},
 					],
 				},
@@ -151,6 +161,8 @@ async function setupDevEnvironment(): Promise<void> {
 								"test only",
 							],
 							correctAnswer: "dev, start, test, typecheck",
+							insight:
+								"These scripts indicate a development-focused project with hot-reload, testing, and type checking.",
 						},
 					],
 				},
@@ -164,6 +176,8 @@ async function setupDevEnvironment(): Promise<void> {
 							prompt: "What linter/formatter is configured?",
 							options: ["Biome", "ESLint + Prettier", "Standard", "None"],
 							correctAnswer: "Biome",
+							insight:
+								"Biome is an all-in-one linter and formatter that's faster than ESLint + Prettier.",
 						},
 					],
 				},
@@ -188,6 +202,11 @@ async function setupDevEnvironment(): Promise<void> {
 							language: "TypeScript",
 							framework: "Express",
 						},
+						missedClues: [
+							"No Express, Fastify, or HTTP server dependencies found",
+							"Ink is for terminal UIs, not web servers",
+							"No routes/ or controllers/ folders present",
+						],
 					},
 					{
 						id: "frontend-app",
@@ -197,6 +216,11 @@ async function setupDevEnvironment(): Promise<void> {
 							language: "TypeScript",
 							framework: "React",
 						},
+						missedClues: [
+							"No index.html or public folder found",
+							"Ink is React for CLI, not React for web",
+							"No components/pages folder structure",
+						],
 					},
 					{
 						id: "library",
@@ -206,6 +230,11 @@ async function setupDevEnvironment(): Promise<void> {
 							language: "TypeScript",
 							framework: "None",
 						},
+						missedClues: [
+							"Has executable commands in src/commands/",
+							"Uses Ink for interactive terminal UI",
+							"Not designed to be imported by other packages",
+						],
 					},
 				],
 				correctId: "cli-tool",

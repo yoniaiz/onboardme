@@ -163,13 +163,9 @@ function getCorrectDeductionLabel(config: FileDetectiveConfig): string {
 	);
 }
 
-export function isComplete(state: FileDetectiveState): boolean {
-	return state.step === "deduction" && state.caseNotes.length > 0;
-}
-
 export function getResult(state: FileDetectiveState): GameResult {
 	return {
-		completed: isComplete(state),
+		completed: true,
 		score: state.totalCommits,
 		maxScore: 100,
 		timeSpent: Date.now() - state.startTime,

@@ -10,6 +10,7 @@ export interface EvidenceQuestion {
 	prompt: string;
 	options?: string[];
 	correctAnswer?: string;
+	insight?: string;
 }
 
 export interface EvidenceCategory {
@@ -36,6 +37,7 @@ export interface DeductionOption {
 	id: string;
 	label: string;
 	matches: ProjectTypeInfo;
+	missedClues?: string[];
 }
 
 export interface DeductionConfig {
@@ -50,4 +52,8 @@ export interface FileDetectiveConfig {
 	deduction: DeductionConfig;
 }
 
-export type InvestigationStep = "select" | "evidence" | "deduction";
+export type InvestigationStep =
+	| "briefing"
+	| "select"
+	| "evidence"
+	| "deduction";

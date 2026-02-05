@@ -67,6 +67,7 @@ export interface GameInstance<TConfig = unknown> {
 	config: TConfig;
 	metadata: GameMetadata;
 	getAIContext: () => GameAIContext;
+	loadPreparedConfig?: (rootDir: string) => Promise<TConfig | null>;
 }
 
 export interface OnboardMeConfig {
@@ -84,6 +85,7 @@ export interface GameDefinition<TConfig> {
 	defaultConfig: TConfig;
 	metadata: GameMetadata;
 	getAIContext: () => GameAIContext;
+	loadPreparedConfig?: (rootDir: string) => Promise<TConfig | null>;
 }
 
 export function defineGame<TConfig>(
@@ -95,5 +97,6 @@ export function defineGame<TConfig>(
 		config: { ...definition.defaultConfig, ...options } as TConfig,
 		metadata: definition.metadata,
 		getAIContext: definition.getAIContext,
+		loadPreparedConfig: definition.loadPreparedConfig,
 	});
 }

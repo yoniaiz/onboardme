@@ -16,6 +16,7 @@ export interface FileDetectiveState {
 }
 
 export type FileDetectiveAction =
+	| { type: "START_INVESTIGATION" }
 	| { type: "SELECT_CATEGORY"; categoryId: EvidenceCategoryId }
 	| { type: "START_DEDUCTION" }
 	| { type: "ANSWER_CORRECT"; caseNote: CaseNote }
@@ -27,7 +28,7 @@ export type FileDetectiveAction =
 
 export function createInitialState(): FileDetectiveState {
 	return {
-		step: "select",
+		step: "briefing",
 		examined: new Set(),
 		currentCategoryId: null,
 		currentQuestionIndex: 0,

@@ -58,6 +58,12 @@ export function DeductionScreen({
 
 			<Text> </Text>
 
+			<CaseNotes notes={caseNotes} />
+
+			<Text> </Text>
+			<Divider />
+			<Text> </Text>
+
 			<Text bold color={colors.secondary}>
 				PROJECT TYPE:
 			</Text>
@@ -70,12 +76,6 @@ export function DeductionScreen({
 				onSelect={handleSelect}
 				disabled={disabled}
 			/>
-
-			<Text> </Text>
-			<Divider />
-			<Text> </Text>
-
-			<CaseNotes notes={caseNotes} />
 
 			<Text> </Text>
 			<Text color={colors.muted}>Use arrows to navigate, Enter to select</Text>

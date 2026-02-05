@@ -7,8 +7,57 @@ import type {
 	OnboardMeConfig,
 } from "@/types/game.ts";
 import { Banner } from "../components/banner.tsx";
+import { MonsterReaction } from "../components/monster-reaction.tsx";
 import { ScoreDisplay } from "../components/score-display.tsx";
 import { SessionComplete, type SessionStats } from "./session-complete.tsx";
+
+const MONSTER_DIALOGUE = [
+	"*crackle*",
+	"",
+	"*something shifts in the codebase*",
+	"",
+	'"Hmm."',
+	"",
+	"*tangle tangle*",
+	"",
+	'"You actually looked before you leaped."',
+	"",
+	"*slrrrrp*",
+	"",
+	'"Examined the evidence. Drew conclusions."',
+	"",
+	"*pause*",
+	"",
+	"\"Identified the tech stack without grep'ing for 'framework'.\"",
+	"",
+	"*static spike*",
+	"",
+	"\"That's... that's not how this usually goes.\"",
+	"",
+	"*whirrrr*",
+	"",
+	"\"Usually they just open package.json, say 'ah, JavaScript,' and start typing things.\"",
+	"",
+	"*creak*",
+	"",
+	'"You\'re methodical."',
+	"",
+	"*pause*",
+	"",
+	'"I don\'t like methodical."',
+	"",
+	"*hrrrrnn*",
+	"",
+	'"Methodical people find things."',
+	"",
+	"*kzzzt*",
+	"",
+	'"I\'m watching you."',
+	"",
+	"[SIGNAL LOST]",
+];
+
+type OrchestratorPhase = "playing" | "monster-reaction" | "session-complete";
 
 interface OrchestratorProps {
 	config: OnboardMeConfig;
@@ -28,7 +77,7 @@ export function GameOrchestrator({
 		currentStreak: 0,
 		longestStreak: 0,
 	});
-	const [isComplete, setIsComplete] = useState(false);
+	const [phase, setPhase] = useState<OrchestratorPhase>("playing");
 
 	const currentGame = config.games[gameIndex];
 
@@ -47,29 +96,43 @@ export function GameOrchestrator({
 		});
 	}, []);
 
-	const handleGameComplete = useCallback(
-		(_result: GameResult) => {
-			const nextIndex = gameIndex + 1;
+	const handleGameComplete = useCallback((_result: GameResult) => {
+		setPhase("monster-reaction");
+	}, []);
 
-			if (nextIndex >= config.games.length) {
-				setIsComplete(true);
-				setStats((currentStats) => {
-					onSessionComplete(currentStats);
-					return currentStats;
-				});
-				setTimeout(() => exit(), 2000);
-			} else {
-				setGameIndex(nextIndex);
-			}
-		},
-		[gameIndex, config.games.length, onSessionComplete, exit],
-	);
+	const handleMonsterContinue = useCallback(() => {
+		const nextIndex = gameIndex + 1;
 
-	if (isComplete || !currentGame) {
+		if (nextIndex >= config.games.length) {
+			setPhase("session-complete");
+			setStats((currentStats) => {
+				onSessionComplete(currentStats);
+				return currentStats;
+			});
+			setTimeout(() => exit(), 2000);
+		} else {
+			setGameIndex(nextIndex);
+			setPhase("playing");
+		}
+	}, [gameIndex, config.games.length, onSessionComplete, exit]);
+
+	if (phase === "session-complete" || !currentGame) {
 		return (
 			<Box flexDirection="column" gap={1}>
 				<Banner />
 				<SessionComplete stats={stats} />
+			</Box>
+		);
+	}
+
+	if (phase === "monster-reaction") {
+		return (
+			<Box flexDirection="column" gap={1}>
+				<Banner />
+				<MonsterReaction
+					dialogue={MONSTER_DIALOGUE}
+					onContinue={handleMonsterContinue}
+				/>
 			</Box>
 		);
 	}

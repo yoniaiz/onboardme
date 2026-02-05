@@ -23,7 +23,10 @@ async function main() {
 			e2e.debug("After typing answer");
 
 			await e2e.press("enter");
-			e2e.debug("After submitting answer - back to Evidence Board");
+			e2e.debug("After submitting answer - feedback screen");
+
+			await e2e.press("enter");
+			e2e.debug("After continuing - back to Evidence Board");
 
 			await e2e.press("down");
 			e2e.debug("After pressing down arrow");

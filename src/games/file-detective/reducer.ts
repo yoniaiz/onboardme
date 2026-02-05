@@ -5,6 +5,12 @@ export function fileDetectiveReducer(
 	action: FileDetectiveAction,
 ): FileDetectiveState {
 	switch (action.type) {
+		case "START_INVESTIGATION":
+			return {
+				...state,
+				step: "select",
+			};
+
 		case "SELECT_CATEGORY":
 			return {
 				...state,

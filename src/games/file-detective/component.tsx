@@ -1,18 +1,30 @@
 import type React from "react";
-import { useCallback, useEffect, useReducer, useRef } from "react";
-import type { GameProps } from "@/types/game.ts";
+import { useCallback, useReducer, useRef, useState } from "react";
+import type { AnswerResult, GameProps } from "@/types/game.ts";
 import {
 	getCurrentCategory,
 	getResult,
 	getSelectableEvidence,
-	isComplete,
 	toAnswerResult,
 	validateAnswer,
 } from "./logic.ts";
 import { fileDetectiveReducer } from "./reducer.ts";
+import { AnswerFeedbackScreen, DeductionResultOverlay } from "./screens.tsx";
 import { createInitialState } from "./state.ts";
 import type { EvidenceCategoryId, FileDetectiveConfig } from "./types.ts";
 import { FileDetectiveUI } from "./ui.tsx";
+
+type OverlayState =
+	| { type: "none" }
+	| { type: "answer-feedback"; result: AnswerResult; insight?: string }
+	| {
+			type: "deduction-result";
+			playerChoice: string;
+			correctAnswer: string;
+			correct: boolean;
+			commitsEarned: number;
+			missedClues?: string[];
+	  };
 
 export function FileDetectiveComponent({
 	config,
@@ -25,6 +37,12 @@ export function FileDetectiveComponent({
 		createInitialState,
 	);
 	const completionTriggered = useRef(false);
+	const [overlay, setOverlay] = useState<OverlayState>({ type: "none" });
+	const [inlineResult, setInlineResult] = useState<AnswerResult | null>(null);
+
+	const handleStartInvestigation = useCallback(() => {
+		dispatch({ type: "START_INVESTIGATION" });
+	}, []);
 
 	const handleSelectCategory = useCallback(
 		(categoryId: EvidenceCategoryId) => {
@@ -49,16 +67,57 @@ export function FileDetectiveComponent({
 		});
 	}, [onAnswerResult]);
 
+	const handleDeductionComplete = useCallback(() => {
+		if (completionTriggered.current) return;
+		completionTriggered.current = true;
+		onGameComplete(getResult(state));
+	}, [onGameComplete, state]);
+
 	const handleSubmitAnswer = useCallback(
 		(answer: string) => {
 			const result = validateAnswer(state, config, answer);
 			const answerResult = toAnswerResult(result);
 			onAnswerResult(answerResult);
 
-			if (!result.isCorrect) {
-				dispatch({ type: "ANSWER_WRONG", answer });
+			if (state.step === "deduction") {
+				if (!result.isCorrect) {
+					dispatch({ type: "ANSWER_WRONG", answer });
+				}
+
+				if (result.isCorrect && result.commitsEarned > 0) {
+					dispatch({ type: "ADD_COMMITS", amount: result.commitsEarned });
+				}
+
+				const correctAnswer =
+					config.deduction.options.find(
+						(option) => option.id === config.deduction.correctId,
+					)?.label ?? config.projectType.projectType;
+
+				const selectedOption = config.deduction.options.find(
+					(option) => option.label === answer,
+				);
+
+				setInlineResult(null);
+				setOverlay({
+					type: "deduction-result",
+					playerChoice: answer,
+					correctAnswer,
+					correct: result.isCorrect,
+					commitsEarned: result.commitsEarned,
+					missedClues: !result.isCorrect
+						? selectedOption?.missedClues
+						: undefined,
+				});
 				return;
 			}
+
+			if (!result.isCorrect) {
+				dispatch({ type: "ANSWER_WRONG", answer });
+				setInlineResult(answerResult);
+				return;
+			}
+
+			setInlineResult(null);
 
 			if (result.caseNote) {
 				dispatch({ type: "ANSWER_CORRECT", caseNote: result.caseNote });
@@ -85,6 +144,14 @@ export function FileDetectiveComponent({
 					dispatch({ type: "ADVANCE_QUESTION" });
 				}
 			}
+
+			const currentCat = getCurrentCategory(state, config);
+			const currentQ = currentCat?.questions[state.currentQuestionIndex];
+			setOverlay({
+				type: "answer-feedback",
+				result: answerResult,
+				insight: currentQ?.insight,
+			});
 		},
 		[state, config, onAnswerResult],
 	);
@@ -109,16 +176,39 @@ export function FileDetectiveComponent({
 		[config, handleSelectCategory],
 	);
 
-	useEffect(() => {
-		if (isComplete(state) && !completionTriggered.current) {
-			completionTriggered.current = true;
-			onGameComplete(getResult(state));
-		}
-	}, [state, onGameComplete]);
-
 	const currentCategory = getCurrentCategory(state, config);
 	const currentQuestion =
 		currentCategory?.questions[state.currentQuestionIndex];
+
+	if (overlay.type === "answer-feedback") {
+		return (
+			<AnswerFeedbackScreen
+				result={overlay.result}
+				insight={overlay.insight}
+				onContinue={() => setOverlay({ type: "none" })}
+			/>
+		);
+	}
+
+	if (overlay.type === "deduction-result") {
+		return (
+			<DeductionResultOverlay
+				playerChoice={overlay.playerChoice}
+				correctAnswer={overlay.correctAnswer}
+				projectInfo={config.projectType}
+				correct={overlay.correct}
+				commitsEarned={overlay.commitsEarned}
+				missedClues={overlay.missedClues}
+				onContinue={() => {
+					if (overlay.correct) {
+						handleDeductionComplete();
+					} else {
+						setOverlay({ type: "none" });
+					}
+				}}
+			/>
+		);
+	}
 
 	return (
 		<FileDetectiveUI
@@ -126,6 +216,8 @@ export function FileDetectiveComponent({
 			config={config}
 			currentQuestion={currentQuestion ?? null}
 			wrongAnswers={state.wrongAnswers}
+			inlineResult={inlineResult}
+			onStartInvestigation={handleStartInvestigation}
 			onSelectCategory={handleCategorySelect}
 			onStartDeduction={handleStartDeduction}
 			onDeductionSelect={handleDeductionSelect}
