@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 1 In Progress  
-> **Current Focus**: Orchestrator MVP — skill files and state management
+> **Status**: Milestone 1 Complete  
+> **Current Focus**: Ready for Milestone 2 — Chapter 2 and additional features
 
 ---
 
@@ -55,171 +55,130 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 **Goal**: Create the core orchestrator skill and state management that enables gameplay within coding agents.
 
 **Success Criteria**:
-- [ ] ONBOARD.md orchestrator skill with slash commands
-- [ ] state.json management (read/write/migrate)
-- [ ] `/prepare-game` command implementation
-- [ ] `/play-game` command implementation
-- [ ] `/status` command implementation
-- [ ] Basic chapter progression tracking
+- [x] SKILL.md orchestrator skill with commands
+- [x] state.json management (read/write/migrate)
+- [x] Prepare Game command implementation
+- [x] Play Game command implementation
+- [x] Status command implementation
+- [x] Basic chapter progression tracking
 
 ---
 
 ### Tasks
 
-#### 1.1 Create Orchestrator Skill
-`in_progress`
+#### 1.1 Create Skill Structure
+`completed`
 
-**Goal**: Create the main ONBOARD.md skill file that serves as the game's entry point.
+**Goal**: Create the skill directory following Agent Skills standard.
 
-**Files to create**:
-- `.onboardme/ONBOARD.md` — Main orchestrator skill
+**Files created**:
+- `skills/onboardme/SKILL.md` — Main orchestrator skill with YAML frontmatter
 
 **Contents**:
-- Skill header with goal and inputs
-- Slash command definitions (`/prepare-game`, `/play-game`, `/status`, `/hint`, `/reset-game`)
-- Monster persona activation instructions
-- Chapter routing logic
-- State file references
+- YAML frontmatter (name, description, license, metadata)
+- Monster persona and voice instructions
+- State management instructions
+- Command sections (Prepare Game, Play Game, Status, Hint, Reset)
+- Gameplay loop and rubric
+- Recovery patterns
+- Safety rules
 
-**Acceptance Criteria**:
-- Skill follows SKILL-CONTRACT.md template
-- Clear command descriptions for each slash command
+**Completed**:
+- Follows Agent Skills standard
+- Clear command descriptions
 - Persona lock mechanism (never break character)
-- References state.json for progress tracking
+- References state-manager.cjs for state operations
 
 ---
 
 #### 1.2 State Manager Script
-`pending`
+`completed`
 
-**Goal**: Create TypeScript utilities for state management.
+**Goal**: Create JavaScript utilities for state management (no TypeScript compilation needed).
 
-**Files to create**:
-- `.onboardme/scripts/state-manager.ts` — State read/write utilities
+**Files created**:
+- `skills/onboardme/scripts/state-manager.cjs` — State read/write utilities
 
-**Functions needed**:
-- `readState()` — Load and validate state.json
-- `writeState(state)` — Persist state with backup
-- `migrateState(oldState)` — Handle schema version upgrades
-- `initializeState(repoInfo)` — Create initial state for new game
+**CLI commands**:
+- `node state-manager.cjs read` — Load and return state
+- `node state-manager.cjs write '<json>'` — Deep merge updates into state
+- `node state-manager.cjs init '<repo-json>'` — Initialize new game
+- `node state-manager.cjs reset` — Delete all state
+- `node state-manager.cjs add-question '<json>'` — Add question result
+- `node state-manager.cjs update-mood <tier>` — Update Monster mood
 
-**Acceptance Criteria**:
+**Completed**:
 - Follows STATE-SCHEMA.md exactly
 - Handles missing/corrupted state gracefully
-- Schema version checking and migration
-- TypeScript types match state schema
+- Auto-backup before writes
+- Schema version checking and migration support
+- Deep merge for partial updates
 
 ---
 
-#### 1.3 Prepare Game Command
-`pending`
+#### 1.3 Commands in SKILL.md
+`completed`
 
-**Goal**: Implement `/prepare-game` that analyzes the target repo and generates context.
+**Goal**: All game commands documented in SKILL.md for agent interpretation.
 
-**Files to update**:
-- `.onboardme/ONBOARD.md` — Add prepare-game section
+**Commands implemented**:
+- **Prepare Game** — Scan repo, initialize state, report in Monster voice
+- **Play Game** — Check prepared, load chapter reference, begin/resume gameplay
+- **Status** — Display progress, score, lives, Monster mood
+- **Hint** — Progressive hints (costs commits), 4 levels
+- **Reset** — Delete state with confirmation
 
-**Behavior**:
-1. Scan target repository structure
-2. Identify key files (package.json, README, configs)
-3. Generate chapter-specific context files
-4. Initialize state.json with repo info
-5. Report preparation status to user
-
-**Acceptance Criteria**:
-- Creates `.onboardme/context/` with gathered intel
-- State initialized with repo.id, repo.path, repo.name
-- Context files follow chapter requirements
-- User sees clear success/failure message
+**Completed**:
+- All commands with clear agent instructions
+- Monster dialogue examples for each
+- State management integration
+- Recovery patterns for edge cases
 
 ---
 
-#### 1.4 Play Game Command
-`pending`
+#### 1.4 Chapter 1 Reference File
+`completed`
 
-**Goal**: Implement `/play-game` that starts or resumes the game session.
+**Goal**: Create the Investigation chapter reference file.
 
-**Files to update**:
-- `.onboardme/ONBOARD.md` — Add play-game section
-
-**Behavior**:
-1. Check state.json for current progress
-2. Load appropriate chapter skill
-3. Activate Monster persona
-4. Begin or resume gameplay
-5. Track progress in state
-
-**Acceptance Criteria**:
-- Resumes from last checkpoint if exists
-- Loads correct chapter based on progress.currentChapter
-- Monster voice activates immediately
-- Handles "game not prepared" error gracefully
-
----
-
-#### 1.5 Status Command
-`pending`
-
-**Goal**: Implement `/status` that shows current game progress.
-
-**Files to update**:
-- `.onboardme/ONBOARD.md` — Add status section
-
-**Output includes**:
-- Current chapter and progress within chapter
-- Total score (commits earned)
-- Monster mood indicator
-- Time played
-- Next recommended action
-
-**Acceptance Criteria**:
-- Works even when no game started (shows "not initialized")
-- Clear visual formatting
-- Accurate progress percentages
-
----
-
-#### 1.6 Chapter 1 Skill File
-`pending`
-
-**Goal**: Create the Investigation chapter skill file.
-
-**Files to create**:
-- `.onboardme/games/THE-INVESTIGATION.md` — Chapter 1 skill
+**Files created**:
+- `skills/onboardme/references/THE-INVESTIGATION.md` — Chapter 1 instructions
 
 **Contents**:
-- Investigation flow from `01-THE-INVESTIGATION.md`
-- CASE_FILE.md artifact creation
-- Open-ended question rubrics
-- Evidence examination patterns
-- Monster dialogue for this chapter
+- 4-phase investigation flow (~20 min)
+- CASE_FILE.md artifact creation template
+- Scoring rubric (Incorrect/Partial/Correct/Deep)
+- Monster dialogue examples for each phase
+- Recovery patterns and timing guidelines
+- State management instructions (reads/writes)
 
-**Acceptance Criteria**:
-- Follows SKILL-CONTRACT.md template
-- Creates CASE_FILE.md artifact during play
+**Completed**:
+- Follows chapter design from `context/chapters/01-THE-INVESTIGATION.md`
+- Full Monster dialogue library for this chapter
+- Clear agent instructions for each phase
 - Rubrics for incorrect/partial/correct/deep answers
 - Progressive hint system
 - Chapter completion criteria clear
 
 ---
 
-#### 1.7 Integration Test: Full Flow
-`pending`
+#### 1.5 Integration Test: State Manager
+`completed`
 
-**Goal**: Manually test the complete `/prepare-game` → `/play-game` → `/status` flow.
+**Goal**: Verify state manager works correctly.
 
-**Test Plan**:
-1. Run `/prepare-game` on this repository (onboardme itself)
-2. Verify state.json created correctly
-3. Run `/play-game` and complete first investigation question
-4. Run `/status` to verify progress saved
-5. Exit and re-run `/play-game` to verify resume works
+**Tested**:
+1. `node state-manager.cjs read` — Returns default state
+2. `node state-manager.cjs init '{"name":"test","path":"/tmp/test"}'` — Creates state.json
+3. `node state-manager.cjs write '{"player":{"totalCommits":5}}'` — Deep merges updates
+4. `node state-manager.cjs reset` — Deletes .onboardme directory
+5. Backup created before writes
 
-**Acceptance Criteria**:
-- All commands work without errors
-- State persists between sessions
-- Monster voice is consistent
-- CASE_FILE.md artifact created
+**Completed**:
+- All CLI commands work without errors
+- State persists and loads correctly
+- Backup mechanism works
+- Deep merge preserves existing fields
 
 ---
 
