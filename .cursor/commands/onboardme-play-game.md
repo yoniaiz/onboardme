@@ -28,7 +28,10 @@ Start or resume the OnboardMe game.
 
 2. **If prepared**, check `progress.currentChapter` and load the appropriate reference:
    - `investigation` → Read `.cursor/skills/onboardme/references/THE-INVESTIGATION.md`
-   - (Future chapters will have their own files)
+   - `hands-on` → Read `.cursor/skills/onboardme/references/THE-HANDS-ON.md`
+   - `deep-dive` → Read `.cursor/skills/onboardme/references/THE-DEEP-DIVE.md`
+   - `hunt` → Read `.cursor/skills/onboardme/references/THE-HUNT.md`
+   - `boss` → Read `.cursor/skills/onboardme/references/THE-BOSS-BATTLE.md`
 
 3. **Check if resuming** by looking at `progress.questionHistory`:
    - If empty: Start fresh with chapter opening

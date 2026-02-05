@@ -11,6 +11,26 @@ Get the project running locally and interact with it as a user would. Learn to t
 
 ---
 
+## Design Principle: Don't Repeat Investigation
+
+**The player ALREADY proved their understanding in Chapter 1.**
+
+**DO NOT ask:**
+- "What type of project is this?"
+- "What's the purpose?"
+- "What problem does it solve?"
+- "What's the architecture?"
+
+**They already answered these. Asking again is redundant and annoying.**
+
+**Instead, REFERENCE what they learned:**
+- "You said this was a [what they identified]. Let's see if you can run it."
+- "You found the [pattern]. Now use it."
+
+**This chapter is about DOING, not re-testing UNDERSTANDING.**
+
+---
+
 ## Inputs
 
 | Resource | Access | Notes |

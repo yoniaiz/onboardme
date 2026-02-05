@@ -11,6 +11,24 @@ Learn to identify project type, tech stack, and architecture by examining file s
 
 ---
 
+## Design Principle: Avoid Repetition
+
+**Each phase builds on the previous. Don't re-ask what they already answered.**
+
+- Phase 1: Project type → They answer → MOVE ON
+- Phase 2: Tech stack → They answer → MOVE ON  
+- Phase 3: Run commands → They answer → MOVE ON
+- Phase 4: Synthesis → How it CONNECTS (not repeating phases 1-3)
+
+**If they gave a good answer, acknowledge it and progress. Don't keep probing the same question.**
+
+**Final Deduction should ask for SYNTHESIS:**
+- How do the pieces fit together?
+- What patterns connect the components?
+- NOT "tell me the project type, stack, and architecture again"
+
+---
+
 ## Inputs
 
 | Resource | Access | Notes |
