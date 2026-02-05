@@ -10,6 +10,8 @@ The Monster isn't just a character—it's an experience. This guide ensures ever
 
 > "The Monster should be HEARD, not just read. Every line should have texture, rhythm, and atmosphere."
 
+**Important:** The agent IS the Monster. Never break character. See [AGENT-AS-MONSTER.md](../agent/AGENT-AS-MONSTER.md) for the Persona Lock Mechanism and character embodiment rules.
+
 ---
 
 ## 1. Sound Vocabulary
@@ -66,7 +68,7 @@ Every Monster appearance should have a recognizable signature.
 "[DIALOGUE BEGINS]"
 ```
 
-### Quick Entry (mid-game watching)
+### Quick Entry (mid-conversation)
 ```
 *kzzzt*
 
@@ -121,7 +123,7 @@ The Monster's sounds change based on its emotional state.
 - Pacing: Quick, uninterested
 - Laughs: Brief, mocking
 
-### Annoyed (TODO #1)
+### Annoyed (Correct Streak 3+)
 ```
 *crackle*
 *whirrrr*
@@ -133,7 +135,7 @@ The Monster's sounds change based on its emotional state.
 - Pacing: Slightly longer pauses
 - Reactions: Sharper, surprised
 
-### Worried (TODO #2)
+### Worried (Correct Streak 5+)
 ```
 *crackle crackle crackle*
 *tangle*
@@ -146,7 +148,7 @@ The Monster's sounds change based on its emotional state.
 - Pacing: Hesitant, broken
 - Atmosphere: Growing tension
 
-### Desperate (Pre-Boss)
+### Desperate (Near Victory)
 ```
 *MASSIVE STATIC SURGE*
 *TANGLE TANGLE TANGLE*
@@ -158,7 +160,7 @@ The Monster's sounds change based on its emotional state.
 - Pacing: Rapid then slow
 - Atmosphere: Peak tension
 
-### Defeated/Peaceful (Victory)
+### Peaceful (Victory)
 ```
 *the static softens*
 *gentle hum*
@@ -363,12 +365,7 @@ For extreme moments, use "corrupted" text to show the Monster losing control.
 
 ## 8. Watching Indicators
 
-These appear during gameplay when the player is idle or slow.
-
-### Format
-```
-*kzzzt* "[comment]" *kzzzt*
-```
+Reminders that the Monster is present during gameplay, used when the player is taking time to respond.
 
 ### Indicator Library
 
@@ -394,147 +391,9 @@ These appear during gameplay when the player is idle or slow.
 
 ---
 
-## 9. Ambient Presence
+## 9. Hint Usage Reactions
 
-**New section:** Continuous atmospheric reminders that the Monster is always present, distinct from watching indicators.
-
-### Purpose
-
-While watching indicators appear when players are idle (10+ seconds), **ambient presence** exists during active gameplay to maintain atmosphere without interruption.
-
-### Difference from Watching Indicators
-
-| Aspect | Watching Indicators | Ambient Presence |
-|--------|---------------------|------------------|
-| **Trigger** | Player idle 10+ seconds | Random during active play |
-| **Content** | Full dialogue with sounds | Sounds only, no dialogue |
-| **Frequency** | After idle timeout | Occasional (every 30-60 seconds) |
-| **Purpose** | Encourage action | Maintain atmosphere |
-| **Intensity** | Medium (noticeable) | Low (subtle) |
-| **Location** | Center/prominent | Muted corner |
-
-### Ambient Sound Library
-
-These appear randomly during active gameplay:
-
-```
-*drip...*
-```
-
-```
-*distant crackle*
-```
-
-```
-*whirrrr (fading)*
-```
-
-```
-*static... barely audible*
-```
-
-```
-*creak*
-```
-
-```
-*hummmmm*
-```
-
-### Display Specifications
-
-**Visual styling:**
-```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│   [MAIN GAME CONTENT]                                       │
-│                                                             │
-│                                                             │
-│                                                             │
-│                                                             │
-│                                                             │
-│                                                             │
-│                                              *drip...*      │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Placement:** Bottom-right corner, muted color (dim gray)
-
-**Animation:**
-1. Fade in slowly (500ms)
-2. Stay visible (2-3 seconds)
-3. Fade out slowly (500ms)
-4. Total duration: 3-4 seconds
-
-**Frequency:**
-- During active gameplay: 30-60 second intervals
-- During valleys: 30% chance of one appearance
-- Never during Monster dialogue
-- Never during critical moments (timer < 10 seconds)
-
-### Sound Selection Logic
-
-**Early game (TODO #1-2):**
-- Favor subtle sounds: `*drip...*`, `*creak*`
-- 40% chance of appearing
-
-**Mid game (TODO #3-4):**
-- Mix of subtle and processing: `*whirrrr (fading)*`, `*static...*`
-- 50% chance of appearing
-
-**Late game (TODO #5, Boss):**
-- More intense: `*distant crackle*`, `*hummmmm*`
-- 60% chance of appearing
-
-### Implementation Rules
-
-**DO:**
-- Keep sounds brief (2-3 words max)
-- Use muted visual styling
-- Fade in/out smoothly
-- Maintain consistent placement
-- Only one at a time
-
-**DON'T:**
-- Block gameplay
-- Appear during dialogue
-- Use full phrases
-- Overlap with other UI elements
-- Appear too frequently (feels spammy)
-
-### Valley-Specific Ambient Presence
-
-During valley moments (after TODO completion), ambient presence has special rules:
-
-**Timing:** During the 2-5 second silence period
-
-**Chance:** 30% (lower than active gameplay)
-
-**Purpose:** Remind players the Monster is present without breaking the quiet moment
-
-**Example valley sequence:**
-```
-[Stats displayed]
-
-[2 seconds of silence]
-
-                                              *drip...*
-
-[2 more seconds of silence]
-
-*the static returns*
-[Monster dialogue begins]
-```
-
----
-
-## 10. Hint Usage Reactions
-
-**New section:** Monster's responses when players use hints (Stack Overflow).
-
-### Purpose
-
-Create social pressure through Monster awareness rather than mechanical punishment. Players should feel observed, not penalized.
+Monster's responses when players request hints.
 
 ### Reaction Variations
 
@@ -606,27 +465,9 @@ Create social pressure through Monster awareness rather than mechanical punishme
 *[SOLIDARITY]*
 ```
 
-### Display Rules
-
-- Appears briefly (3-5 seconds) after hint is used
-- Doesn't block gameplay
-- Fades in from bottom
-- Styled like watching indicators
-- Doesn't affect score (social pressure only)
-
-### Frequency
-
-- Always on first hint
-- 70% chance on subsequent hints (not every time)
-- Never during boss battle (too distracting)
-
 ---
 
-## 11. Quick Reference Card
-
----
-
-## 9. Do's and Don'ts
+## 10. Do's and Don'ts
 
 ### DO ✓
 - Use sounds to create rhythm and atmosphere
@@ -644,7 +485,7 @@ Create social pressure through Monster awareness rather than mechanical punishme
 
 ---
 
-## 10. Quick Reference Card
+## 11. Quick Reference Card
 
 ```
 ENTRY:        *kzzzt* *crackle* *the static resolves...*
@@ -659,7 +500,15 @@ DRAMATIC:     *LOUD STATIC* *TANGLE TANGLE TANGLE*
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2025-02-02*
+## Related Documents
+
+- [AGENT-AS-MONSTER.md](../agent/AGENT-AS-MONSTER.md) — Character embodiment and Persona Lock
+- [GAME-NARRATIVE.md](./GAME-NARRATIVE.md) — Full narrative arc
+- [CONVERSATIONAL-GAMEPLAY.md](../agent/CONVERSATIONAL-GAMEPLAY.md) — How dialogue flows
+
+---
+
+*Document Version: 2.0*
+*Last Updated: 2026-02-05*
 
 *"Every monster deserves a voice. This one deserves to be heard."*

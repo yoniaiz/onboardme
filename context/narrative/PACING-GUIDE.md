@@ -10,7 +10,7 @@ This document specifies the emotional pacing throughout OnboardMe, ensuring play
 
 > "Action is like candy—occasional peaks keep it exciting, but constant intensity makes it bland."
 
-Research shows that constant high intensity leads to:
+Constant high intensity leads to:
 - Cognitive fatigue
 - Emotional numbness
 - Reduced impact of climactic moments
@@ -30,12 +30,12 @@ Intensity
     │    ╭─╮  ╱   ╲    ╱     ╲  ╱       ╲ ╱         │ VICTORY
     │   ╱   ╲╱     ╲  ╱       ╲╱         V          │
  ───┼──────────────────────────────────────────────┴──►
-   INTRO  TODO1   TODO2    TODO3    TODO4   TODO5  FIXME
+   INTRO  Invest   Hands   Deep    Hunt   BOSS    End
     
-    ↑      ↑        ↑        ↑        ↑       ↑      ↑
-  Hook   Peak1   Peak2    Peak3    Peak4   Peak5  Climax
-          ↓        ↓        ↓        ↓       ↓
-        Valley1  Valley2  Valley3  Valley4  Valley5
+    ↑      ↑        ↑        ↑        ↑      ↑      ↑
+  Hook   Peak1   Peak2    Peak3    Peak4  Climax  Calm
+          ↓        ↓        ↓        ↓       
+       Valley1  Valley2  Valley3  Valley4  
 ```
 
 ---
@@ -43,7 +43,6 @@ Intensity
 ## Pacing Phases
 
 ### Phase 1: Hook (Cold Open)
-**Duration:** 17 seconds  
 **Intensity:** Medium  
 **Goal:** Create curiosity without overwhelming
 
@@ -57,58 +56,41 @@ Intensity
 
 ---
 
-### Phase 2: Introduction
-**Duration:** 2-3 minutes  
-**Intensity:** Low-Medium  
-**Goal:** Orient player, set expectations
-
-- Game explanation
-- TODO list overview
-- Controls and mechanics
-
-**Emotional state:** Learning, preparing
-
----
-
-### Phase 3: TODO #1 - First Peak
-**Duration:** 12-15 minutes  
+### Phase 2: Investigation — First Peak
 **Intensity:** Medium-High  
-**Goal:** Engage player with challenges
+**Goal:** Engage player with initial challenges
 
-- Active gameplay
-- Questions and challenges
+- Active investigation
+- Evidence gathering
 - Learning codebase structure
 
 **Emotional state:** Focused, challenged
 
-**Peak moment:** Completing final sub-task
+**Peak moment:** Completing the case file
 
 ---
 
-### Phase 4: Valley #1 - First Breath
-**Duration:** 30-45 seconds  
+### Phase 3: Valley #1 — First Breath
 **Intensity:** Low  
 **Goal:** Let player process accomplishment
 
 **Sequence:**
-1. Completion celebration (5 seconds)
-2. Stats reveal (10 seconds)
-3. **Silence** (2-3 seconds) ← Critical
-4. Monster appears (15-20 seconds)
-5. Transition to next TODO (5 seconds)
+1. Completion acknowledgment — Monster grudgingly accepts
+2. Stats reveal — What was accomplished
+3. **Breathing room** — A moment of quiet
+4. Monster appears — Reflective, less intense
+5. Transition to next chapter
 
 **Emotional state:** Accomplished, reflective
 
-**What happens in the silence:**
-- No dialogue
-- No sound effects
-- Just ambient presence: `*drip...*` or `*distant crackle*`
-- Player sits with their achievement
+**What happens in the breathing room:**
+- Shorter Monster dialogue
+- No immediate new challenges
+- A moment to feel the win
 
 ---
 
-### Phase 5: TODO #2 - Building Peak
-**Duration:** 12-15 minutes  
+### Phase 4: Hands-On — Building Peak
 **Intensity:** Medium-High  
 **Goal:** Increase complexity
 
@@ -116,25 +98,15 @@ Intensity
 
 ---
 
-### Phase 6: Valley #2 - Deepening
-**Duration:** 45-60 seconds  
+### Phase 5: Valley #2 — Deepening
 **Intensity:** Low-Medium  
 **Goal:** Introduce Monster's backstory hints
-
-**Sequence:**
-1. Completion celebration
-2. Stats reveal
-3. **Silence** (2-3 seconds)
-4. Monster appears with more vulnerability
-5. Brief knowledge unlock moment
-6. Transition
 
 **Emotional state:** Curious about Monster, empathetic
 
 ---
 
-### Phase 7: TODO #3 - Emotional Peak
-**Duration:** 15-18 minutes  
+### Phase 6: Deep Dive — Emotional Peak
 **Intensity:** High  
 **Goal:** Reveal Monster's origin story
 
@@ -144,25 +116,15 @@ Intensity
 
 ---
 
-### Phase 8: Valley #3 - Processing
-**Duration:** 60-75 seconds  
+### Phase 7: Valley #3 — Processing
 **Intensity:** Medium  
 **Goal:** Let backstory sink in
-
-**Sequence:**
-1. Completion celebration
-2. Stats reveal
-3. **Longer silence** (4-5 seconds) ← Emotional processing
-4. Monster appears, more vulnerable
-5. Memory log unlocked
-6. Transition
 
 **Emotional state:** Reflective, connected to Monster
 
 ---
 
-### Phase 9: TODO #4 - Existential Peak
-**Duration:** 15-18 minutes  
+### Phase 8: Hunt — Existential Peak
 **Intensity:** High  
 **Goal:** Monster's existential crisis
 
@@ -170,81 +132,39 @@ Intensity
 
 ---
 
-### Phase 10: Valley #4 - False Peace
-**Duration:** 60 seconds  
-**Intensity:** Low  
-**Goal:** Calm before the storm
-
-**Sequence:**
-1. Completion celebration
-2. Stats reveal
-3. **Silence** (3-4 seconds)
-4. Monster appears, resigned/peaceful
-5. Hint of upcoming confrontation
-6. Transition
-
-**Emotional state:** Calm, anticipatory
-
----
-
-### Phase 11: TODO #5 - Desperate Peak
-**Duration:** 15-18 minutes  
-**Intensity:** Very High  
-**Goal:** Monster's desperation
-
-**Peak moment:** Monster's plea/threat
-
-**Emotional state:** Tense, conflicted
-
----
-
-### Phase 12: Valley #5 - Before the Storm
-**Duration:** 75-90 seconds  
+### Phase 9: Valley #4 — Before the Storm
 **Intensity:** Medium-High  
 **Goal:** Build tension for boss battle
-
-**Sequence:**
-1. Completion celebration
-2. Stats reveal
-3. **Tense silence** (5 seconds) ← Anticipation
-4. Monster's desperate dialogue
-5. Boss battle warning
-6. Brief preparation moment
-7. Transition to boss
 
 **Emotional state:** Anxious, prepared, determined
 
 ---
 
-### Phase 13: BOSS BATTLE - Climax
-**Duration:** 15-20 minutes  
+### Phase 10: Boss Battle — Climax
 **Intensity:** Maximum  
 **Goal:** Test everything learned
 
 **Internal pacing:**
 - Phase 1: High intensity
-- Brief respite between phases (10 seconds)
+- Brief respite between phases
 - Phase 2: Higher intensity
-- Brief respite (10 seconds)
+- Brief respite
 - Phase 3: Maximum intensity
 
 **Emotional state:** Focused, determined, stressed
 
 ---
 
-### Phase 14: Victory - Resolution
-**Duration:** 2-3 minutes  
+### Phase 11: Victory — Resolution
 **Intensity:** High → Low (descending)  
 **Goal:** Emotional catharsis
 
 **Sequence:**
 1. Victory moment (high intensity)
-2. **Long silence** (8-10 seconds) ← Let it sink in
+2. **Long breathing room** — Let it sink in
 3. Monster's peaceful transformation
 4. Knowledge transfer
-5. Victory stats
-6. Shareable summary
-7. Post-game suggestion
+5. Final artifact: CODEBASE_KNOWLEDGE.md
 
 **Emotional state:** Triumphant → Bittersweet → Accomplished
 
@@ -254,99 +174,103 @@ Intensity
 
 ### What Makes a Good Valley?
 
-1. **Silence is powerful**
-   - 2-5 seconds of no dialogue or sound effects
-   - Only ambient presence indicators
-   - Lets players breathe
+1. **Breathing room is powerful**
+   - Don't immediately launch into the next challenge
+   - Let players sit with their achievement briefly
+   - The Monster can be present without demanding action
 
 2. **Gradual transitions**
    - Don't snap from peak to valley
-   - Use fading sounds: `*the static fades*`
+   - Use softening sounds: `*the static fades*`
    - Slow reveal of next content
 
 3. **Reflection opportunities**
-   - Show stats (what was accomplished)
-   - Display unlocked knowledge
+   - Monster acknowledges what was accomplished
+   - Display progress toward victory
    - Brief Monster dialogue that's less intense
 
 4. **Ambient atmosphere**
-   - Subtle sounds without dialogue
+   - Subtle sounds without demanding dialogue
    - `*drip...*` or `*distant crackle*`
-   - Reminds players Monster is present without demanding attention
+   - Reminds players Monster is present without interrupting
 
 ### What to Avoid in Valleys
 
 - ❌ Immediate next challenge
-- ❌ Loud or jarring sounds
-- ❌ Complex new information
+- ❌ Aggressive or intense dialogue
+- ❌ Complex new information dumps
 - ❌ Time pressure
-- ❌ Multiple simultaneous stimuli
+- ❌ Multiple demanding questions at once
 
 ---
 
-## Silence Specifications
+## Conversational Rhythm
 
-| Moment | Silence Duration | Purpose |
-|--------|------------------|---------|
-| After TODO #1 | 2-3 seconds | First breath |
-| After TODO #2 | 2-3 seconds | Processing |
-| After TODO #3 | 4-5 seconds | Emotional backstory processing |
-| After TODO #4 | 3-4 seconds | Existential weight |
-| After TODO #5 | 5 seconds | Tension before boss |
-| After Boss Victory | 8-10 seconds | Let triumph sink in |
+### Challenge → Completion → Breath
 
-**Implementation:** Actual silence—no text, no sounds, just a blank screen or minimal UI.
-
----
-
-## Ambient Presence During Valleys
-
-While valleys are "quiet," they're not empty. Subtle atmospheric elements maintain immersion:
-
-### Ambient Sound Indicators
-
-Appear randomly during valley moments (not all at once):
+After each significant accomplishment:
 
 ```
-*drip...*
+[Challenge completed]
+
+*kzzzt*
+
+"...Alright."
+
+*pause*
+
+"That was... acceptable."
+
+*slrrrrp*
+
+[Breathing room — Monster doesn't demand anything]
+
+*crackle*
+
+"Ready for what's next?"
+
+[Player indicates readiness]
+
+[Next challenge begins]
 ```
 
-```
-*distant crackle*
-```
+### Intensity Through Sound
+
+Control intensity through Monster's sonic presence:
+
+| Intensity | Sounds | Pacing |
+|-----------|--------|--------|
+| Low | `*drip*`, `*gentle hum*` | Long pauses, soft |
+| Medium | `*kzzzt*`, `*crackle*` | Normal pacing |
+| High | `*KZZZT*`, `*static spike*` | Rapid, urgent |
+| Maximum | `*TANGLE TANGLE*`, `*HRRRRNN*` | Overwhelming |
+
+### Multi-Turn Pacing
+
+In multi-turn investigations, alternate intensity:
 
 ```
-*whirrrr (fading)*
+Turn 1: Challenge (medium)
+Turn 2: Answer evaluated (feedback)
+Turn 3: Breathing room (low)
+Turn 4: Probe deeper (medium)
+Turn 5: Answer evaluated (feedback)
+Turn 6: Chapter climax (high)
+Turn 7: Valley (low)
 ```
-
-```
-*static... barely audible*
-```
-
-**Display rules:**
-- Appear in a muted corner of the screen
-- Fade in slowly (500ms)
-- Stay visible for 2-3 seconds
-- Fade out slowly (500ms)
-- Only one at a time
-- 30% chance of appearing during any valley
 
 ---
 
 ## Monster Dialogue Pacing in Valleys
 
-Monster appearances after TODOs should feel different from in-game watching:
+Monster appearances after chapter completion should feel different from mid-chapter:
 
 ### Valley Monster Appearance
 
 ```
-[Completion celebration]
+[Completion acknowledgment]
 
-[Stats reveal]
-
-[2-3 seconds of silence]
-
-*the static returns*
+*the static softens*
 
 *kzzzt*
 
@@ -356,19 +280,17 @@ Monster appearances after TODOs should feel different from in-game watching:
 
 *pause*
 
-"[More dialogue]"
+"[More dialogue - reflective]"
 
 *the noise fades*
 
-*[DISCONNECTED]*
+*[CHAPTER COMPLETE]*
 
-[5 second transition]
-
-[Next TODO begins]
+[Breathing room before next chapter begins]
 ```
 
-**Key differences from in-game Monster:**
-- Slower entry (2-3 seconds vs instant)
+**Key differences from mid-chapter Monster:**
+- Slower entry (more lead-up)
 - More pauses between lines
 - Softer exit
 - Longer transition to next content
@@ -379,13 +301,13 @@ Monster appearances after TODOs should feel different from in-game watching:
 
 ### ❌ The "Constant Action" Trap
 ```
-TODO Complete → IMMEDIATE Monster → IMMEDIATE Next TODO
+Chapter Complete → IMMEDIATE new challenge
 ```
 **Problem:** No time to process, feels rushed
 
 ### ✓ Correct Pacing
 ```
-TODO Complete → Celebration → Stats → Silence → Monster → Transition → Next TODO
+Chapter Complete → Acknowledgment → Breathing room → Transition → Next Chapter
 ```
 **Benefit:** Player has time to feel accomplishment
 
@@ -393,13 +315,13 @@ TODO Complete → Celebration → Stats → Silence → Monster → Transition �
 
 ### ❌ The "Dead Air" Trap
 ```
-TODO Complete → 30 seconds of nothing → Next TODO
+Chapter Complete → Extended silence with nothing
 ```
-**Problem:** Too much emptiness, loses momentum
+**Problem:** Loses momentum, confusing
 
 ### ✓ Correct Pacing
 ```
-TODO Complete → 2-3 seconds silence → Ambient presence → Monster → Next TODO
+Chapter Complete → Brief acknowledgment → Ambient presence → Transition
 ```
 **Benefit:** Breathing room without boredom
 
@@ -407,50 +329,46 @@ TODO Complete → 2-3 seconds silence → Ambient presence → Monster → Next 
 
 ### ❌ The "Inconsistent Rhythm" Trap
 ```
-TODO #1: 5 second valley
-TODO #2: 30 second valley
-TODO #3: 2 second valley
+Chapter 1: Quick valley
+Chapter 2: Long valley
+Chapter 3: No valley
 ```
 **Problem:** Unpredictable, jarring
 
 ### ✓ Correct Pacing
 ```
-TODO #1: 30-45 second valley
-TODO #2: 45-60 second valley
-TODO #3: 60-75 second valley (emotional moment)
+Chapter 1: Brief valley (first win feels new)
+Chapter 2: Normal valley
+Chapter 3: Longer valley (emotional moment)
+Chapter 4: Building tension
 ```
 **Benefit:** Gradual escalation, predictable rhythm
 
 ---
 
-## Testing Checklist
+## Intensity Guidelines by Chapter
 
-- [ ] Players report feeling "breathing room" between challenges
-- [ ] Completion moments feel satisfying (not rushed)
-- [ ] Monster appearances feel dramatic (not jarring)
-- [ ] Silence moments create anticipation (not boredom)
-- [ ] Emotional peaks have maximum impact
-- [ ] Players don't report fatigue until late game (expected)
-- [ ] Boss battle feels climactic (not "just another TODO")
+| Chapter | Peak Intensity | Valley After |
+|---------|---------------|--------------|
+| Investigation | Medium | Brief — first accomplishment |
+| Hands-On | Medium-High | Normal — confidence building |
+| Deep Dive | High | Extended — emotional backstory |
+| Hunt | High | Building — tension for boss |
+| Boss Battle | Maximum | Long — catharsis, reflection |
 
 ---
 
-## Implementation Notes
+## Emotional Checkpoints
 
-### For Developers
+At each valley, the player should feel:
 
-1. **Timing is critical** — Use actual delays, not just fast text
-2. **Silence is content** — Don't fill every moment
-3. **Ambient presence** — Subtle reminders, not interruptions
-4. **Transitions matter** — Fade in/out, don't snap
-5. **Test with real players** — Pacing is felt, not measured
-
-### Configuration Options
-
-Consider allowing players to adjust pacing:
-- **Normal:** As specified in this document
-- **Fast:** 50% shorter valleys (for experienced players)
-- **Relaxed:** 50% longer valleys (for thoughtful players)
+| After | Player Should Feel |
+|-------|-------------------|
+| Investigation | "I can do this" |
+| Hands-On | "I'm getting it" |
+| Deep Dive | "I understand you now" |
+| Hunt | "I'm ready for you" |
+| Boss Battle | "I know this codebase" |
 
 ---
 
@@ -459,11 +377,11 @@ Consider allowing players to adjust pacing:
 - [COLD-OPEN.md](./COLD-OPEN.md) — Introduction sequence
 - [MONSTER-VOICE.md](./MONSTER-VOICE.md) — Monster dialogue style
 - [GAME-NARRATIVE.md](./GAME-NARRATIVE.md) — Overall narrative arc
-- [JUICE-FEEDBACK.md](../visuals/JUICE-FEEDBACK.md) — Feedback systems
+- [CONVERSATIONAL-GAMEPLAY.md](../agent/CONVERSATIONAL-GAMEPLAY.md) — Dialogue flow patterns
 
 ---
 
-*Document Version: 1.0*  
-*Last Updated: 2025-02-02*
+*Document Version: 2.0*  
+*Last Updated: 2026-02-05*
 
 *"In music, the silence between notes is as important as the notes themselves. In games, the valleys between peaks are as important as the peaks."*

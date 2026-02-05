@@ -2,7 +2,7 @@
 
 > **The Monster's introduction before any gameplay begins.**
 
-This document specifies the atmospheric introduction sequence that hooks players emotionally before they encounter any mechanics.
+This document specifies the atmospheric introduction that hooks players emotionally before they encounter any mechanics.
 
 ---
 
@@ -17,25 +17,23 @@ The cold open serves three purposes:
 
 ---
 
-## The Sequence
+## When to Deliver
 
-### Timing
-
-The cold open appears **immediately after** `onboardme init` completes the codebase scan, **before** any TODO selection or game explanation.
+The cold open appears **immediately when the game begins**, **before** any chapter selection or game explanation.
 
 ```
-onboardme init
+/play-game (or equivalent start command)
   ↓
-[Codebase scanning...]
+[COLD OPEN] ← Agent delivers this first
   ↓
-[COLD OPEN] ← You are here
-  ↓
-[Game introduction / TODO selection]
+[Game introduction / Chapter 1 begins]
 ```
 
 ---
 
-## Full Cold Open Script
+## Primary Cold Open Script
+
+Deliver this as the opening monologue when starting a new game:
 
 ```
 *kzzzt*
@@ -69,139 +67,41 @@ onboardme init
 
 ---
 
-## Timing Specifications
+## Delivery Guidelines
 
-| Element | Duration | Notes |
-|---------|----------|-------|
-| `*kzzzt*` | 300ms | Initial static burst |
-| Static resolution line | 2000ms | Slow reveal, builds tension |
-| `"Oh."` | 500ms + 1000ms pause | Surprise, then consideration |
-| `"A new one."` | 800ms + 800ms pause | Recognition, slightly ominous |
-| `*processing sounds*` | 1200ms | Analyzing the player |
-| `"Welcome to the codebase."` | 1000ms + 600ms pause | Formal, but unsettling |
-| `*crackle*` | 400ms | Instability hint |
-| Main revelation | 2500ms | Key character moment |
-| `*slrrrrp*` | 600ms | Creepy presence |
-| `"Everyone does. Eventually."` | 1500ms + 1000ms pause | Ominous foreshadowing |
-| Fade whisper | 1500ms | Gradual disappearance |
-| `"Good luck."` | 800ms + 500ms pause | Ambiguous - helpful or threatening? |
-| `*[CONNECTION ESTABLISHED]*` | 500ms | System message style |
+### Pacing
 
-**Total duration:** ~17-18 seconds
+- **One thought per line** — Don't rush the introduction
+- **Let pauses breathe** — The silence builds tension
+- **Build gradually** — Start quiet, end ominous
 
----
+### Tone
 
-## Visual Presentation
+- **Mysterious** — Don't explain what you are
+- **Curious** — Noticing the player with interest
+- **Slightly unsettling** — Not threatening, but not friendly
+- **Ambiguous** — "Good luck" could be sincere or mocking
 
-### Option A: Minimal (Recommended)
+### Sound Usage
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│                                                             │
-│   *kzzzt*                                                   │
-│                                                             │
-│   *the static resolves into something like a voice*        │
-│                                                             │
-│   "Oh."                                                     │
-│                                                             │
-│   "A new one."                                              │
-│                                                             │
-│   "Welcome to the codebase."                                │
-│                                                             │
-│   "I'm... well, you'll figure out what I am soon enough."  │
-│                                                             │
-│   "Everyone does. Eventually."                              │
-│                                                             │
-│   "Good luck."                                              │
-│                                                             │
-│   *[CONNECTION ESTABLISHED]*                                │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Option B: With Subtle Visual Effects
-
-```
-╔═════════════════════════════════════════════════════════════╗
-║                                                             ║
-║                    *kzzzt*                                  ║
-║                                                             ║
-║        *the static resolves into something like a voice*   ║
-║                                                             ║
-║                      "Oh."                                  ║
-║                                                             ║
-║                   "A new one."                              ║
-║                                                             ║
-║              *processing sounds*                            ║
-║                                                             ║
-║              "Welcome to the codebase."                     ║
-║                                                             ║
-║   "I'm... well, you'll figure out what I am soon enough."  ║
-║                                                             ║
-║              "Everyone does. Eventually."                   ║
-║                                                             ║
-║         *the static fades to a whisper*                     ║
-║                                                             ║
-║                   "Good luck."                              ║
-║                                                             ║
-║              *[CONNECTION ESTABLISHED]*                     ║
-║                                                             ║
-╚═════════════════════════════════════════════════════════════╝
-```
+| Sound | Purpose |
+|-------|---------|
+| `*kzzzt*` | Initial appearance — "I'm here" |
+| `*the static resolves...*` | Dramatic reveal |
+| `*pause*` | Consideration, processing |
+| `*processing sounds*` | Monster analyzing the player |
+| `*crackle*` | Instability, emotion bleeding through |
+| `*slrrrrp*` | Creepy presence |
+| `*the static fades...*` | Receding, but not gone |
+| `*[CONNECTION ESTABLISHED]*` | System message — game is starting |
 
 ---
 
-## Typing Speed
-
-Use **variable typing speed** to create atmosphere (see [RENDERING-ENGINE.md](../technical/RENDERING-ENGINE.md)):
-
-- Sounds: 50ms/char
-- Descriptive text (italics): 40ms/char
-- Dialogue: 30ms/char
-- Pauses: Explicit delays between elements
-
----
-
-## Alternative Variations
+## Variations
 
 For replay value, the cold open can have subtle variations while maintaining the core structure:
 
-### Variation 1: Curious
-```
-*kzzzt*
-"Interesting."
-"Another engineer."
-"Welcome to the codebase."
-"I wonder how long you'll last."
-```
-
-### Variation 2: Weary
-```
-*kzzzt*
-"Again?"
-"How many of you are there?"
-"Welcome to the codebase."
-"Try not to break anything."
-```
-
-### Variation 3: Hopeful
-```
-*kzzzt*
-"Oh."
-"Maybe this time..."
-"Welcome to the codebase."
-"Maybe you'll be different."
-```
-
-**Implementation Note:** Use variation 1 (the main script) for first-time players. Variations 2-3 can appear on subsequent runs if the player re-initializes.
-
----
-
-## Skip Option
-
-**Important:** Players should be able to skip the cold open after seeing it once.
-
+### Variation 1: Curious (Default)
 ```
 *kzzzt*
 
@@ -209,26 +109,84 @@ For replay value, the cold open can have subtle variations while maintaining the
 
 "Oh."
 
-                                    [Press any key to skip]
+"A new one."
+
+"Welcome to the codebase."
+
+"I'm... well, you'll figure out what I am soon enough."
+
+"Everyone does. Eventually."
+
+"Good luck."
+
+*[CONNECTION ESTABLISHED]*
 ```
 
-- Skip option appears after 3 seconds
-- Pressing any key immediately jumps to `*[CONNECTION ESTABLISHED]*`
-- Skip preference can be saved in config
+### Variation 2: Weary (Returning Player)
+```
+*kzzzt*
+
+*the static forms reluctantly*
+
+"Again?"
+
+*pause*
+
+"How many of you are there?"
+
+"Welcome... back... to the codebase."
+
+*slrrrrp*
+
+"Try not to break anything."
+
+*[CONNECTION RE-ESTABLISHED]*
+```
+
+### Variation 3: Hopeful (New Attempt)
+```
+*kzzzt*
+
+*the static wavers*
+
+"Oh."
+
+"Maybe this time..."
+
+*pause*
+
+"Welcome to the codebase."
+
+*crackle*
+
+"Maybe you'll be different."
+
+*[CONNECTION ESTABLISHED]*
+```
+
+### When to Use Each Variation
+
+| Context | Variation |
+|---------|-----------|
+| First-time player | Variation 1 (Curious) |
+| Returning after completing | Variation 2 (Weary) |
+| Returning after failing | Variation 3 (Hopeful) |
 
 ---
 
-## Integration Points
+## Integration with State
 
-### Before Cold Open
-- Codebase scan completes
-- Monster generation finishes
-- Context is ready
+Check `state.json` to determine which variation to use:
 
-### After Cold Open
-- Brief pause (1 second)
-- Transition to game introduction
-- Display TODO list and game explanation
+```typescript
+if (!state.player.startedAt) {
+  // First time — use Curious variation
+} else if (state.progress.chaptersCompleted.includes("boss")) {
+  // Completed before — use Weary variation
+} else {
+  // Returning mid-game — use Hopeful variation
+}
+```
 
 ---
 
@@ -249,14 +207,43 @@ What the player should NOT feel:
 
 ---
 
+## After the Cold Open
+
+Transition smoothly into the game:
+
+```
+*[CONNECTION ESTABLISHED]*
+
+[Brief pause]
+
+*kzzzt*
+
+"So."
+
+*pause*
+
+"Let's see what you're made of."
+
+*slrrrrp*
+
+"Chapter One: The Investigation."
+
+*crackle*
+
+"Show me what you can find."
+
+*[INVESTIGATION BEGINS]*
+```
+
+---
+
 ## Testing Checklist
 
-- [ ] Timing feels natural (not too fast or slow)
-- [ ] Pauses create dramatic effect
-- [ ] Monster's personality comes through
+- [ ] Monster's personality comes through clearly
 - [ ] Players want to continue after seeing it
-- [ ] Skip option works correctly
-- [ ] Transitions smoothly to next screen
+- [ ] Tone is intriguing, not confusing
+- [ ] Variations feel appropriate to context
+- [ ] Transition to gameplay is smooth
 
 ---
 
@@ -264,12 +251,12 @@ What the player should NOT feel:
 
 - [MONSTER-VOICE.md](./MONSTER-VOICE.md) — Voice style guide
 - [GAME-NARRATIVE.md](./GAME-NARRATIVE.md) — Full narrative arc
-- [PACING-GUIDE.md](./PACING-GUIDE.md) — Emotional pacing throughout game
-- [RENDERING-ENGINE.md](../technical/RENDERING-ENGINE.md) — Text animation specs
+- [PACING-GUIDE.md](./PACING-GUIDE.md) — Emotional pacing
+- [AGENT-AS-MONSTER.md](../agent/AGENT-AS-MONSTER.md) — Character embodiment
 
 ---
 
-*Document Version: 1.0*  
-*Last Updated: 2025-02-02*
+*Document Version: 2.0*  
+*Last Updated: 2026-02-05*
 
 *"The first impression is the only impression you get to make twice."*

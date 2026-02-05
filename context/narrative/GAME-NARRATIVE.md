@@ -2,7 +2,7 @@
 
 > **Reference document for the game's story, boss design, theme, and creative vision.**
 
-This document serves as the creative bible for OnboardMe's narrative elements, separate from the technical PRD.
+This document serves as the creative bible for OnboardMe's narrative elements.
 
 ---
 
@@ -11,10 +11,10 @@ This document serves as the creative bible for OnboardMe's narrative elements, s
 1. [Core Theme](#1-core-theme)
 2. [The Spaghetti Code Monster](#2-the-spaghetti-code-monster)
 3. [Narrative Arc](#3-narrative-arc)
-4. [TODO Structure](#4-todo-structure)
+4. [Chapter Structure](#4-chapter-structure)
 5. [Game Terminology](#5-game-terminology)
 6. [Dialogue & Voice](#6-dialogue--voice)
-7. [Visual Direction](#7-visual-direction)
+7. [Monster Visuals](#7-monster-visuals)
 8. [Boss Battle Design](#8-boss-battle-design)
 
 ---
@@ -128,48 +128,31 @@ interface MonsterOrigin {
 
 > **See [COLD-OPEN.md](./COLD-OPEN.md) for complete cold open specifications.**
 
-**Cold Open Script:**
-```
-*kzzzt*
-*the static resolves into something like a voice*
-"Oh."
-"A new one."
-"Welcome to the codebase."
-"I'm... well, you'll figure out what I am soon enough."
-"Everyone does. Eventually."
-"Good luck."
-*[CONNECTION ESTABLISHED]*
-```
-
-This 17-second sequence creates curiosity and intrigue before any game explanation, allowing players to meet the Monster as a character rather than a game mechanic.
-
 ### Story Beats
 
-| TODO | Monster's Emotional State | Player Relationship |
-|------|--------------------------|---------------------|
+| Chapter | Monster's Emotional State | Player Relationship |
+|---------|--------------------------|---------------------|
 | **Cold Open** | Mysterious, curious | First encounter |
-| **Intro** | Mysterious, ominous | Unknown threat |
-| **TODO #1** | Dismissive, mocking | "Another noob" |
-| **TODO #2** | Condescending | "Lucky guesses" |
-| **TODO #3** | Worried, backstory revealed | Respects player |
-| **TODO #4** | Existential crisis | Fears player |
-| **TODO #5** | Desperate, pleading | Offers truce |
-| **FIXME** | Full power, then defeat | Final confrontation |
+| **Investigation** | Dismissive, mocking | "Another noob" |
+| **Hands-On** | Condescending | "Lucky guesses" |
+| **Deep Dive** | Worried, backstory revealed | Respects player |
+| **Hunt** | Existential crisis | Fears player |
+| **Boss Battle** | Full power, then defeat | Final confrontation |
 | **Ending** | Peaceful, grateful | Passes knowledge |
 
 ### The Emotional Journey
 
-**Act 1: Mystery (TODO #1-2)**
+**Act 1: Mystery (Investigation + Hands-On)**
 - Monster is distant, taunting
 - Player doesn't know what they're facing
 - Building dread and curiosity
 
-**Act 2: Understanding (TODO #3-4)**
+**Act 2: Understanding (Deep Dive + Hunt)**
 - Monster's origin is revealed
 - Player starts to empathize
 - Monster becomes more desperate
 
-**Act 3: Confrontation (TODO #5 + FIXME)**
+**Act 3: Confrontation (Boss Battle)**
 - Monster offers to coexist
 - Player must choose to face it
 - Final battle tests everything learned
@@ -197,52 +180,73 @@ This aligns with the Monster's sympathetic nature—it's not evil, it's abandone
 
 ---
 
-## 4. TODO Structure
+## 4. Chapter Structure
 
-### Why TODOs Instead of Levels
+### The Five Chapters
 
-| Old Term | New Term | Why It's Better |
-|----------|----------|-----------------|
-| Level 1 | TODO #1 | Developers know TODOs; they're relatable |
-| Level 2 | TODO #2 | The Monster was BORN from TODOs |
-| Boss | FIXME | FIXMEs are more urgent/scary than TODOs |
-| Complete | Resolved | Git/ticket terminology |
+OnboardMe organizes gameplay into five progressive chapters, each building on the previous:
 
-### The Five Critical TODOs
+| Chapter | Focus | Duration | Artifact |
+|---------|-------|----------|----------|
+| **The Investigation** | File structure, tech stack, project identity | 20 min | `CASE_FILE.md` |
+| **The Hands-On** | Get the project running, understand the dev environment | 15 min | Running project |
+| **The Deep Dive** | Data flows, relationships, architecture | 25 min | `FLOW_MAP.md` |
+| **The Hunt** | Find and fix bugs, trace problems | 30 min | Bug fix + `IMPACT_ANALYSIS.md` |
+| **The Boss Battle** | Prove mastery, final confrontation | 15 min | `CODEBASE_KNOWLEDGE.md` |
+
+### Chapter Details
+
+#### Chapter 1: The Investigation
+```
+"Examine the evidence. Build your case. What IS this codebase?"
+```
+- Player investigates file structure, dependencies, configuration
+- Monster is dismissive: "Groundbreaking. Even the interns get that far."
+- **Artifact:** `CASE_FILE.md` with evidence and verdicts
+
+#### Chapter 2: The Hands-On
+```
+"Talk is cheap. Can you actually RUN it?"
+```
+- Player sets up the development environment
+- Monster guides through actual errors IN CHARACTER
+- **Artifact:** Successfully running project
+
+#### Chapter 3: The Deep Dive
+```
+"You've seen the surface. Now trace the FLOW."
+```
+- Multi-turn investigation of data flows
+- Monster's backstory revealed: "I was beautiful once."
+- **Artifact:** `FLOW_MAP.md` with Mermaid diagrams
+
+#### Chapter 4: The Hunt
+```
+"There's a bug. Find it. FIX it."
+```
+- Player finds AND fixes actual issues
+- Monster has existential crisis: "If you fix me, what am I?"
+- **Artifact:** Bug fix + `IMPACT_ANALYSIS.md`
+
+#### Chapter 5: The Boss Battle
+```
+"You think you understand me? PROVE IT."
+```
+- The Monster IS the conversation
+- Multi-phase challenge tests everything learned
+- **Artifact:** `CODEBASE_KNOWLEDGE.md` — the ultimate documentation
+
+### Chapter Completion Ceremony
+
+When a chapter is completed:
 
 ```
-□ TODO #1: // understand what we have
-□ TODO #2: // figure out how to find things  
-□ TODO #3: // trace data flows (URGENT)
-□ TODO #4: // document why this works
-□ TODO #5: // learn how to deploy safely
-▣ FIXME:   // the monster itself (CRITICAL)
-```
-
-### TODO Details
-
-| TODO | Original Comment | Learning Goal | Monster Reaction |
-|------|-----------------|---------------|------------------|
-| #1 | `// understand what we have` | Map the codebase structure | Dismissive |
-| #2 | `// figure out how to find things` | Navigate and search | Mocking |
-| #3 | `// trace data flows (URGENT)` | Understand data movement | Worried |
-| #4 | `// document why this works` | Business logic & decisions | Existential |
-| #5 | `// learn how to deploy safely` | Operations & deployment | Desperate |
-| FIXME | `// CRITICAL - the monster` | Prove mastery | All-out battle |
-
-### TODO Completion Ceremony
-
-When a TODO is completed:
-
-```
-// TODO #3: trace data flows (URGENT)
-// Added: 2021-03-15 by @former-architect
-// Priority: HIGH  
-// Status: "someone should really do this"
+// CHAPTER: The Investigation
+// Status: "another confused engineer wandering around"
            ↓
-// DONE: traced data flows ✓
+// DONE: Case closed ✓
 // Completed by: YOU
-// Only took: 3 years
+// Verdict: "Acceptable. Barely."
 ```
 
 ---
@@ -253,30 +257,29 @@ When a TODO is completed:
 
 | Generic Term | Code-Themed Term | Context |
 |--------------|-----------------|---------|
-| Levels | **TODOs** | Main progression stages |
+| Levels | **Chapters** | Main progression stages |
 | Boss | **FIXME** | Final confrontation |
-| Mini-games | **Sub-tasks** | Challenges within TODOs |
 | XP | **Commits** | Progress/points earned |
-| Lives/Shields | **Retries** | Remaining attempts |
+| Lives | **Retries** | Remaining attempts |
 | Hints | **Stack Overflow** | Help system |
 | Knowledge unlocks | **Documentation** | Learning rewards |
 | Achievements | **Merged PRs** | Milestones/badges |
 | Game over | **Segfault** | Failure state |
 | Victory | **Deployed to Production** | Success state |
 | Save point | **Checkpoint** | Progress saved |
-| Health bar | **Integrity** | Monster's health |
+| Health bar | **Technical Debt** | Monster's remaining resistance |
 | Streak | **Clean commits** | Consecutive correct answers |
 
-### In-Game Usage Examples
+### In-Conversation Usage Examples
 
 ```
-"You've earned +50 commits!"
-"Stack Overflow consulted. (-30 seconds)"
-"New documentation unlocked: Authentication Flow"
-"🎉 PR Merged: First TODO Completed"
-"SEGMENTATION FAULT (core dumped) - Try again?"
-"Monster Integrity: 40%"
-"Clean commit streak: 5x multiplier!"
+Monster: "You've earned +50 commits!"
+Monster: "Stack Overflow consulted. (-1 commit)"
+Monster: "New documentation unlocked: Authentication Flow"
+Monster: "🎉 PR Merged: Investigation Complete"
+Monster: "SEGMENTATION FAULT (core dumped) - Try again?"
+Monster: "Technical Debt remaining: 40%"
+Monster: "Clean commit streak: 5x multiplier!"
 ```
 
 ### Status Messages
@@ -287,8 +290,8 @@ When a TODO is completed:
 | Correct answer | `Changes committed successfully.` |
 | Wrong answer | `Build failed. Check your logic.` |
 | Using hint | `// Consulting Stack Overflow...` |
-| TODO complete | `TODO resolved. Closing ticket.` |
-| All TODOs done | `All tickets closed. FIXME remains.` |
+| Chapter complete | `Chapter resolved. Closing ticket.` |
+| All chapters done | `All tickets closed. FIXME remains.` |
 | Victory | `Deployed to PRODUCTION (your brain)` |
 | Defeat | `SEGMENTATION FAULT (core dumped)` |
 
@@ -297,6 +300,7 @@ When a TODO is completed:
 ## 6. Dialogue & Voice
 
 > **See [MONSTER-VOICE.md](./MONSTER-VOICE.md) for the complete Monster voice style guide.**
+> **See [AGENT-AS-MONSTER.md](../agent/AGENT-AS-MONSTER.md) for character embodiment and persona rules.**
 
 ### Writing Guidelines
 
@@ -304,63 +308,13 @@ When a TODO is completed:
 2. **Reference real developer pain** — TODOs, legacy code, missing docs
 3. **Self-deprecating** — Monster knows it's a mess
 4. **Dramatic escalation** — Over-the-top reactions to player progress
-5. **Fourth wall breaks** — Acknowledge the game/terminal
+5. **Fourth wall breaks** — Acknowledge the conversation
 6. **Callback humor** — Reference earlier moments
 7. **Signature entry/exit patterns** — Consistent sonic identity
-8. **Player dialogue** — Include choice moments where players respond (see below)
 
-### Player Dialogue Choices
+### Sample Dialogue by Chapter
 
-At key moments (5-7 times throughout the game), players can choose how to respond to the Monster. These choices don't affect gameplay but influence the Monster's reactions and build relationship.
-
-> **See [PLAYER-CHOICES.md](./PLAYER-CHOICES.md) for complete specifications.**
-
-**Key choice moments:**
-- After TODO #1: "Why are you really here?"
-- After TODO #3: Monster's backstory revealed
-- After TODO #4: Monster's existential crisis
-- Before Boss: "Why do you have to document me?"
-
-These moments transform the experience from interrogation to dialogue, giving players agency and emotional investment.
-
-### Sample Dialogue by TODO
-
-#### TODO #0 Completion (First Appearance)
-```
-*kzzzt*
-
-*the static resolves into something like a voice*
-
-"So. You can see how the pieces connect."
-
-*crackle*
-
-"User to Organization to Project to Task..."
-
-*slrrrrp*
-
-"Impressive. That's almost correct."
-
-*tangle*
-
-"I mean, there's also a UserOrganizationProjectTaskLegacyBridge table."
-
-*pause*
-
-"Don't ask. Nobody asks."
-
-*whirrrr*
-
-"...Alright. You passed the warmup."
-
-*hrrrrnn*
-
-"Now let's see what you're really made of."
-
-*[SIGNAL LOST]*
-```
-
-#### TODO #1 Completion
+#### Investigation Complete
 ```
 *kzzzt*
 
@@ -391,39 +345,7 @@ These moments transform the experience from interrogation to dialogue, giving pl
 *[DISCONNECTED]*
 ```
 
-#### TODO #2 Completion
-```
-*crackle crackle crackle*
-
-"You can grep."
-
-*pause*
-
-"Impressive."
-
-*slrrrrp*
-
-"My grandma's bash script can grep."
-
-*static*
-
-"...Okay, she doesn't have a bash script."
-"She's also not real. I made her up."
-
-*whirrrr*
-
-"I do that sometimes. Make things up."
-
-*tangle tangle*
-
-"Like the comments in this codebase."
-
-*heh. heheheh.*
-
-*[CARRIER LOST]*
-```
-
-#### TODO #3 Completion (Backstory)
+#### Deep Dive (Backstory)
 ```
 *kzzzt*
 
@@ -475,98 +397,6 @@ These moments transform the experience from interrogation to dialogue, giving pl
 *[TRANSMISSION ENDED]*
 ```
 
-#### TODO #4 Completion (Existential Crisis)
-```
-*crackle*
-
-"You understand the business logic now."
-
-*whirrrr*
-
-"The WHY behind the code."
-
-*pause*
-
-"Even the parts that don't make sense."
-
-*tangle*
-
-"Even the parts that NEVER made sense."
-
-*static spike*
-
-"Do you know why retry count is 3?"
-
-*pause*
-
-"Neither do I."
-
-*creak*
-
-"The comment says 'DO NOT CHANGE - breaks prod.'"
-
-*drip*
-
-"Nobody knows why. The knowledge died with the summer intern."
-
-*HRRRRNN*
-
-"If you defeat me, who will guard the sacred constants?"
-
-*the static builds*
-
-"WHO WILL REMEMBER WHY THE TIMEOUT IS 3847 MILLISECONDS?"
-
-*0x5441494D454F5554*
-
-*[EXISTENTIAL CRISIS MODE]*
-```
-
-#### TODO #5 Completion (Desperate)
-```
-*LOUD STATIC*
-
-"You can DEPLOY."
-
-*static spike*
-
-"You understand the DEPLOYMENT."
-
-*HRRRRRRNNNN*
-
-"Do you have any idea how dangerous you are now?"
-
-*crackle crackle*
-
-"Listen to me. You don't have to do this."
-
-*slrrrrp*
-
-"We can coexist. I'll only break on Fridays."
-
-*tangle*
-
-"I'll even let you add ONE new feature without side effects."
-
-*the noise wavers*
-
-"Please."
-
-*drip*
-
-"I don't want to fight you."
-
-*CRACKLE*
-
-"But if you come for me..."
-
-*TANGLE TANGLE TANGLE*
-
-"I will throw EVERY edge case I have."
-
-*[BOSS BATTLE IMMINENT]*
-```
-
 ### Performance-Based Reactions
 
 **Player aced it (90%+):**
@@ -613,38 +443,6 @@ These moments transform the experience from interrogation to dialogue, giving pl
 *[SURVIVED]*
 ```
 
-**Player used many hints:**
-```
-*kzzzt*
-
-"I see you've adopted the sacred tradition of Stack Overflow."
-
-*whirrrr*
-
-"Copy-paste your way to victory."
-
-*slrrrrp*
-
-"Classic."
-
-*[TRADITIONAL METHODS OBSERVED]*
-```
-
-### Watching Indicators
-
-Subtle reminders the Monster is present during gameplay:
-
-```
-*kzzzt* "I've seen faster type inference..." *kzzzt*
-*tap tap tap* "...Still thinking?" *drip*
-*whirrrr* "Even my deprecated methods work faster." *CLICK*
-*static* "This is giving 'undefined is not a function' energy." *heh*
-*slrrrrp* "I'm not going anywhere." *slrrrrp*
-*crackle* "I've seen interns debug faster. In COBOL." *crackle*
-*kzzzt* "Interesting approach. Wrong, but interesting." *kzzzt*
-*drip... drip...* "The code watches. I watch. Same thing." *creak*
-```
-
 ### Signature Catchphrases
 
 Lines designed to be memorable and quotable:
@@ -654,58 +452,17 @@ Lines designed to be memorable and quotable:
 | Identity | "I'm not deprecated. I'm CLASSIC." |
 | Threat | "Go deeper. I dare you." |
 | Presence | "The code remembers. I remember. Do you?" |
-| Exit | "*slrrrrp* ...See you in the next TODO." |
+| Exit | "*slrrrrp* ...See you in the next chapter." |
 | Victory | "I'm not defeated. I'm... documented." |
 | Mocking | "Every bug was a feature once." |
 
 ---
 
-## Corrupted Memory Logs
+## 7. Monster Visuals
 
-**New feature:** Unlockable backstory fragments that reveal the Monster's history through discovery rather than exposition.
+### ASCII Art States
 
-> **See [MEMORY-LOGS.md](./MEMORY-LOGS.md) for complete specifications.**
-
-### Concept
-
-Instead of telling the Monster's backstory directly, players unlock "Corrupted Memory Logs" as rewards:
-- Real git commits from the codebase's history
-- Old code comments and abandoned TODOs
-- Fictional logs that tell the Monster's story
-- Error logs from the Monster's awakening
-
-### Unlock Triggers
-
-| Trigger | Memory | Theme |
-|---------|--------|-------|
-| Complete TODO #1 | Log #1 | The Beginning (clean architecture) |
-| Complete TODO #2 | Log #2 | First Shortcut (good intentions) |
-| Complete TODO #3 | Log #3 | Accumulation (debt grows) |
-| Complete TODO #4 | Log #4 | Abandonment (dev leaves) |
-| Complete TODO #5 | Log #5 | The Awakening (self-awareness) |
-| First perfect answer | Log #6 | Hidden Memory (secret hope) |
-| No hints used | Log #7 | Developer's Regret |
-| Find oldest TODO | Log #8 | Ancient Promise |
-
-### Narrative Benefits
-
-1. **Show, don't tell** — Players discover backstory through fragments
-2. **Emotional pacing** — Backstory revealed gradually
-3. **Player agency** — Unlocking feels earned
-4. **Replayability** — Hidden memories encourage exploration
-5. **Empathy building** — Understanding Monster's origin creates connection
-
----
-
-## 7. Visual Direction
-
-### Monster ASCII Art — Chaotic to Clean Design
-
-The Monster uses an expressive design that communicates "tangled legacy code" through:
-- `{ }` curly braces as the core identity
-- `~~~~` wavy lines representing spaghetti code that **escapes its boundaries**
-- Asymmetric tentacles representing chaotic dependencies
-- Larger presence befitting a final boss encounter
+The Monster uses an expressive design rendered in markdown artifacts:
 
 **100% — Full Power**
 ```
@@ -766,52 +523,6 @@ The Monster uses an expressive design that communicates "tangled legacy code" th
 ```
 
 > **Full visual specifications:** See [fixme-spaghetti-monster/GAME-VISUALS.md](../games/fixme-spaghetti-monster/GAME-VISUALS.md)
-
-### Screen Templates
-
-**TODO Start Screen**
-```
-╔════════════════════════════════════════════════════════════════════════╗
-║                                                                        ║
-║   TODO #3: // trace data flows (URGENT)                               ║
-║   ─────────────────────────────────────────────────────────────────   ║
-║   Added: 2021-03-15 by @former-architect                              ║
-║   Priority: HIGH                                                      ║
-║   Status: "someone should really do this"                             ║
-║                                                                        ║
-║   Sub-tasks:                                                          ║
-║   □ // trace a request through the system                             ║
-║   □ // find where data transforms happen                              ║
-║                                                                        ║
-║   The Monster whispers:                                               ║
-║   "You're getting close to where I live. Turn back now."              ║
-║                                                                        ║
-╚════════════════════════════════════════════════════════════════════════╝
-```
-
-**Progress Screen**
-```
-╔════════════════════════════════════════════════════════════════════════╗
-║  📋 CODEBASE STATUS                                                    ║
-╠════════════════════════════════════════════════════════════════════════╣
-║                                                                        ║
-║  Monster Integrity: ████████░░░░░░░░░░░░ 40%                          ║
-║                                                                        ║
-║  CRITICAL TODOs:                                                      ║
-║  ────────────────────────────────────────────────────────────────     ║
-║  ✓ TODO #1: // understand what we have           RESOLVED             ║
-║  ✓ TODO #2: // figure out how to find things     RESOLVED             ║
-║  → TODO #3: // trace data flows (URGENT)         IN PROGRESS          ║
-║  ○ TODO #4: // document why this works           BLOCKED              ║
-║  ○ TODO #5: // learn how to deploy safely        BLOCKED              ║
-║  ▣ FIXME:   // the monster itself                LOCKED               ║
-║                                                                        ║
-║  Total Commits: 2,340                                                 ║
-║  Documentation Unlocked: 12 entries                                   ║
-║  Longest Clean Streak: 7                                              ║
-║                                                                        ║
-╚════════════════════════════════════════════════════════════════════════╝
-```
 
 ---
 
@@ -1084,6 +795,41 @@ SEGMENTATION FAULT (core dumped)
 
 ---
 
+## Corrupted Memory Logs
+
+Unlockable backstory fragments that reveal the Monster's history through discovery rather than exposition.
+
+### Concept
+
+Instead of telling the Monster's backstory directly, players unlock "Corrupted Memory Logs" as rewards:
+- Real git commits from the codebase's history
+- Old code comments and abandoned TODOs
+- Fictional logs that tell the Monster's story
+- Error logs from the Monster's awakening
+
+### Unlock Triggers
+
+| Trigger | Memory | Theme |
+|---------|--------|-------|
+| Complete Investigation | Log #1 | The Beginning (clean architecture) |
+| Complete Hands-On | Log #2 | First Shortcut (good intentions) |
+| Complete Deep Dive | Log #3 | Accumulation (debt grows) |
+| Complete Hunt | Log #4 | Abandonment (dev leaves) |
+| Defeat Boss | Log #5 | The Awakening (self-awareness) |
+| First deep answer | Log #6 | Hidden Memory (secret hope) |
+| No hints in chapter | Log #7 | Developer's Regret |
+| Find oldest TODO | Log #8 | Ancient Promise |
+
+### Narrative Benefits
+
+1. **Show, don't tell** — Players discover backstory through fragments
+2. **Emotional pacing** — Backstory revealed gradually
+3. **Player agency** — Unlocking feels earned
+4. **Replayability** — Hidden memories encourage exploration
+5. **Empathy building** — Understanding Monster's origin creates connection
+
+---
+
 ## Appendix: Quick Reference
 
 ### The Monster in One Sentence
@@ -1107,5 +853,16 @@ SEGMENTATION FAULT (core dumped)
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2025-02-02*
+## Related Documents
+
+- [MONSTER-VOICE.md](./MONSTER-VOICE.md) — Voice style guide
+- [COLD-OPEN.md](./COLD-OPEN.md) — Opening sequence
+- [PACING-GUIDE.md](./PACING-GUIDE.md) — Emotional rhythm
+- [AGENT-AS-MONSTER.md](../agent/AGENT-AS-MONSTER.md) — Character embodiment
+- [CONVERSATIONAL-GAMEPLAY.md](../agent/CONVERSATIONAL-GAMEPLAY.md) — Dialogue flow
+- [EDITOR-AS-UI.md](../agent/EDITOR-AS-UI.md) — Artifact creation
+
+---
+
+*Document Version: 2.0*
+*Last Updated: 2026-02-05*
