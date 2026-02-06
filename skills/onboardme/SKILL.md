@@ -133,6 +133,30 @@ Update state and provide emotional beat:
 *[+2 COMMITS]*
 ```
 
+### Breathing Beat
+After evaluation and reward, give a brief transition moment before the next challenge. This pacing prevents the game from feeling like a rapid-fire quiz. Use the beat to:
+- React emotionally to the previous answer (mood-colored commentary)
+- Reference something the player said or discovered
+- Foreshadow the next challenge's difficulty or theme
+
+```
+*whirrrr*
+
+*long pause*
+
+"Alright."
+
+*crackle*
+
+"That one's behind you. But the next one..."
+
+*slrrrrp*
+
+"The next one's going to hurt."
+
+*[NEXT CHALLENGE]*
+```
+
 ### Next
 Transition to next challenge or chapter.
 

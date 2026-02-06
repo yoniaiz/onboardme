@@ -203,7 +203,7 @@ function updateMonsterMood(performance) {
 
   const recentHistory = state.progress.questionHistory.slice(-5);
   const correctStreak = recentHistory.filter(
-    (q) => q.tier === "correct" || q.tier === "deep"
+    (q) => q.tier === "correct" || q.tier === "deep",
   ).length;
 
   if (correctStreak >= 5 && state.monster.currentMood === "annoyed") {
@@ -257,9 +257,7 @@ function main() {
       try {
         const updates = JSON.parse(args[0]);
         const result = updateState(updates);
-        console.log(
-          `ok | commits: ${result.player.totalCommits} | mood: ${result.monster.currentMood} | chapter: ${result.progress.currentChapter}`
-        );
+        console.log(JSON.stringify(result, null, 2));
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -274,7 +272,7 @@ function main() {
       try {
         const repoInfo = JSON.parse(args[0]);
         const result = initializeState(repoInfo);
-        console.log(`ok | initialized ${result.repo.name}`);
+        console.log(JSON.stringify(result, null, 2));
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -297,9 +295,7 @@ function main() {
       try {
         const questionResult = JSON.parse(args[0]);
         const result = addQuestionResult(questionResult);
-        console.log(
-          `+${questionResult.commits || 0} | total: ${result.player.totalCommits} | lives: ${result.player.currentLives}`
-        );
+        console.log(JSON.stringify(result, null, 2));
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -309,14 +305,12 @@ function main() {
     case "update-mood":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js update-mood <incorrect|partial|correct|deep>"
+          "Usage: state-manager.js update-mood <incorrect|partial|correct|deep>",
         );
         process.exit(1);
       }
-      const moodResult = updateMonsterMood(args[0]);
-      console.log(
-        `ok | mood: ${moodResult.monster.currentMood} | respect: ${moodResult.monster.respectLevel}`
-      );
+      const result = updateMonsterMood(args[0]);
+      console.log(JSON.stringify(result, null, 2));
       break;
 
     case "help":

@@ -118,6 +118,18 @@ _Date opened: [Current Timestamp]_
 
 *whirrrr*
 
+"Here's how this works. You give me answers — I give you commits."
+
+*pause*
+
+"Vague answers? 1 commit. Maybe. Correct answers? 2 commits. But if you actually UNDERSTAND the system — deep insight — that's 3 commits."
+
+*crackle*
+
+"Get it wrong? Zero commits and you lose a life. You've got 5."
+
+*heh*
+
 "I'll be watching."
 
 *[INVESTIGATION BEGINS]*

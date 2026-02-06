@@ -60,6 +60,40 @@ bun run check:fix    # Auto-fix lint/format issues
 
 ---
 
+## Skill Development
+
+The OnboardMe game runs as an **agent skill** — markdown files that instruct coding agents (Cursor, Claude Code) to embody the Spaghetti Code Monster.
+
+### Source of Truth
+
+**`skills/onboardme/`** is the authoritative source for all skill files:
+
+```
+skills/onboardme/
+├── SKILL.md              # Monster persona, commands, gameplay loop
+├── instructions/         # Command implementations (play-game, prepare-game, etc.)
+├── references/           # Chapter content (THE-INVESTIGATION, THE-HANDS-ON, etc.)
+└── scripts/              # State and knowledge manager utilities
+```
+
+### Syncing to Runtime
+
+The agent reads skills from `.cursor/skills/onboardme/`. To deploy changes:
+
+```bash
+bash scripts/install-skill.sh
+```
+
+This copies `skills/onboardme/` -> `.cursor/skills/onboardme/`, replacing the previous installation.
+
+### Rules
+
+- **Always edit in `skills/onboardme/`** — never edit `.cursor/skills/onboardme/` directly
+- **Run `bash scripts/install-skill.sh` after any skill file changes** — otherwise the agent uses stale files
+- `.cursor/skills/onboardme/` is a deployment target, not a source — it is overwritten on each sync
+
+---
+
 ## Code Standards
 
 ### Design Principles
@@ -272,17 +306,29 @@ Only run checks for affected areas — if you changed code that could affect tes
 
 ```
 onboardme/
+├── skills/onboardme/     # Skill source of truth
+│   ├── SKILL.md          # Monster persona & commands
+│   ├── instructions/     # Command implementations
+│   ├── references/       # Chapter content
+│   └── scripts/          # State/knowledge managers
+├── scripts/
+│   └── install-skill.sh  # Syncs skills/ -> .cursor/skills/
 ├── src/
-│   └── index.ts          # Entry point
+│   └── index.ts          # Entry point (legacy CLI)
 ├── tests/
 │   ├── integration/      # Flow tests
-│   └── unit/             # Module tests
+│   ├── unit/             # Module tests
+│   └── e2e/              # End-to-end Ink UI tests
 ├── context/              # Design documentation
 │   ├── ARCHITECTURE.md
+│   ├── chapters/         # Chapter design docs
+│   ├── agent/            # Agent architecture docs
 │   ├── games/
 │   ├── narrative/
 │   ├── technical/
 │   └── visuals/
+├── feedback/             # Playtest feedback
+├── .onboardme/           # Game runtime state (gitignored)
 ├── PRD.md                # Product requirements
 ├── PROGRESS.md           # Task tracking & milestones
 ├── AGENTS.md             # This file
@@ -294,5 +340,5 @@ onboardme/
 
 ---
 
-*Document Version: 0.3*
-*Last Updated: 2026-02-04*
+*Document Version: 0.4*
+*Last Updated: 2026-02-06*

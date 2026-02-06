@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 1 Complete  
-> **Current Focus**: Ready for Milestone 2 — Chapter 2 and additional features
+> **Status**: Milestone 2 In Progress  
+> **Current Focus**: Milestone 2 — Polishing Chapter 1 based on playtest feedback
 
 ---
 
@@ -188,11 +188,11 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 
 **Success Criteria**:
 - [x] Context gathering system (repo-knowledge.json)
-- [ ] Full investigation flow with 5 evidence categories
-- [ ] CASE_FILE.md artifact generation
-- [ ] Tiered rubric evaluation working
-- [ ] Monster reactions based on answer quality
-- [ ] Chapter completion triggers progression
+- [x] Full investigation flow with 4 phases (Identity, Tech Stack, Documentation, Synthesis)
+- [x] CASE_FILE.md artifact generation
+- [x] Tiered rubric evaluation working (incorrect/partial/correct/deep)
+- [x] Monster reactions based on answer quality (mood shifts, respect tracking)
+- [x] Chapter completion triggers progression (investigation -> hands-on)
 
 ---
 
@@ -220,21 +220,22 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 ---
 
 #### 2.1 Evidence Examination Flow
-`pending`
+`completed`
 
-**Goal**: Implement the 5-category evidence examination from THE-INVESTIGATION.md.
+**Goal**: Implement the 4-phase investigation flow in THE-INVESTIGATION.md.
 
-**Categories**:
-1. Project Identity (README, package.json)
-2. Architecture (folder structure, entry points)
-3. Dependencies (tech stack, frameworks)
-4. Build & Scripts (npm scripts, config files)
-5. Code Patterns (naming conventions, structure)
+**Phases** (refined from original 5 categories):
+1. Project Identity (~5 min) — Language, project type, framework
+2. Tech Stack Discovery (~7 min) — Database, testing, build tools, services
+3. Documentation Hunt (~5 min) — Run commands, env vars, prerequisites
+4. Final Deduction (~3 min) — Synthesis of how components connect
+
+**Completed**: Proven in playtest (2026-02-06). Full 4-phase flow working end-to-end with Monster dialogue, evidence logging, and progressive difficulty.
 
 ---
 
 #### 2.2 CASE_FILE.md Artifact
-`pending`
+`completed`
 
 **Goal**: Create the CASE_FILE.md artifact that builds during investigation.
 
@@ -244,39 +245,55 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 - Monster's Notes (commentary)
 - Final Assessment (chapter score)
 
+**Completed**: Generated during playtest. Artifact created at `.onboardme/artifacts/CASE_FILE.md` with evidence log, findings, case summary, and Monster notes.
+
 ---
 
 #### 2.3 Rubric Evaluation
-`pending`
+`completed`
 
 **Goal**: Implement tiered answer evaluation per SKILL-CONTRACT.md.
 
 **Tiers**:
-- Incorrect: Fundamentally wrong understanding
-- Partial: Right direction, missing details
-- Correct: Accurate and complete
-- Deep: Shows insight beyond the question
+- Incorrect: 0 commits, -1 life
+- Partial: 1 commit
+- Correct: 2 commits
+- Deep: 3 commits, +15 respect
+
+**Completed**: All 4 tiers working in playtest. Commit awards, life deductions, and respect adjustments applied correctly via state-manager.cjs.
 
 ---
 
 #### 2.4 Monster Reactions
-`pending`
+`completed`
 
 **Goal**: Dynamic Monster responses based on answer quality.
 
 **Reactions mapped to**:
 - Answer tier (dismissive → impressed)
-- Cumulative performance (mood tracking)
-- Time taken (impatience vs respect)
+- Cumulative performance (mood tracking via update-mood)
+- Respect level adjustments (+15 for deep answers)
+
+**Completed**: Mood shifts visible in playtest (dismissive -> annoyed). Respect level tracking working. Emotional beats with commit announcements confirmed.
 
 ---
 
 #### 2.5 Playtest & Iterate
-`pending`
+`completed`
 
 **Goal**: Playtest Chapter 1 and iterate based on experience.
 
-**Before proceeding to Milestone 3**, must playtest with real user.
+**Playtest completed** (2026-02-06): Full Chapter 1 run with detailed feedback in `feedback/onboardme/2026-02-06T12-30-00Z.json` (overall score: 1.81/3).
+
+**All feedback addressed:**
+- [x] Monster conflating player with code author → Fixed with third-person language instructions
+- [x] Mood progression mostly internal → Added mood-surfacing instructions and example lines
+- [x] Scoring tiers never explained to player → Added to THE-INVESTIGATION.md opening dialogue
+- [x] Pacing between challenges → Added breathing-beat guidance to SKILL.md gameplay loop
+
+**Bonus work completed (ahead of schedule):**
+- Chapter 2 reference: `references/THE-HANDS-ON.md` — Full 3-phase flow
+- Chapter 5 reference: `references/THE-BOSS-BATTLE.md` — Full 4-phase flow
 
 ---
 
@@ -426,4 +443,4 @@ This code may be archived or adapted for the state-manager.ts utilities.
 
 ---
 
-*Last Updated: 2026-02-05 (Agent-Skills Pivot Complete — PRD & Architecture Rewritten)*
+*Last Updated: 2026-02-06 (Milestone 2 — Tasks 2.1-2.4 completed, playtest feedback iteration in progress)*
