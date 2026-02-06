@@ -57,6 +57,44 @@ The player learns to identify project type, tech stack, and architecture by exam
 
 ---
 
+## CRITICAL: State Commands
+
+**You MUST run these bash commands. State does NOT update automatically.**
+
+**After EACH answer evaluation:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"investigation","commits":<0|1|2|3>}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+```
+
+**After correct/deep answers — save the discovery:**
+
+```bash
+node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"investigation","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<file or source>"}'
+```
+
+**After notable moments (1-3 per chapter):**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+```
+
+**At chapter completion:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation"],"currentChapter":"hands-on"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of investigation results>"}}'
+```
+
+---
+
 ## Scoring Rubric
 
 | Tier | Criteria | Example | Commits | Effect |
@@ -451,9 +489,18 @@ _[GRUDGING APPROVAL GRANTED / BARELY ACCEPTABLE / etc.]_
 ```
 
 2. Update state:
-   - Add `"investigation"` to `progress.chaptersCompleted`
-   - Set `progress.currentChapter` to `"hands-on"`
-   - Update `session.conversationSummary`
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation"],"currentChapter":"hands-on"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Investigation complete — player identified project type, tech stack, and architecture."}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Investigation complete — case file sealed'
+```
 
 3. Transition to next chapter:
 

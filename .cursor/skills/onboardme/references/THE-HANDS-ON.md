@@ -113,6 +113,44 @@ The player gets the project running locally and interacts with it. They've inves
 
 ---
 
+## CRITICAL: State Commands
+
+**You MUST run these bash commands. State does NOT update automatically.**
+
+**After EACH answer evaluation:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hands-on","commits":<0|1|2|3>}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+```
+
+**After correct/deep answers — save the discovery:**
+
+```bash
+node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"hands-on","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<command or output>"}'
+```
+
+**After notable moments (1-3 per chapter):**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+```
+
+**At chapter completion:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on"],"currentChapter":"deep-dive"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of hands-on results>"}}'
+```
+
+---
+
 ## Scoring Rubric
 
 | Tier | Criteria | Example | Commits |
@@ -492,8 +530,18 @@ Simply acknowledge they got it running and transition:
 ```
 
 Update state:
-- Add `"hands-on"` to `progress.chaptersCompleted`
-- Set `progress.currentChapter` to `"deep-dive"`
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on"],"currentChapter":"deep-dive"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Hands-on complete — player got the project running and explored its behavior."}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Hands-on complete — project running successfully'
+```
 
 ---
 

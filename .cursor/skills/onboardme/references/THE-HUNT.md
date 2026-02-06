@@ -224,6 +224,48 @@ Create a minimal test file that exercises the broken code and fails. The player 
 
 ---
 
+## CRITICAL: State Commands
+
+**You MUST run these bash commands. State does NOT update automatically.**
+
+**After EACH answer evaluation:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hunt","commits":<0|1|2|3>}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+```
+
+**After correct/deep answers — save the discovery:**
+
+```bash
+node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"hunt","fact":"<what they found or fixed>","tier":"<correct|deep>","evidence":"<file path or git diff>"}'
+```
+
+**After notable moments (1-3 per chapter):**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+```
+
+**At chapter completion:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt"],"currentChapter":"boss"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"desperate"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of hunt results — bug found, fixed, feature planned>"}}'
+```
+
+---
+
 ## Scoring Rubric
 
 | Tier | Criteria | Example | Commits | Effect |
@@ -772,9 +814,22 @@ _— The Spaghetti Code Monster_
 ```
 
 2. Update state:
-   - Add `"hunt"` to `progress.chaptersCompleted`
-   - Set `progress.currentChapter` to `"boss"`
-   - Set `monster.currentMood` to `desperate`
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt"],"currentChapter":"boss"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"desperate"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Hunt complete — player diagnosed and fixed sabotage, planned feature locations, assessed impact."}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Hunt complete — bug squashed, Monster desperate'
+```
 
 3. Transition to final chapter:
 

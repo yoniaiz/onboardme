@@ -156,6 +156,48 @@ The player traces how code actually flows through the system: from user action t
 
 ---
 
+## CRITICAL: State Commands
+
+**You MUST run these bash commands. State does NOT update automatically.**
+
+**After EACH answer evaluation:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"deep-dive","commits":<0|1|2|3>}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+```
+
+**After correct/deep answers — save the discovery:**
+
+```bash
+node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"deep-dive","fact":"<what they traced or discovered>","tier":"<correct|deep>","evidence":"<file path or code reference>"}'
+```
+
+**After notable moments (1-3 per chapter):**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+```
+
+**At chapter completion:**
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive"],"currentChapter":"hunt"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"worried"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of deep dive results>"}}'
+```
+
+---
+
 ## Scoring Rubric
 
 | Tier | Criteria | Example | Commits | Effect |
@@ -805,9 +847,22 @@ _[RELUCTANT APPROVAL GRANTED]_
 ```
 
 2. Update state:
-   - Add `"deep-dive"` to `progress.chaptersCompleted`
-   - Set `progress.currentChapter` to `"hunt"`
-   - Update `monster.currentMood` to `worried` (if not already)
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive"],"currentChapter":"hunt"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"worried"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Deep dive complete — player traced flows, mapped entities, and extracted test insights."}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Deep dive complete — FLOW_MAP.md finalized'
+```
 
 3. Transition to next chapter:
 
