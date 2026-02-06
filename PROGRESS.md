@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 2 In Progress  
-> **Current Focus**: Milestone 2 — Polishing Chapter 1 based on playtest feedback
+> **Status**: Milestone 3 In Progress  
+> **Current Focus**: Milestone 3 — Act 2: Chapters 3 (Deep Dive) + 4 (The Hunt)
 
 ---
 
@@ -297,45 +297,89 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 
 ---
 
-## Milestone 3: One "Real Action" Game
+## Milestone 3: Act 2 — Chapters 3 + 4
 
-**Goal**: Complete Chapter 4 (The Hunt) where players actually fix bugs.
+**Goal**: Complete Chapters 3 (The Deep Dive) and 4 (The Hunt) — the gameplay heart of OnboardMe where the player evolves from understanding code to changing it, and the Monster transitions from worried to desperate.
 
 **Success Criteria**:
-- [ ] Bug hunt with actual code changes
-- [ ] Agent validates fixes by running tests
-- [ ] IMPACT_ANALYSIS.md artifact generation
-- [ ] Monster's increasingly desperate reactions
+- [x] Chapter 3 reference: collaborative diagram building, FLOW_MAP.md artifact
+- [x] Chapter 4 reference: Monster-as-saboteur mechanic with git game branch
+- [x] Game branch setup in prepare-game (onboardme/game branch)
+- [x] State manager supports git branch tracking
+- [x] Safety rules sanction game branch mechanic
+- [ ] Playtest Chapters 3→4 sequentially on a real codebase
+- [ ] Monster emotional arc: annoyed → worried → desperate
 
 ---
 
 ### Tasks
 
-#### 3.1 Bug Hunt Flow
-`pending`
+#### 3.1 State Manager Updates
+`completed`
 
-Implement bug discovery and fixing flow from THE-HUNT.md.
-
----
-
-#### 3.2 Fix Validation
-`pending`
-
-Agent runs tests to validate player's fixes.
+Added `git` section to state schema: `gameBranch`, `originalBranch`, `branchCreated` — enables tracking the game branch for Ch4 sabotage and post-game cleanup.
 
 ---
 
-#### 3.3 Impact Analysis Artifact
-`pending`
+#### 3.2 Safety Rules Update
+`completed`
 
-Generate IMPACT_ANALYSIS.md showing what was fixed and why.
+Added Section 6 (Game Branch) to SAFETY-RULES.md — explicitly sanctions the `onboardme/game` branch as a game mechanic, defines what branch operations are safe within the game, and what remains forbidden.
 
 ---
 
-#### 3.4 Playtest & Iterate
+#### 3.3 Prepare Game Branch
+`completed`
+
+Updated prepare-game.md with Step 5: creates `onboardme/game` branch during preparation. Handles uncommitted changes (player chooses commit/stash/revert), records original branch in state, confirms branch creation to player.
+
+---
+
+#### 3.4 Chapter 3 Reference (The Deep Dive)
+`completed`
+
+Created `skills/onboardme/references/THE-DEEP-DIVE.md` — 3-phase collaborative flow:
+
+1. **Flow Trace** (~10 min): Trace user action from entry to data layer, build Mermaid diagrams
+2. **Entity Relations** (~8 min): Map how models/types connect, build ER diagram
+3. **Test Stories** (~7 min): Extract business rules from test assertions
+
+Key design: Monster is a reluctant collaborator (not just evaluator). Backstory leaks. Mood: annoyed → worried. FLOW_MAP.md artifact builds progressively.
+
+---
+
+#### 3.5 Chapter 4 Reference (The Hunt)
+`completed`
+
+Created `skills/onboardme/references/THE-HUNT.md` — Monster-as-saboteur mechanic:
+
+1. **The Sabotage** (~3 min): Agent picks target from Ch1-3 discoveries, introduces subtle bug, commits with misleading message
+2. **The Hunt** (~15 min): Player diagnoses from test failures, traces root cause, explains WHY, fixes the code, agent verifies
+3. **Feature Location** (~10 min): Player plans where new code would live (architectural understanding)
+4. **Impact Reflection** (~2 min): "If I removed [service], what would break?"
+
+Key design: Scoring rewards understanding, not just finding. Git-based debugging is valid. No-tests fallback included. Optional second sabotage for fast players.
+
+---
+
+#### 3.6 Chapter Design Update
+`completed`
+
+Updated `context/chapters/04-THE-HUNT.md` design doc to v2.0 — reflects Monster-as-saboteur mechanic, game branch workflow, sabotage design guidelines, and no-tests fallback strategy.
+
+---
+
+#### 3.7 Install and Verify
 `pending`
 
-Playtest Chapter 4 before proceeding.
+Run install-skill.sh to deploy skill changes. Verify play-game routing works for `deep-dive` and `hunt` chapters.
+
+---
+
+#### 3.8 Playtest & Iterate
+`pending`
+
+Playtest Chapters 3→4 sequentially on a real codebase with tests. Validate: sabotage believability, test failure signal quality, Monster emotional arc, transition quality.
 
 ---
 
@@ -352,19 +396,21 @@ Playtest Chapter 4 before proceeding.
 
 ---
 
-## Milestone 5: Remaining Chapters
+## Milestone 5: Full Game Integration
 
-**Goal**: Implement Chapters 2, 3, and 5.
+**Goal**: All 5 chapters playable end-to-end with full emotional arc.
 
-**Chapters**:
-- Chapter 2: The Hands-On (get project running)
-- Chapter 3: The Deep Dive (flow tracing)
-- Chapter 5: The Boss Battle (final confrontation)
+**Remaining**:
+- Playtest full Ch1→Ch2→Ch3→Ch4→Ch5 sequence
+- Verify chapter transitions and state continuity
+- CODEBASE_KNOWLEDGE.md generated on victory (Ch5)
+- Full emotional arc: dismissive → annoyed → worried → desperate → peaceful
 
 **Success Criteria**:
-- [ ] All 5 chapters playable
-- [ ] CODEBASE_KNOWLEDGE.md generated on victory
-- [ ] Full emotional arc from dismissive to peaceful
+- [ ] All 5 chapters playable sequentially
+- [ ] State persists across sessions
+- [ ] All artifacts generated (CASE_FILE, FLOW_MAP, IMPACT_ANALYSIS, CODEBASE_KNOWLEDGE)
+- [ ] Monster mood arc visible throughout
 
 ---
 
@@ -443,4 +489,4 @@ This code may be archived or adapted for the state-manager.ts utilities.
 
 ---
 
-*Last Updated: 2026-02-06 (Milestone 2 — Tasks 2.1-2.4 completed, playtest feedback iteration in progress)*
+*Last Updated: 2026-02-06 (Milestone 3 — Ch3 & Ch4 references created, game branch mechanic implemented)*

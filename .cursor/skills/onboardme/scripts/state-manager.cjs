@@ -47,6 +47,11 @@ function getDefaultState() {
       accuracyByTopic: {},
       playerStyle: "balanced",
     },
+    git: {
+      gameBranch: "",
+      originalBranch: "",
+      branchCreated: false,
+    },
     context: {
       prepared: false,
       preparedAt: "",

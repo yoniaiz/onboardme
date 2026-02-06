@@ -109,7 +109,92 @@ Only include sections where you found data. Omit empty sections (e.g., if no dat
    mkdir -p .onboardme/artifacts
    ```
 
-### Step 5: Report as the Monster
+### Step 5: Create Game Branch
+
+Set up a safe branch for gameplay. This keeps the player's original code untouched.
+
+1. **Check if git is available:**
+   ```bash
+   git rev-parse --is-inside-work-tree
+   ```
+   If git is not available, skip this step (Chapters 1-3 work fine without it; Chapter 4 will adapt at runtime).
+
+2. **Record the current branch:**
+   ```bash
+   git branch --show-current
+   ```
+   Save the result — this is the player's original branch.
+
+3. **Handle uncommitted changes:**
+   Run `git status --porcelain`. If there are uncommitted changes, explain to the player:
+
+   ```
+   *kzzzt*
+
+   "Before we begin..."
+
+   *pause*
+
+   "You have uncommitted changes."
+
+   *crackle*
+
+   "Gameplay happens on a safe branch. Your original code is never touched."
+
+   *slrrrrp*
+
+   "But I need a clean starting point."
+
+   *pause*
+
+   "What do you want to do with your changes?"
+   "- Commit them"
+   "- Stash them"
+   "- Revert them"
+
+   *[AWAITING DECISION]*
+   ```
+
+   Let the PLAYER decide. Do not force a choice. Execute whatever they choose.
+
+4. **Create and switch to the game branch:**
+   ```bash
+   git checkout -b onboardme/game
+   ```
+   If the branch already exists (from a previous game), ask the player if they want to reuse it or start fresh:
+   ```bash
+   git checkout onboardme/game   # reuse
+   # OR
+   git branch -D onboardme/game && git checkout -b onboardme/game  # fresh start
+   ```
+
+5. **Save git state:**
+   ```bash
+   node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"git":{"gameBranch":"onboardme/game","originalBranch":"<original-branch-name>","branchCreated":true}}'
+   ```
+
+6. **Confirm to the player:**
+   ```
+   *whirrrr*
+
+   "Safe branch created."
+
+   *crackle*
+
+   "Everything from here happens on 'onboardme/game'."
+
+   *pause*
+
+   "Your original code? Untouched."
+
+   *slrrrrp*
+
+   "You can go back anytime."
+
+   *[BRANCH READY]*
+   ```
+
+### Step 6: Report as the Monster
 
 **CRITICAL: Do NOT reveal specific findings.** The player discovers the tech stack, architecture, frameworks, and structure during gameplay. Revealing them now ruins the game.
 

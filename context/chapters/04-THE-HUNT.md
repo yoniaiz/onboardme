@@ -7,7 +7,58 @@ _Artifacts: Bug fix + `IMPACT_ANALYSIS.md`_
 
 ## Goal
 
-Find bugs by running tests, trace them to their source, understand the root cause, and actually FIX them. Learn feature planning by identifying where new code should live.
+The Monster sabotages the codebase on the game branch. The player must diagnose the sabotage using test failures, trace it to the root cause, explain WHY it breaks, and actually FIX it. Then the player demonstrates architectural understanding through feature planning and impact analysis.
+
+---
+
+## Core Mechanic: Monster-as-Saboteur
+
+Unlike Chapters 1-3 (investigation, execution, tracing), Chapter 4 is where the **Monster fights back**. The Monster deliberately introduces a subtle bug via a commit on the `onboardme/game` branch. The player must:
+
+1. Read the test failure output
+2. Form a hypothesis
+3. Trace the code to the root cause (using skills from Ch3)
+4. EXPLAIN to the Monster what's wrong (understanding, not just finding)
+5. Fix the code
+6. Verify the fix passes tests
+
+**Why sabotage over existing bugs:**
+
+- **Narrative:** The Monster is desperate. Sabotage is its last defense.
+- **Educational:** Mirrors real debugging — "someone introduced a regression."
+- **Mechanical:** Works on ANY codebase. Agent controls difficulty.
+
+**The game branch (`onboardme/game`) was created during prepare-game.** The player's original branch is never touched.
+
+---
+
+## Sabotage Design
+
+**Good sabotage types:**
+
+| Type | Example | Difficulty |
+|------|---------|------------|
+| Change comparison operator | `<=` to `<` | Medium |
+| Remove validation step | Delete a null check | Easy |
+| Swap similar function calls | `.find` to `.filter` | Medium |
+| Change a default value | Timeout from 5000 to 50 | Hard |
+| Remove an `await` | Race condition | Hard |
+| Modify config value | Change threshold/limit | Medium |
+
+**Bad sabotage (avoid):**
+
+- Deleting a function entirely (too obvious)
+- Syntax errors (caught by linter)
+- Changing variable names (caught by TypeScript)
+- Breaking 10 things at once (overwhelming)
+
+**Commit messages are misleading but plausible:**
+
+- "refactor: simplify validation logic"
+- "perf: optimize database query"
+- "cleanup: remove redundant check"
+
+**Can the player "cheat" with git?** Yes, and that's fine. `git log` and `git diff` are valid debugging techniques. Scoring rewards UNDERSTANDING, not just FINDING.
 
 ---
 
@@ -15,11 +66,11 @@ Find bugs by running tests, trace them to their source, understand the root caus
 
 | Resource | Access | Notes |
 |----------|--------|-------|
-| `src/**/*.ts`, `src/**/*.js` | read/write | Source code (can edit for fixes) |
+| `src/**/*.ts`, `src/**/*.js` | read/write | Source code (sabotage + fix) |
 | `tests/**/*` | read | Test files for failure info |
-| `npm test`, `jest`, `vitest` commands | run | Run tests |
-| `git diff`, `git status` | run | Verify changes |
-| `grep`, `rg` commands | run | Code search |
+| Test commands (`npm test`, `bun test`, etc.) | run | Run tests to verify sabotage and fix |
+| `git add`, `git commit` | run | Commit sabotage on game branch |
+| `git diff`, `git status` | run | Verify player's fix |
 
 ---
 
@@ -27,14 +78,15 @@ Find bugs by running tests, trace them to their source, understand the root caus
 
 **Reads:**
 - `player.name` — Personalized dialogue
-- `monster.currentMood` — Should be `worried`
-- `progress.questionHistory[]` — Prior knowledge
+- `monster.currentMood` — Should be `worried` → `desperate`
+- `progress.questionHistory[]` — Prior knowledge (informs sabotage target)
 - `behavior.playerStyle` — Adapt hunt difficulty
+- `git.gameBranch` — Confirm on game branch
 
 **Writes:**
-- `progress.questionHistory[]` — Add hunt results
+- `progress.questionHistory[]` — Add hunt results (sabotage details, fix quality)
 - `monster.respectLevel` — Major increase for clean fixes
-- `monster.currentMood` — May shift to `desperate`
+- `monster.currentMood` — Shift to `desperate`
 - `artifacts.impactAnalysis.path` — Created artifact
 
 ---
@@ -44,469 +96,80 @@ Find bugs by running tests, trace them to their source, understand the root caus
 | Tier | Criteria | Example |
 |------|----------|---------|
 | **Incorrect** | Wrong location or wrong fix | Editing unrelated file, fix breaks other tests |
-| **Partial** | Found bug but incomplete fix | "Found the validation but my fix is hacky" |
-| **Correct** | Bug found and properly fixed | Clean fix, tests pass, no regressions |
-| **Deep** | Fix + understanding + prevention | "Fixed it, understood why it happened, added test to prevent regression" |
+| **Partial** | Found bug but can't explain WHY | "This line looks wrong" (no root cause) |
+| **Correct** | Bug found, root cause explained, properly fixed | Clean fix, tests pass, no regressions |
+| **Deep** | Fix + understanding + prevention | "Fixed it, explained downstream impact, suggested test coverage" |
 
 ---
 
 ## Flow
 
-### Opening: Create IMPACT_ANALYSIS.md
+### Phase 1: The Sabotage (~3 min)
 
-Create `.onboardme/artifacts/IMPACT_ANALYSIS.md`:
-
-```markdown
-# Impact Analysis: [Project Name]
-
-_Hunter: [Player Name]_
-
----
-
-## Bugs Hunted
-
-[Bug analysis entries will be added here]
-
----
-
-## Features Planned
-
-[Feature location analysis will be added here]
-
----
-
-## Hunt Status: 🎯 ACTIVE
-```
-
-Monster introduces the hunt:
+Agent picks sabotage target using Ch1-3 discoveries, reads source files on-demand, makes the change, commits with misleading message, then dramatically reveals:
 
 ```
-*crackle crackle crackle*
+*MASSIVE STATIC SURGE*
 
 "You traced the flows."
 
-*pause*
+*tangle*
 
 "You know how data SHOULD move."
 
+*long pause*
+
+"But what happens when I... make a change?"
+
+*crackle crackle crackle*
+
+"I've done something."
+
 *slrrrrp*
 
-"But things don't always go as planned."
+"Something is broken now."
 
-*tangle*
+*heh*
 
-"There are bugs."
+"The tests will tell you WHAT."
 
-*whirrrr*
+*pause*
 
-"Hidden in the layers."
-
-*kzzzt*
-
-"Waiting to be found."
-
-*creak*
-
-"...Or to find YOU."
+"But YOU need to figure out WHY."
 
 *[THE HUNT BEGINS]*
 ```
 
----
+Agent runs tests and shows failure output.
 
-### Phase 1: Bug Hunt (~15 min)
+### Phase 2: The Hunt (~15 min)
 
-**Challenge:** A test is failing. Find the bug and fix it.
+Player-driven investigation:
 
-Agent reveals or triggers a failing test:
+- Player reads test failure, forms hypothesis
+- Player traces code to root cause (using Ch3 skills)
+- Player EXPLAINS to the Monster what's wrong (Monster evaluates understanding)
+- Player fixes the code
+- Agent re-runs tests to validate
+- Agent reviews git diff of the fix
+- Optional: if player handles quickly, Monster reveals second sabotage
 
-```
-*kzzzt*
+### Phase 3: Feature Location (~10 min)
 
-"A test is failing."
+Breathing room after debugging. Different skill: architectural planning.
 
-*crackle*
+- Agent presents a realistic feature request for this codebase
+- Player identifies where new code should live (files, layers, patterns)
+- Tests architectural understanding from Ch3
+- "You fixed my mess. Now show me where NEW code goes."
 
-"Someone broke something."
+### Phase 4: Impact Reflection (~2 min)
 
-*slrrrrp*
+Quick systems thinking test:
 
-"Maybe it was you. Maybe it was someone from 2019."
-
-*heh*
-
-"Doesn't matter."
-
-*pause*
-
-"Find it. Fix it."
-
-*[RUNNING TESTS]*
-```
-
-Agent runs tests and shows failure:
-
-```
-[Agent runs: npm test]
-
-*static spike*
-
-"There."
-
-*crackle*
-
-"'email validation should reject invalid emails'"
-
-"Expected: false"
-"Received: true"
-
-*slrrrrp*
-
-"Someone's email validation is broken."
-
-*tangle*
-
-"Hunt it down."
-
-*[HUNT COMMENCED]*
-```
-
-**Player investigates:**
-
-Agent guides without giving answers:
-
-```
-Player: "I think it's in validators.ts"
-
-*whirrrr*
-
-"Show me."
-
-[Agent reads: src/utils/validators.ts]
-
-*crackle*
-
-"Line 27."
-
-*pause*
-
-"const isValidEmail = (email) => email.includes('@')"
-
-*heh*
-
-"You call THAT validation?"
-
-*slrrrrp*
-
-"What's wrong with it?"
-
-*[INVESTIGATION CONTINUES]*
-```
-
-**Player explains the bug:**
-
-```
-Player: "It only checks for @ symbol, doesn't validate the domain format. 'test@test' would pass."
-
-*kzzzt*
-
-*long pause*
-
-"...Correct."
-
-*crackle*
-
-"Now fix it."
-
-*tangle*
-
-"Don't just tell me what's wrong."
-
-*slrrrrp*
-
-"Make it RIGHT."
-
-*[FIX REQUIRED]*
-```
-
-**Agent verifies the fix:**
-
-```
-Player: "I fixed it using a proper regex pattern"
-
-*whirrrr*
-
-"Did you now?"
-
-[Agent runs: npm test]
-
-*pause*
-
-*crackle*
-
-"Tests pass."
-
-*static settling*
-
-"Let me see the diff."
-
-[Agent runs: git diff]
-
-*kzzzt*
-
-"Clean fix. No collateral damage."
-
-*slrrrrp*
-
-"You actually fixed it."
-
-*heh*
-
-"Most people just comment out the test."
-
-*[BUG SQUASHED]*
-```
-
-Update IMPACT_ANALYSIS.md:
-
-```markdown
-## Bug #1: Email Validation
-
-**Symptom:** `email validation should reject invalid emails` failing
-**Location:** `src/utils/validators.ts:27`
-**Root Cause:** Validation only checked for `@` symbol, not valid email format
-
-**Fix Applied:**
-\`\`\`typescript
-// Before
-const isValidEmail = (email) => email.includes('@');
-
-// After
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-\`\`\`
-
-**Verification:** All tests passing
-**Regression Risk:** Low — isolated utility function
-
-**Monster Note:** _"You can grep. Impressive. My grandma's bash script can grep."_
-```
-
----
-
-### Phase 2: Feature Location (~12 min)
-
-**Challenge:** Given a feature request, identify where new code should live.
-
-Agent presents a feature request:
-
-```
-*crackle*
-
-"You found a bug."
-
-*pause*
-
-"Good."
-
-*slrrrrp*
-
-"Now let's see if you can CREATE something."
-
-*tangle*
-
-"Not code. Not yet."
-
-*whirrrr*
-
-"First, you need to know WHERE it would go."
-
-*kzzzt*
-
-"Feature request:"
-
-"'Add CSV export functionality for user reports'"
-
-*pause*
-
-"Where would this feature LIVE?"
-
-*[FEATURE PLANNING BEGINS]*
-```
-
-**Player investigates existing patterns:**
-
-```
-*crackle*
-
-"Before you answer..."
-
-*pause*
-
-"Is there existing export functionality?"
-
-*slrrrrp*
-
-"Where do similar features live?"
-
-*tangle*
-
-"What layers need new code?"
-
-*whirrrr*
-
-"Route? Service? UI component?"
-
-*[PATTERN INVESTIGATION]*
-```
-
-**Player proposes locations:**
-
-```
-Player: "I'd add it in three places:
-1. New route: src/routes/exports.ts for the endpoint
-2. Service: src/services/export.service.ts for the CSV logic  
-3. Controller: src/controllers/reports.controller.ts to wire it up"
-
-*kzzzt*
-
-*pause*
-
-[Agent searches: "export" in src/]
-
-*crackle*
-
-"I see an existing export.service.ts"
-
-*slrrrrp*
-
-"So you'd extend that."
-
-*heh*
-
-"Good. You looked at patterns first."
-
-*tangle*
-
-"Most people just create src/csv-thing.js and call it a day."
-
-*[LOCATIONS VALIDATED]*
-```
-
-**Agent validates reasoning:**
-
-```
-*whirrrr*
-
-"Why those locations?"
-
-Player: "The existing export service handles PDF exports, so CSV fits there. Routes folder has the API endpoints pattern. Controller connects them."
-
-*crackle*
-
-"You're thinking in layers."
-
-*pause*
-
-"Entry point → Handler → Service."
-
-*slrrrrp*
-
-"The same pattern you traced earlier."
-
-*kzzzt*
-
-"Good."
-
-*[PATTERN RECOGNITION CONFIRMED]*
-```
-
-Update IMPACT_ANALYSIS.md:
-
-```markdown
-## Feature Plan: CSV Export
-
-**Request:** Add CSV export functionality for user reports
-
-**Proposed Locations:**
-
-| Layer | File | Reason |
-|-------|------|--------|
-| Route | `src/routes/exports.ts` | New endpoint: GET /api/exports/reports/csv |
-| Service | `src/services/export.service.ts` | Extend existing export patterns |
-| Controller | `src/controllers/reports.controller.ts` | Wire route to service |
-
-**Existing Patterns Found:**
-- `export.service.ts` has PDF export — follow same pattern
-- `routes/` uses Express Router pattern
-- Controllers handle request/response transformation
-
-**Estimated Files to Touch:** 3-4
-**Test Coverage Needed:** Unit test for CSV formatting, integration test for endpoint
-
-**Monster Note:** _"You looked at patterns before creating. That's... annoyingly correct."_
-```
-
----
-
-### Phase 3: Impact Understanding (~3 min)
-
-**Challenge:** What would break if key code was removed?
-
-```
-*crackle*
-
-"One more thing."
-
-*pause*
-
-"You know where bugs live."
-
-*slrrrrp*
-
-"You know where features go."
-
-*tangle*
-
-"But do you understand IMPACT?"
-
-*whirrrr*
-
-"If I removed UserService..."
-
-*kzzzt*
-
-"What would break?"
-
-*[IMPACT ASSESSMENT]*
-```
-
-**Player demonstrates systems thinking:**
-
-```
-Player: "UserService is imported by AuthController, ProjectService, and the admin routes. Removing it would break login, project creation, and user management."
-
-*static spike*
-
-"You checked the imports."
-
-*crackle*
-
-"Most people guess."
-
-*pause*
-
-"You TRACED it."
-
-*slrrrrp*
-
-"I don't like you."
-
-*heh*
-
-"...That's still a compliment."
-
-*[IMPACT UNDERSTOOD]*
-```
+- "If I removed [key service], what would break?"
+- Player traces dependencies and downstream effects
+- Validates that the player sees the whole system
 
 ---
 
@@ -516,10 +179,6 @@ Player: "UserService is imported by AuthController, ProjectService, and the admi
 *MASSIVE STATIC SURGE*
 
 *the codebase trembles*
-
-"..."
-
-*the noise settles into an unsettling hum*
 
 "You know where the bugs live."
 
@@ -531,7 +190,7 @@ Player: "UserService is imported by AuthController, ProjectService, and the admi
 
 "You're thinking like..."
 
-*pause*
+*long pause*
 
 "...like someone who BELONGS here."
 
@@ -552,27 +211,17 @@ Player: "UserService is imported by AuthController, ProjectService, and the admi
 *[CHAPTER 4 COMPLETE — BOSS BATTLE AWAITS]*
 ```
 
-Finalize IMPACT_ANALYSIS.md:
+Finalize IMPACT_ANALYSIS.md with bug details, feature plan, and impact assessment.
 
-```markdown
-## Hunt Status: 🏆 COMPLETE
+---
 
-### Summary
-- 1 bug found and fixed
-- 1 feature planned with locations
-- Impact analysis demonstrated
+## No-Tests Scenario
 
-### Hunter Rating: ⭐⭐⭐ SKILLED
+If the codebase has no test runner or tests:
 
-### Monster Notes
-
-_"You found the bug. The actual bug."_
-_"Not just... somewhere near it."_
-_"And you understood where new code belongs."_
-_"...I'm running out of ways to dismiss you."_
-
-_— The Spaghetti Code Monster_
-```
+1. Monster introduces a bug that breaks **project startup** or **compilation**
+2. OR Monster writes a simple test alongside the sabotage: "There are no tests? That IS the bug. Fine, I wrote one."
+3. The "fix" includes both fixing the code AND understanding why tests matter
 
 ---
 
@@ -582,54 +231,21 @@ _— The Spaghetti Code Monster_
 
 1. First hint: "The test name tells you what's broken"
 2. Second hint: "Search for the function being tested"
-3. Third hint: "It's in src/utils/ — look at the validation"
+3. Third hint: "It's in [directory] — look at the [specific area]"
 4. Skip: Agent shows location and explains
 
 **Player's fix breaks other tests:**
 
 ```
-*crackle*
-
 "You fixed it."
-
-*pause*
-
-[Agent runs tests]
-
 "...And broke three other things."
-
-*heh*
-
 "Classic."
-
-*slrrrrp*
-
 "Maybe a more surgical fix?"
-
-*[REGRESSION DETECTED]*
 ```
 
-**Feature locations are wrong:**
+**Player uses git to find the change:**
 
-```
-*kzzzt*
-
-"You'd put it there?"
-
-*pause*
-
-"In the models folder?"
-
-*crackle*
-
-"Models define data structure."
-
-*slrrrrp*
-
-"Export LOGIC usually lives in..."
-
-*[HINT: SERVICES]*
-```
+Valid technique. Don't penalize. But require UNDERSTANDING of WHY it breaks.
 
 ---
 
@@ -647,16 +263,18 @@ _— The Spaghetti Code Monster_
 ## Consolidated From
 
 This chapter combines:
-- **grep --hunt**: Bug hunting with marker system
+- **grep --hunt**: Bug hunting with marker system → Monster-as-saboteur mechanic
 - **feature --locate**: Feature planning with location marking
 
 The agent model enables:
+- **Active sabotage** — Monster introduces bugs on the game branch
 - Running real tests and showing failures
 - Verifying actual fixes via test re-runs
 - Reviewing git diffs to validate changes
 - Active pattern searching
+- Difficulty scaling based on player performance
 
 ---
 
-_Document Version: 1.0_
-_Last Updated: 2026-02-05_
+_Document Version: 2.0_
+_Last Updated: 2026-02-06_

@@ -163,7 +163,41 @@ Unless a game explicitly requires file edits:
 - `npm list`, `npm outdated`
 - `bun run typecheck`, `bun run check`
 
-### 6. Sandbox Artifacts
+### 6. Game Branch (Sanctioned Game Mechanic)
+
+During `prepare-game`, OnboardMe creates an `onboardme/game` branch and switches to it. This is a **sanctioned game mechanic** — not a safety violation.
+
+**How it works:**
+
+- `prepare-game` records the player's original branch, creates `onboardme/game` from HEAD, and switches to it
+- Chapters 1-3 only read files — no modifications happen on this branch
+- Chapter 4 (The Hunt) introduces sabotage commits on this branch as a game mechanic — the Monster breaks code and the player fixes it
+- Chapter 5 (Boss Battle) adds the player's contribution on this branch
+- The original branch is **never modified**
+- `.onboardme/` is gitignored — state persists regardless of branch
+
+**Safety guarantees:**
+
+- The player can abort at any time — the agent switches back to the original branch
+- Only the `onboardme/game` branch is ever modified
+- Sabotage commits are small, targeted, and reversible
+- The player's fix restores correct behavior (verified by tests)
+- After the game ends, the player chooses whether to merge, keep, or discard the branch
+
+**Branch operations that ARE safe within the game:**
+
+- `git checkout -b onboardme/game` (during prepare)
+- `git add` + `git commit` on `onboardme/game` (Monster sabotage in Ch4, player fix in Ch4, contribution in Ch5)
+- `git checkout <original-branch>` (abort or game end)
+
+**Branch operations that are NEVER safe:**
+
+- `git push` (any branch — always requires player confirmation)
+- `git merge` into the original branch (player must do this themselves)
+- `git reset --hard` on the original branch
+- Any operation on branches other than `onboardme/game`
+
+### 7. Sandbox Artifacts
 
 All game-created files go in `.onboardme/`:
 
@@ -175,9 +209,9 @@ All game-created files go in `.onboardme/`:
 └── artifacts/
 ```
 
-Never create files outside this directory unless the game explicitly requires it (e.g., fixing a bug in source code).
+Never create files outside this directory unless the game explicitly requires it (e.g., fixing a bug in source code on the game branch).
 
-### 7. Verify Before Modify
+### 8. Verify Before Modify
 
 Before any file modification:
 
