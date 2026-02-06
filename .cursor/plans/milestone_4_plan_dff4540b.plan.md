@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: "4.8"
     content: "Install and verify: Run install-skill.sh, verify all flows work end-to-end"
-    status: in_progress
+    status: completed
 isProject: false
 ---
 
