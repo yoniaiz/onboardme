@@ -7,11 +7,13 @@ Start or resume the OnboardMe game.
 ### Step 1: Load Game State
 
 Read the game state:
+
 ```bash
 node .cursor/skills/onboardme/scripts/state-manager.cjs read
 ```
 
 If `context.prepared` is `false`, tell the user:
+
 ```
 *kzzzt*
 
@@ -31,11 +33,13 @@ If `context.prepared` is `false`, tell the user:
 ### Step 2: Load Knowledge
 
 Read the Monster's answer key:
+
 ```bash
 node .cursor/skills/onboardme/scripts/knowledge-manager.cjs read
 ```
 
 This gives you the codebase facts you gathered during prepare. Use it to:
+
 - **Chapters 1-2**: Validate player answers against `identity`, `techStack`, `commands`, `structure`
 - **Chapters 3-5**: Read actual source files on-demand for deeper questions, then validate
 
@@ -44,6 +48,7 @@ Also review `discoveries` — these are facts the player already validated in pr
 ### Step 3: Load Chapter Reference
 
 Check `progress.currentChapter` and read the appropriate reference file:
+
 - `investigation` → Read `.cursor/skills/onboardme/references/THE-INVESTIGATION.md`
 - `hands-on` → Read `.cursor/skills/onboardme/references/THE-HANDS-ON.md`
 - `deep-dive` → Read `.cursor/skills/onboardme/references/THE-DEEP-DIVE.md`
@@ -55,6 +60,7 @@ Check `progress.currentChapter` and read the appropriate reference file:
 **Check `progress.questionHistory`:**
 
 If empty — start fresh with chapter opening:
+
 ```
 *kzzzt*
 
@@ -86,6 +92,7 @@ If empty — start fresh with chapter opening:
 ```
 
 If has entries — resume with acknowledgment, referencing discoveries and progress:
+
 ```
 *kzzzt*
 
@@ -109,11 +116,13 @@ If has entries — resume with acknowledgment, referencing discoveries and progr
 Follow the chapter reference file for gameplay. After each validated player answer:
 
 1. **Update state** (score, question history):
+
    ```bash
    node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what player said>","tier":"<incorrect|partial|correct|deep>","chapter":"<current-chapter>","commits":<commits-awarded>}'
    ```
 
 2. **Save discovery** if the answer was correct or deep:
+
    ```bash
    node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"<current-chapter>","fact":"<the validated fact>","tier":"<correct|deep>","evidence":"<file or source that confirms it>"}'
    ```

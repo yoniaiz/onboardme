@@ -188,6 +188,12 @@ function addQuestionResult(result) {
     ...result,
     timestamp: new Date().toISOString(),
   });
+  if (result.commits && typeof result.commits === "number") {
+    state.player.totalCommits += result.commits;
+  }
+  if (result.tier === "incorrect") {
+    state.player.currentLives = Math.max(0, state.player.currentLives - 1);
+  }
   writeState(state);
   return state;
 }
@@ -251,7 +257,9 @@ function main() {
       try {
         const updates = JSON.parse(args[0]);
         const result = updateState(updates);
-        console.log(JSON.stringify(result, null, 2));
+        console.log(
+          `ok | commits: ${result.player.totalCommits} | mood: ${result.monster.currentMood} | chapter: ${result.progress.currentChapter}`
+        );
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -266,7 +274,7 @@ function main() {
       try {
         const repoInfo = JSON.parse(args[0]);
         const result = initializeState(repoInfo);
-        console.log(JSON.stringify(result, null, 2));
+        console.log(`ok | initialized ${result.repo.name}`);
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -289,7 +297,9 @@ function main() {
       try {
         const questionResult = JSON.parse(args[0]);
         const result = addQuestionResult(questionResult);
-        console.log(JSON.stringify(result, null, 2));
+        console.log(
+          `+${questionResult.commits || 0} | total: ${result.player.totalCommits} | lives: ${result.player.currentLives}`
+        );
       } catch (error) {
         console.error("Invalid JSON:", error.message);
         process.exit(1);
@@ -303,8 +313,10 @@ function main() {
         );
         process.exit(1);
       }
-      const result = updateMonsterMood(args[0]);
-      console.log(JSON.stringify(result, null, 2));
+      const moodResult = updateMonsterMood(args[0]);
+      console.log(
+        `ok | mood: ${moodResult.monster.currentMood} | respect: ${moodResult.monster.respectLevel}`
+      );
       break;
 
     case "help":

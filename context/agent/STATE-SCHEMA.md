@@ -80,12 +80,12 @@ interface OnboardMeState {
 }
 
 interface QuestionResult {
-  questionId: string;
+  question: string;
+  answer: string;
   chapter: string;
   tier: "incorrect" | "partial" | "correct" | "deep";
-  hintsUsed: number;
+  commits: number;
   timestamp: string;
-  followUps: number;
 }
 ```
 
@@ -197,6 +197,8 @@ Prepared game context status.
 | `prepared`     | boolean  | Whether `/prepare-game` has run |
 | `preparedAt`   | string   | ISO timestamp of preparation    |
 | `contextFiles` | string[] | List of analyzed files          |
+
+**Codebase knowledge** is stored separately in `.onboardme/context/repo-knowledge.json` (managed by `knowledge-manager.cjs`). This file contains the Monster's answer key and player-validated discoveries. See `context/agent/CONTEXT-GATHERING.md` for the full schema.
 
 ### `preferences`
 
@@ -334,7 +336,27 @@ await updateState({
 
 **Atomic updates:** Always read-modify-write with backup.
 
+## Auto-Scoring
+
+The `add-question` command automatically handles scoring:
+
+- **Commits**: If the result includes a `commits` field, it's added to `player.totalCommits`
+- **Lives**: If `tier` is `"incorrect"`, `player.currentLives` is decremented by 1
+
+This means the agent only needs to call `add-question` — no separate `write` call for scoring.
+
+## Companion: Knowledge File
+
+Game state (`state.json`) tracks **where the player is**. Codebase knowledge (`repo-knowledge.json`) tracks **what's known about the repo**.
+
+Together they enable full cross-session resumption:
+
+```
+state.json          → chapter, score, lives, mood, question history
+repo-knowledge.json → codebase facts, player-validated discoveries
+```
+
 ---
 
-_Document Version: 1.0_
-_Last Updated: 2026-02-05_
+_Document Version: 1.1_
+_Last Updated: 2026-02-06_

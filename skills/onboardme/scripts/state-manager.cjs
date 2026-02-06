@@ -188,6 +188,12 @@ function addQuestionResult(result) {
     ...result,
     timestamp: new Date().toISOString(),
   });
+  if (result.commits && typeof result.commits === "number") {
+    state.player.totalCommits += result.commits;
+  }
+  if (result.tier === "incorrect") {
+    state.player.currentLives = Math.max(0, state.player.currentLives - 1);
+  }
   writeState(state);
   return state;
 }
@@ -197,7 +203,7 @@ function updateMonsterMood(performance) {
 
   const recentHistory = state.progress.questionHistory.slice(-5);
   const correctStreak = recentHistory.filter(
-    (q) => q.tier === "correct" || q.tier === "deep"
+    (q) => q.tier === "correct" || q.tier === "deep",
   ).length;
 
   if (correctStreak >= 5 && state.monster.currentMood === "annoyed") {
@@ -299,7 +305,7 @@ function main() {
     case "update-mood":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js update-mood <incorrect|partial|correct|deep>"
+          "Usage: state-manager.js update-mood <incorrect|partial|correct|deep>",
         );
         process.exit(1);
       }

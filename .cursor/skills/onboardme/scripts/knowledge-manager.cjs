@@ -74,7 +74,7 @@ function main() {
 			try {
 				const data = JSON.parse(args[0]);
 				if (writeKnowledge(data)) {
-					console.log(JSON.stringify(data, null, 2));
+					console.log("ok | knowledge written");
 				} else {
 					process.exit(1);
 				}
@@ -93,7 +93,8 @@ function main() {
 			try {
 				const discovery = JSON.parse(args[0]);
 				const result = addDiscovery(discovery);
-				console.log(JSON.stringify(result, null, 2));
+				const count = result.discoveries ? result.discoveries.length : 0;
+				console.log(`ok | discoveries: ${count}`);
 			} catch (error) {
 				console.error("Invalid JSON:", error.message);
 				process.exit(1);
