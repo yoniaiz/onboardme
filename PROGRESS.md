@@ -187,6 +187,7 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 **Goal**: Complete Chapter 1 (The Investigation) as a fully playable experience.
 
 **Success Criteria**:
+- [x] Context gathering system (repo-knowledge.json)
 - [ ] Full investigation flow with 5 evidence categories
 - [ ] CASE_FILE.md artifact generation
 - [ ] Tiered rubric evaluation working
@@ -196,6 +197,27 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 ---
 
 ### Tasks
+
+#### 2.0 Context Gathering System
+`completed`
+
+**Goal**: Implement the Monster's persistent knowledge base so it can validate answers consistently across sessions.
+
+**Files created/updated**:
+- `skills/onboardme/scripts/knowledge-manager.cjs` — Read/write/add-discovery for repo-knowledge.json
+- `skills/onboardme/commands/prepare-game.md` — Detailed repo analysis instructions (Priority 1/2/3 files, JSON schema)
+- `skills/onboardme/commands/play-game.md` — Load knowledge at session start, save discoveries after validated answers
+- `skills/onboardme/SKILL.md` — Added Knowledge Management section
+
+**How it works**:
+- **Prepare**: Agent reads 8-12 key files, builds `repo-knowledge.json` as answer key
+- **Play**: Agent loads knowledge, validates Ch 1-2 answers against it, reads live files for Ch 3-5
+- **Discover**: After each correct/deep answer, fact is appended to `discoveries[]`
+- **Resume**: New session reads `state.json` + `repo-knowledge.json` for full continuity
+
+**Design reference**: `context/agent/CONTEXT-GATHERING.md`
+
+---
 
 #### 2.1 Evidence Examination Flow
 `pending`
