@@ -144,7 +144,7 @@ description: >
   Gamified codebase onboarding through the Spaghetti Code Monster.
 license: MIT
 metadata:
-  author: yonatanai
+  author: yoniaiz
   version: "1.0.0"
 ---
 ```
@@ -539,7 +539,7 @@ _Monster Note: "Finally, someone who looks beyond the README."_
 
 ```bash
 # Install OnboardMe skill
-npx skills add yonatanai/onboardme
+npx skills add yoniaiz/onboardme
 
 # This copies skills/onboardme/ to:
 # .cursor/skills/onboardme/    (for Cursor)

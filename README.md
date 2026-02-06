@@ -53,7 +53,7 @@ The agent **is** the game engine. No CLI, no server, no cloud — just your codi
 Requires [Cursor](https://cursor.com) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview).
 
 ```bash
-npx skills add yonatanai/onboardme
+npx skills add yoniaiz/onboardme
 ```
 
 This installs the OnboardMe skill into your project's `.cursor/skills/onboardme/` directory.

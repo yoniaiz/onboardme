@@ -70,7 +70,7 @@ Traditional onboarding sucks:
 1. Engineer joins new company
 2. Clones the repo
 3. Installs OnboardMe skill:
-   npx skills add yonatanai/onboardme
+   npx skills add yoniaiz/onboardme
 4. Opens Cursor/Claude Code
 5. Tells agent: "prepare game" or "/onboardme"
    - Agent scans codebase, initializes state
@@ -399,7 +399,7 @@ The Monster speaks through interference, static, and glitches:
 
 ```bash
 # Via npx (recommended)
-npx skills add yonatanai/onboardme
+npx skills add yoniaiz/onboardme
 
 # This installs to:
 # .cursor/skills/onboardme/   (for Cursor)

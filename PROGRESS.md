@@ -591,7 +591,7 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 - [x] Create MIT LICENSE file
 - [x] Strip package.json to minimal metadata
 - [x] Update .gitignore for clean repo
-- [x] Update SKILL.md frontmatter (author: yonatanai)
+- [x] Update SKILL.md frontmatter (author: yoniaiz)
 - [x] Update AGENTS.md (remove CLI references)
 - [x] Update PRD.md (install command, current scope)
 - [x] Update ARCHITECTURE.md (remove legacy section)
@@ -687,7 +687,7 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 - Slash commands for agent interaction
 - Legacy CLI code deleted in Milestone 7 (clean slate for open source)
 - State files in `.onboardme/` in the target repository
-- Distribution via skills.sh ecosystem (`npx skills add yonatanai/onboardme`)
+- Distribution via skills.sh ecosystem (`npx skills add yoniaiz/onboardme`)
 
 ### Blockers
 - None currently
