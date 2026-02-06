@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 3 Complete  
-> **Current Focus**: Planning next milestone
+> **Status**: Milestone 4 Complete  
+> **Current Focus**: Ready for Milestone 5
 
 ---
 
@@ -411,11 +411,93 @@ Key design: Monster is a reluctant collaborator (not just evaluator). Backstory 
 **Goal**: Implement the full Monster persona with emotional arc and progression tracking.
 
 **Success Criteria**:
-- [ ] Persona lock mechanism (never breaks character)
-- [ ] Snark slider (friendly → full-monster)
-- [ ] Emotional arc tracking across sessions
-- [ ] Memorable exchange logging
-- [ ] Mood-appropriate dialogue selection
+- [x] Persona lock mechanism (never breaks character)
+- [x] Snark slider (friendly → full-monster)
+- [x] Emotional arc tracking across sessions
+- [x] Memorable exchange logging
+- [x] Mood-appropriate dialogue selection
+
+---
+
+### Tasks
+
+#### 4.1 Snark Slider
+`completed`
+
+Added tone selection to the game flow:
+- `state-manager.cjs`: New `set-tone` command (validates friendly/balanced/spicy/full-monster)
+- `prepare-game.md`: New Step 7 — "How much pain do you want?" prompt with 4 tone levels
+- `SKILL.md`: New "Tone Adjustment" section with per-tone behavioral guidelines (hint generosity, mockery intensity, partial credit, pacing)
+- `play-game.md`: Step 2.5 — reads tone preference before gameplay
+- `SKILL.md` commands table: Added "change tone" trigger for mid-game adjustment
+
+---
+
+#### 4.2 Player Name + Game-Over + Game-Complete
+`completed`
+
+Three critical flow gaps closed:
+- `prepare-game.md`: New Step 5 — auto-detects player name from `git config user.name`, falls back to "Unknown Agent", Monster reacts without asking
+- `play-game.md`: Step 2.7 — game-over flow (0 lives): offers continue (costs 5 commits, 3 lives restored) or start over
+- `play-game.md`: Step 2.8 — game-complete flow (all 5 chapters done): victory summary, artifact list, branch cleanup options (keep/merge/delete)
+- `SKILL.md`: Added "Game Over" and "Game Complete" sections
+
+---
+
+#### 4.3 Memorable Exchange Mechanics
+`completed`
+
+Exchanges now have save/load mechanics:
+- `state-manager.cjs`: New `add-exchange` command — appends to `memorableExchanges[]` with chapter and timestamp
+- `play-game.md`: Step 5.4 — explicit `add-exchange` instruction after notable moments (1-3 per chapter)
+- All 5 reference files: Added `memorableExchanges[]` to "During chapter, update" sections
+- Investigation + Hands-On: Added `memorableExchanges[]` to "At chapter start, read" sections (were missing)
+
+---
+
+#### 4.4 Emotional Arc Completion
+`completed`
+
+Full mood arc now works:
+- `state-manager.cjs`: Rewrote `updateMonsterMood()` — supports `desperate→peaceful` (when boss completed), chapter-based mood minimums (Ch3+ = at least annoyed), backward transitions on failure streaks
+- `SKILL.md`: New "Emotional Arc" section with chapter-to-mood mapping and mood-specific behavior guidelines
+- `play-game.md`: Step 2.6 — explicit mood check before generating dialogue
+
+---
+
+#### 4.5 Boss Battle Polish
+`completed`
+
+Boss battle now has full templates and state commands:
+- `THE-BOSS-BATTLE.md`: Added BOSS_BATTLE.md artifact template (challenge, requirements, constraints, review log)
+- `THE-BOSS-BATTLE.md`: Added CODEBASE_KNOWLEDGE.md template (project identity, how to run, architecture, debugging notes, contribution, monster's notes, key discoveries)
+- `THE-BOSS-BATTLE.md`: Added explicit bash commands for all state updates (add-question, write chaptersCompleted, set mood to peaceful, add-exchange)
+- Fixed chapter name inconsistency: `"boss-battle"` → `"boss"` to match routing
+
+---
+
+#### 4.6 Reset + Safety Cleanup
+`completed`
+
+- `reset-game.md`: Now reads git state before deleting, switches to original branch, asks player about deleting game branch, then resets
+- `SAFETY-RULES.md`: Fixed artifact path tree — moved CASE_FILE.md, FLOW_MAP.md under `.onboardme/artifacts/`, added all 5 artifact files and context directory
+
+---
+
+#### 4.7 Session Flow
+`completed`
+
+- `play-game.md`: Step 6 — auto-continue between chapters (no need to say "play game" again), with graceful stop option and session summary save
+- `play-game.md`: Step 7 — player style tracking (methodical/aggressive/balanced/struggling) based on hint usage, accuracy, and response patterns
+
+---
+
+#### 4.8 Install and Verify
+`completed`
+
+- Ran `bash scripts/install-skill.sh` — all 13 files deployed
+- Verified `set-tone`, `add-exchange`, `update-mood` commands work
+- Verified deployed files match source (diff clean)
 
 ---
 
@@ -545,4 +627,4 @@ This code may be archived or adapted for the state-manager.ts utilities.
 
 ---
 
-*Last Updated: 2026-02-06 (Milestone 3 complete — All 5 chapter references exist, Ch1-4 playtested)*
+*Last Updated: 2026-02-06 (Milestone 4 complete — Monster voice, snark slider, emotional arc, memorable exchanges, game-over/complete flows, session continuity)*

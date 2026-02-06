@@ -215,6 +215,7 @@ Create a minimal test file that exercises the broken code and fails. The player 
 **During chapter, update:**
 - `progress.questionHistory[]` — Add hunt results (include sabotage details)
 - `monster.respectLevel` — Major increase for clean fix (+15), deep understanding (+25)
+- `monster.memorableExchanges[]` — Save the debugging approach, the "aha" moment when they find the bug
 
 **At chapter end, update:**
 - `progress.chaptersCompleted` — Add `"hunt"`

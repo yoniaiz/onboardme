@@ -100,10 +100,12 @@ The player gets the project running locally and interacts with it. They've inves
 - `player.name` — For personalized dialogue
 - `monster.currentMood` — Should be `annoyed` (they succeeded in investigation)
 - `progress.questionHistory[]` — Reference what they learned
+- `monster.memorableExchanges[]` — Reference 1-2 past moments in your opening dialogue
 
 **During chapter, update:**
 - `progress.questionHistory[]` — Add hands-on findings
 - `monster.respectLevel` — First-try success = +respect
+- `monster.memorableExchanges[]` — Save standout moments (first-try commands, creative problem-solving)
 
 **At chapter end, update:**
 - `progress.chaptersCompleted` — Add `"hands-on"`

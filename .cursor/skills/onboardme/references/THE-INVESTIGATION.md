@@ -49,6 +49,7 @@ The player learns to identify project type, tech stack, and architecture by exam
 - `progress.questionHistory[]` — Add each finding
 - `monster.respectLevel` — Adjust based on insight quality
 - `session.conversationSummary` — Brief investigation status
+- `monster.memorableExchanges[]` — Save standout moments (first correct answer, clever deductions, spectacular misses)
 
 **At chapter end, update:**
 - `progress.chaptersCompleted` — Add `"investigation"`

@@ -203,10 +203,16 @@ All game-created files go in `.onboardme/`:
 
 ```
 .onboardme/
-├── CASE_FILE.md
-├── FLOW_MAP.md
 ├── state.json
+├── state.backup.json
+├── context/
+│   └── repo-knowledge.json
 └── artifacts/
+    ├── CASE_FILE.md
+    ├── FLOW_MAP.md
+    ├── IMPACT_ANALYSIS.md
+    ├── BOSS_BATTLE.md
+    └── CODEBASE_KNOWLEDGE.md
 ```
 
 Never create files outside this directory unless the game explicitly requires it (e.g., fixing a bug in source code on the game branch).

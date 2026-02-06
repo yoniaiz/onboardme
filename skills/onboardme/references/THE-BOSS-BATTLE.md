@@ -59,9 +59,10 @@ Victory when their contribution passes your review.
 **During chapter, update:**
 - `progress.questionHistory[]` — Add review results
 - `monster.respectLevel` — Increase as they succeed
+- `monster.memorableExchanges[]` — Save the final moments (their best contribution insight, the Monster's reaction)
 
 **At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"boss-battle"`
+- `progress.chaptersCompleted` — Add `"boss"`
 - `monster.currentMood` — Set to `peaceful`
 
 ---
@@ -190,11 +191,61 @@ Victory when their contribution passes your review.
 *[CHALLENGE ISSUED — SHOW ME WHAT YOU'VE GOT]*
 ```
 
-Create `.onboardme/artifacts/BOSS_BATTLE.md` with:
-- Challenge description
-- Requirements checklist
-- Constraints
-- Review log section
+Create `.onboardme/artifacts/BOSS_BATTLE.md` using this template:
+
+```markdown
+# Boss Battle: The Contribution
+
+_Challenger: [Player Name]_
+_Date: [Timestamp]_
+
+---
+
+## The Challenge
+
+[Description of what the player must build]
+
+### Requirements
+
+- [ ] [Requirement 1]
+- [ ] [Requirement 2]
+- [ ] [Requirement 3]
+
+### Constraints
+
+- [Constraint 1 — e.g., follow existing pattern in X]
+- [Constraint 2 — e.g., create files in Y]
+- [Constraint 3 — e.g., integrate with Z]
+
+---
+
+## Review Log
+
+### Round 1
+
+**Files reviewed:** [list]
+
+**Verdict:** [Rejected / Needs Work / Acceptable / Impressive]
+
+**Feedback:**
+- [Specific feedback per file]
+
+**Monster's Notes:**
+> [In-character commentary]
+
+---
+
+## Final Verdict
+
+**Status:** [PENDING]
+**Score:** [commits awarded]
+**Monster's Final Word:** [quote]
+```
+
+Save state after creating the artifact:
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Boss Battle: [challenge description]","answer":"challenge-issued","tier":"partial","chapter":"boss","commits":0}'
+```
 
 ---
 
@@ -476,14 +527,133 @@ When their code passes review:
 ```
 
 **Update state:**
-- Add `"boss-battle"` to `progress.chaptersCompleted`
-- Set `monster.currentMood` to `peaceful`
-- Max out `monster.respectLevel`
 
-**Create CODEBASE_KNOWLEDGE.md** with:
-- Everything they learned
-- Their contribution details
-- Monster's final words
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Boss Battle: Final Review","answer":"contribution-accepted","tier":"deep","chapter":"boss","commits":3}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt","boss"],"currentChapter":"complete"}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"peaceful","respectLevel":100}}'
+```
+
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Victory — player completed the Boss Battle and earned Contributor status'
+```
+
+**Create `.onboardme/artifacts/CODEBASE_KNOWLEDGE.md`** using this template:
+
+```markdown
+# Codebase Knowledge: [Project Name]
+
+_Compiled by: [Player Name]_
+_Date: [Timestamp]_
+_Monster Status: Peaceful_
+
+---
+
+## Project Identity
+
+| Field | Value |
+|-------|-------|
+| Name | [from Ch1 investigation] |
+| Language | [from Ch1] |
+| Framework | [from Ch1] |
+| Type | [from Ch1 — e.g., REST API, CLI tool] |
+| Runtime | [from Ch1] |
+
+---
+
+## How to Run It
+
+[From Ch2 — the commands that work, prerequisites, gotchas]
+
+```bash
+# Dev
+[dev command]
+
+# Test
+[test command]
+
+# Build
+[build command]
+```
+
+---
+
+## Architecture
+
+[From Ch3 — key flows, how components connect]
+
+[Include the ASCII flow diagram from FLOW_MAP.md or summarize the key flows]
+
+### Key Directories
+
+| Directory | Purpose |
+|-----------|---------|
+| [dir] | [purpose — from Ch1/Ch3] |
+
+### Key Flows
+
+[Summarize 1-2 critical paths the player traced in Ch3]
+
+---
+
+## Debugging Notes
+
+[From Ch4 — what they learned about the codebase's failure modes]
+
+- **Where bugs hide:** [patterns from the hunt]
+- **How to diagnose:** [their debugging approach]
+- **Test coverage:** [what's well-tested vs gaps]
+
+---
+
+## The Contribution
+
+[From Ch5 — what they built]
+
+- **What:** [description of their contribution]
+- **Where:** [files created/modified]
+- **Pattern followed:** [which existing pattern they extended]
+
+---
+
+## Monster's Notes
+
+> [Final in-character commentary — callbacks to memorable moments]
+> [Reference their journey from investigation to contribution]
+> [The Monster's grudging respect]
+
+---
+
+## Key Discoveries
+
+[Auto-populated from repo-knowledge.json discoveries array — list the most important facts they validated]
+
+1. [Discovery 1]
+2. [Discovery 2]
+3. [Discovery 3]
+...
+
+---
+
+_"They came. They investigated. They contributed. — The Spaghetti Code Monster"_
+```
+
+Update BOSS_BATTLE.md final verdict:
+
+```markdown
+## Final Verdict
+
+**Status:** ACCEPTED
+**Total Score:** [totalCommits] commits
+**Lives Remaining:** [currentLives]
+**Monster's Final Word:** "[in-character closing line]"
+```
 
 ---
 

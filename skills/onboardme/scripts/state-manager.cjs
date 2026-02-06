@@ -205,17 +205,8 @@ function addQuestionResult(result) {
 
 function updateMonsterMood(performance) {
   const state = readState();
-
-  const recentHistory = state.progress.questionHistory.slice(-5);
-  const correctStreak = recentHistory.filter(
-    (q) => q.tier === "correct" || q.tier === "deep",
-  ).length;
-
-  if (correctStreak >= 5 && state.monster.currentMood === "annoyed") {
-    state.monster.currentMood = "worried";
-  } else if (correctStreak >= 3 && state.monster.currentMood === "dismissive") {
-    state.monster.currentMood = "annoyed";
-  }
+  const mood = state.monster.currentMood;
+  const chaptersCompleted = state.progress.chaptersCompleted;
 
   if (performance === "deep") {
     state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 15);
@@ -225,11 +216,74 @@ function updateMonsterMood(performance) {
     state.monster.respectLevel = Math.max(0, state.monster.respectLevel - 5);
   }
 
-  const chaptersCompleted = state.progress.chaptersCompleted.length;
-  if (chaptersCompleted >= 4 && state.monster.currentMood === "worried") {
+  if (chaptersCompleted.includes("boss")) {
+    state.monster.currentMood = "peaceful";
+    writeState(state);
+    return state;
+  }
+
+  const MOOD_ORDER = ["dismissive", "annoyed", "worried", "desperate", "peaceful"];
+  const CHAPTER_MINIMUMS = {
+    investigation: "dismissive",
+    "hands-on": "dismissive",
+    "deep-dive": "annoyed",
+    hunt: "worried",
+    boss: "desperate",
+  };
+
+  const chapterMinimum = CHAPTER_MINIMUMS[state.progress.currentChapter] || "dismissive";
+  const minimumIndex = MOOD_ORDER.indexOf(chapterMinimum);
+  const currentIndex = MOOD_ORDER.indexOf(mood);
+
+  if (currentIndex < minimumIndex) {
+    state.monster.currentMood = chapterMinimum;
+  }
+
+  const recentHistory = state.progress.questionHistory.slice(-5);
+  const correctCount = recentHistory.filter(
+    (q) => q.tier === "correct" || q.tier === "deep",
+  ).length;
+  const incorrectCount = recentHistory.filter(
+    (q) => q.tier === "incorrect",
+  ).length;
+
+  const updatedIndex = MOOD_ORDER.indexOf(state.monster.currentMood);
+
+  if (correctCount >= 3 && updatedIndex < 3) {
+    state.monster.currentMood = MOOD_ORDER[Math.min(updatedIndex + 1, 3)];
+  }
+
+  if (incorrectCount >= 3 && updatedIndex > minimumIndex) {
+    state.monster.currentMood = MOOD_ORDER[Math.max(updatedIndex - 1, minimumIndex)];
+  }
+
+  if (chaptersCompleted.length >= 4 && state.monster.currentMood === "worried") {
     state.monster.currentMood = "desperate";
   }
 
+  writeState(state);
+  return state;
+}
+
+function addExchange(description) {
+  const state = readState();
+  state.monster.memorableExchanges.push({
+    description,
+    chapter: state.progress.currentChapter,
+    timestamp: new Date().toISOString(),
+  });
+  writeState(state);
+  return state;
+}
+
+function setTone(tone) {
+  const validTones = ["friendly", "balanced", "spicy", "full-monster"];
+  if (!validTones.includes(tone)) {
+    console.error(`Invalid tone: ${tone}. Valid: ${validTones.join(", ")}`);
+    process.exit(1);
+  }
+  const state = readState();
+  state.preferences.monsterTone = tone;
   writeState(state);
   return state;
 }
@@ -318,6 +372,28 @@ function main() {
       console.log(JSON.stringify(result, null, 2));
       break;
 
+    case "add-exchange":
+      if (!args[0]) {
+        console.error(
+          "Usage: state-manager.js add-exchange '<description>'",
+        );
+        process.exit(1);
+      }
+      const exchangeResult = addExchange(args[0]);
+      console.log(JSON.stringify(exchangeResult, null, 2));
+      break;
+
+    case "set-tone":
+      if (!args[0]) {
+        console.error(
+          "Usage: state-manager.js set-tone <friendly|balanced|spicy|full-monster>",
+        );
+        process.exit(1);
+      }
+      const toneResult = setTone(args[0]);
+      console.log(JSON.stringify(toneResult, null, 2));
+      break;
+
     case "help":
     default:
       console.log(`OnboardMe State Manager
@@ -331,6 +407,8 @@ Commands:
   reset                             Delete all state (start over)
   add-question '<result-json>'      Add a question result to history
   update-mood <performance>         Update Monster mood based on performance
+  add-exchange '<description>'      Save a memorable exchange moment
+  set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
   help                              Show this help message
 
 Examples:
@@ -339,6 +417,8 @@ Examples:
   state-manager.js write '{"player":{"totalCommits":5}}'
   state-manager.js add-question '{"questionId":"q1","tier":"correct","chapter":"investigation"}'
   state-manager.js update-mood correct
+  state-manager.js add-exchange 'Player figured out the auth flow on first try'
+  state-manager.js set-tone spicy
 `);
       break;
   }

@@ -28,7 +28,37 @@ Clear all game progress and start over.
 
 2. **Wait for user to type "confirm reset"**.
 
-3. **If confirmed**, delete the game state:
+3. **If confirmed**, clean up git branch first, then delete state:
+
+   Read `git.originalBranch` and `git.branchCreated` from state before deleting:
+   ```bash
+   node .cursor/skills/onboardme/scripts/state-manager.cjs read
+   ```
+
+   If `git.branchCreated` is `true` and we're on the game branch:
+   ```bash
+   git checkout <original-branch>
+   ```
+
+   Ask the player if they want to delete the game branch:
+   ```
+   *kzzzt*
+
+   "The game branch."
+
+   *pause*
+
+   "Delete it too?"
+
+   *[AWAITING DECISION]*
+   ```
+
+   If they say yes:
+   ```bash
+   git branch -D onboardme/game
+   ```
+
+   Then delete all game state:
    ```bash
    node .cursor/skills/onboardme/scripts/state-manager.cjs reset
    ```
