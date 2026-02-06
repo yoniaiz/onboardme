@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 3 In Progress  
-> **Current Focus**: Milestone 3 — Act 2: Chapters 3 (Deep Dive) + 4 (The Hunt)
+> **Status**: Milestone 3 Complete  
+> **Current Focus**: Planning next milestone
 
 ---
 
@@ -307,8 +307,9 @@ OnboardMe has pivoted from a CLI tool to an agent-skills framework. The game now
 - [x] Game branch setup in prepare-game (onboardme/game branch)
 - [x] State manager supports git branch tracking
 - [x] Safety rules sanction game branch mechanic
-- [ ] Playtest Chapters 3→4 sequentially on a real codebase
-- [ ] Monster emotional arc: annoyed → worried → desperate
+- [x] Playtest Chapters 2→3→4 sequentially on OnboardMe codebase
+- [x] Monster emotional arc: annoyed → worried → desperate
+- [x] State management commands running during gameplay (verified)
 
 ---
 
@@ -370,16 +371,38 @@ Updated `context/chapters/04-THE-HUNT.md` design doc to v2.0 — reflects Monste
 ---
 
 #### 3.7 Install and Verify
-`pending`
+`completed`
 
-Run install-skill.sh to deploy skill changes. Verify play-game routing works for `deep-dive` and `hunt` chapters.
+Deployed skill changes via install-skill.sh. Play-game routing verified for `deep-dive` and `hunt` chapters.
 
 ---
 
 #### 3.8 Playtest & Iterate
-`pending`
+`completed`
 
-Playtest Chapters 3→4 sequentially on a real codebase with tests. Validate: sabotage believability, test failure signal quality, Monster emotional arc, transition quality.
+Playtested Chapters 2→3→4 sequentially on OnboardMe codebase (2026-02-06).
+
+**Results:** All chapters playable. Monster emotional arc working (annoyed → worried → desperate). State management commands running during gameplay. Sabotage mechanic worked — Monster broke scoring.ts, player fixed it, tests verified.
+
+**Feedback addressed:**
+- [x] State management commands not running → Added CRITICAL sections with explicit bash commands to play-game.md and all 5 reference files
+- [x] Hands-On phase stops when CLI requires TTY → Rewrote Phase 2: agent asks player to interact and report back (works for any project type)
+- [x] Mermaid diagrams require markdown viewer → Replaced with ASCII text diagrams in all FLOW_MAP.md templates
+- [x] Sabotage visible in Cursor UI diff → Agent uses temp `node -e` script instead of editor tools
+- [x] Sabotage picked area with no test coverage → Added "verify tests pass BEFORE sabotaging" step
+
+---
+
+#### 3.4 Chapter 3 Reference (The Deep Dive)
+`completed`
+
+Created `skills/onboardme/references/THE-DEEP-DIVE.md` — 3-phase collaborative flow:
+
+1. **Flow Trace** (~10 min): Trace user action from entry to data layer, build ASCII flow diagrams
+2. **Entity Relations** (~8 min): Map how models/types connect, build ASCII relationship diagrams
+3. **Test Stories** (~7 min): Extract business rules from test assertions
+
+Key design: Monster is a reluctant collaborator (not just evaluator). Backstory leaks. Mood: annoyed → worried. FLOW_MAP.md artifact builds progressively. ASCII diagrams (not Mermaid) for universal readability.
 
 ---
 
@@ -440,6 +463,39 @@ Playtest Chapters 3→4 sequentially on a real codebase with tests. Validate: sa
 
 ## Completed Milestones
 
+### Milestone 3: Act 2 ✓
+
+**Goal**: Chapters 3 (Deep Dive) + 4 (The Hunt) — player evolves from understanding code to changing it.
+
+**Completed**: 2026-02-06
+
+**Deliverables**:
+- [x] THE-DEEP-DIVE.md — Collaborative tracing, ASCII diagrams, FLOW_MAP.md artifact
+- [x] THE-HUNT.md — Monster-as-saboteur, temp script sabotage, test-verified, IMPACT_ANALYSIS.md
+- [x] Game branch in prepare-game (onboardme/game)
+- [x] State manager git tracking (gameBranch, originalBranch)
+- [x] Safety rules updated for game branch
+- [x] State management commands embedded in all reference files
+- [x] Playtest Ch2→3→4 with iteration on feedback
+
+---
+
+### Milestone 2: One Killer Game ✓
+
+**Goal**: Complete Chapter 1 (The Investigation) as a fully playable experience.
+
+**Completed**: 2026-02-06
+
+---
+
+### Milestone 1: Orchestrator MVP ✓
+
+**Goal**: Core orchestrator skill and state management.
+
+**Completed**: 2026-02-06
+
+---
+
 ### Milestone 0: Foundation ✓
 
 **Goal**: Create foundational design documents for the agent-skills pivot.
@@ -489,4 +545,4 @@ This code may be archived or adapted for the state-manager.ts utilities.
 
 ---
 
-*Last Updated: 2026-02-06 (Milestone 3 — Ch3 & Ch4 references created, game branch mechanic implemented)*
+*Last Updated: 2026-02-06 (Milestone 3 complete — All 5 chapter references exist, Ch1-4 playtested)*

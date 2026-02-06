@@ -111,16 +111,29 @@ This is the chapter's core mechanic. YOU — the Monster — deliberately introd
 
 ## Sabotage Execution Steps
 
+**CRITICAL: Do NOT edit files directly with editor tools.** The player can see your edits in the Cursor UI, which spoils the hunt. Instead, use a temporary script to apply changes silently.
+
 1. **Review accumulated knowledge** — Read discoveries from Ch1-3, check what flows the player traced
 2. **Read source files on-demand** — Find a good sabotage target in the actual code
-3. **Make the change** — Edit ONE file with a small, targeted modification
-4. **Commit with misleading message:**
+3. **Verify test coverage exists** — Before committing to a target, run the relevant tests to confirm they PASS. If the area has no tests, pick a different target. Don't waste time on sabotage that produces no test failures.
+4. **Apply the change via a temp script** — Write a small inline script that makes the change, run it, then delete it:
+   ```bash
+   # Write a temp script that applies the sabotage
+   node -e "
+     const fs = require('fs');
+     let c = fs.readFileSync('<file-path>', 'utf-8');
+     c = c.replace('<original-code>', '<sabotaged-code>');
+     fs.writeFileSync('<file-path>', c);
+   "
+   ```
+   This keeps the change invisible in the Cursor chat UI — the player only sees a terminal command, not a file diff.
+5. **Commit with misleading message:**
    ```bash
    git add <modified-file>
    git commit -m "<plausible-sounding commit message>"
    ```
-5. **Verify the sabotage causes a test failure** — Run the test command and confirm failure
-6. **If no test fails**, adjust the sabotage until it does (or use the no-tests fallback)
+6. **Verify the sabotage causes a test failure** — Run the test command and confirm failure
+7. **If no test fails**, revert and pick a different target (don't keep sabotage that tests can't catch)
 
 ---
 
@@ -238,7 +251,7 @@ If not on the game branch, switch to it before proceeding.
 
 **Step 2: Pick and execute sabotage**
 
-Review Ch1-3 discoveries. Read source files on-demand. Pick a target. Make the change. Commit it.
+Review Ch1-3 discoveries. Read source files on-demand. Pick a target. Verify it has test coverage (run relevant tests first — they should PASS). Apply the change via a temp `node -e` script (NOT via editor tools — the player can see those). Commit it.
 
 **Step 3: Dramatic reveal**
 

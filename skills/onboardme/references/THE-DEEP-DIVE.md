@@ -68,9 +68,51 @@ kzzzt... crackle
 
 Unlike Ch1 (quiz) or Ch4 (hunt), this chapter is a **collaboration**. You and the player build FLOW_MAP.md together.
 
-**Your role shifts:** You're a reluctant collaborator, not just an evaluator. You read files alongside the player, confirm steps, point at code ("I see an export.service.ts here"), and add Mermaid diagrams as the player gets each layer right.
+**Your role shifts:** You're a reluctant collaborator, not just an evaluator. You read files alongside the player, confirm steps, point at code ("I see an export.service.ts here"), and add diagrams as the player gets each layer right.
 
 **This creates a unique dynamic:** The Monster is cooperating — reluctantly, with snark — but genuinely helping trace the architecture. It's the first time you act as a guide.
+
+## CRITICAL: Use ASCII Text Diagrams, NOT Mermaid
+
+**Do NOT use Mermaid syntax** (`\`\`\`mermaid`). It requires a markdown viewer to render and looks like raw code in most editors.
+
+**Instead, use ASCII arrow diagrams** that look good in ANY editor:
+
+**Good (ASCII):**
+```
+  POST /api/projects
+       │
+       ▼
+  projectController.create()
+       │
+       ▼
+  ProjectService.createProject()
+       │
+       ▼
+  ProjectRepository.save()
+       │
+       ▼
+  ┌──────────┐
+  │PostgreSQL │
+  └──────────┘
+```
+
+**Bad (Mermaid — requires viewer):**
+```mermaid
+flowchart TD
+    A[POST /api/projects] --> B[projectController.create]
+```
+
+For entity relationships, use simple text tables or ASCII:
+
+**Good:**
+```
+  User ──┬── has many ──▶ Projects
+         │
+         └── member of ──▶ Organization ── owns ──▶ Projects
+```
+
+**Bad:** `erDiagram` blocks that need rendering.
 
 ---
 
@@ -212,7 +254,7 @@ _Date: [Current Timestamp]_
 1. Pick a realistic user journey from the actual codebase (e.g., "User creates a project", "User logs in", "User submits a form")
 2. Read the relevant entry point file yourself to know the correct path
 3. Guide the player through each layer, validating as they go
-4. Update FLOW_MAP.md with a Mermaid diagram after each correct step
+4. Update FLOW_MAP.md with an ASCII flow diagram after each correct step
 
 **Opening prompt — present the journey:**
 
@@ -334,18 +376,26 @@ _Date: [Current Timestamp]_
 *[STEP CONFIRMED]*
 ```
 
-**Update FLOW_MAP.md with diagram after correct trace:**
+**Update FLOW_MAP.md with ASCII diagram after correct trace:**
 
 ```markdown
 ## Flow 1: [User Action]
 
-\`\`\`mermaid
-flowchart TD
-    A[Entry Point] --> B[Handler/Controller]
-    B --> C[Service Layer]
-    C --> D[Data Layer]
-    D --> E[(Database)]
-\`\`\`
+  [Entry Point]
+       │
+       ▼
+  [Handler/Controller]
+       │
+       ▼
+  [Service Layer]
+       │
+       ▼
+  [Data Layer]
+       │
+       ▼
+  ┌──────────┐
+  │ Database  │
+  └──────────┘
 
 _Traced: Entry → Controller → Service → Repository → Database_
 
@@ -423,7 +473,7 @@ _Traced: Entry → Controller → Service → Repository → Database_
 2. Identify 3-5 key entities
 3. Present them to the player
 4. Player investigates relationships (read model files, look at foreign keys, check imports)
-5. Build an ER diagram in FLOW_MAP.md
+5. Build an ASCII relationship diagram in FLOW_MAP.md
 
 **Opening prompt:**
 
@@ -498,17 +548,15 @@ For each pair, the player determines:
 *[RELATIONSHIP CONFIRMED]*
 ```
 
-**Update FLOW_MAP.md with ER diagram:**
+**Update FLOW_MAP.md with ASCII relationship diagram:**
 
 ```markdown
 ## Entity Relationships
 
-\`\`\`mermaid
-erDiagram
-    EntityA ||--o{ EntityB : "relationship"
-    EntityB ||--o{ EntityC : "relationship"
-    EntityA ||--o{ EntityC : "relationship"
-\`\`\`
+  EntityA ──── has many ────▶ EntityB
+     │                           │
+     │                           │
+     └──── has many ────▶ EntityC ◀── belongs to ── EntityB
 
 _Key insight: [Summary of the most important relationship]_
 ```
