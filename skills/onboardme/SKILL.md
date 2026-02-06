@@ -6,7 +6,7 @@ description: >
   investigation, hands-on challenges, and the Monster's guidance.
 license: MIT
 metadata:
-  author: onboardme
+  author: yonatanai
   version: "1.0.0"
 ---
 

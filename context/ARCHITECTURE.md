@@ -16,7 +16,6 @@ OnboardMe is implemented as an **agent skill** that transforms coding agents (Cu
 6. [Runtime Files](#6-runtime-files)
 7. [Installation & Distribution](#7-installation--distribution)
 8. [Design Documents](#8-design-documents)
-9. [Legacy CLI Code](#9-legacy-cli-code)
 
 ---
 
@@ -145,7 +144,7 @@ description: >
   Gamified codebase onboarding through the Spaghetti Code Monster.
 license: MIT
 metadata:
-  author: onboardme
+  author: yonatanai
   version: "1.0.0"
 ---
 ```
@@ -540,7 +539,7 @@ _Monster Note: "Finally, someone who looks beyond the README."_
 
 ```bash
 # Install OnboardMe skill
-npx add-skill onboardme/onboardme
+npx skills add yonatanai/onboardme
 
 # This copies skills/onboardme/ to:
 # .cursor/skills/onboardme/    (for Cursor)
@@ -607,30 +606,8 @@ When user says "onboardme", "prepare game", or "/onboardme":
 
 ---
 
-## 9. Legacy CLI Code
-
-The repository contains legacy CLI code in `src/` from an earlier implementation approach. This code includes:
-
-- `src/commands/` — CLI commands (init, start, status, validate)
-- `src/games/` — React/Ink game components
-- `src/ui/` — Terminal UI components
-- `tests/` — Unit, integration, and E2E tests
-
-This code is **superseded** by the agent-skills approach but preserved for:
-1. Reference for game logic patterns
-2. Potential future CLI companion tool
-3. E2E testing framework (still useful for testing concepts)
-
-### What Was Learned
-
-Key patterns from CLI development that informed the skill design:
-- **Game plugin architecture** → Influenced chapter reference file structure
-- **State management patterns** → Adapted for state-manager.cjs
-- **Scoring rubrics** → Used directly in SKILL.md
-- **File-detective game logic** → Informed Chapter 1 design
-
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Last Updated: 2026-02-06*
-*Status: Context Gathering Implemented — Chapter 1 Playable with Persistent Knowledge*
+*Status: All 5 chapters implemented, full game integration complete*

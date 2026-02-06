@@ -70,7 +70,7 @@ Traditional onboarding sucks:
 1. Engineer joins new company
 2. Clones the repo
 3. Installs OnboardMe skill:
-   npx add-skill onboardme/onboardme
+   npx skills add yonatanai/onboardme
 4. Opens Cursor/Claude Code
 5. Tells agent: "prepare game" or "/onboardme"
    - Agent scans codebase, initializes state
@@ -399,7 +399,7 @@ The Monster speaks through interference, static, and glitches:
 
 ```bash
 # Via npx (recommended)
-npx add-skill onboardme/onboardme
+npx skills add yonatanai/onboardme
 
 # This installs to:
 # .cursor/skills/onboardme/   (for Cursor)
@@ -412,15 +412,20 @@ npx add-skill onboardme/onboardme
 skills/onboardme/
 ├── SKILL.md                    # Main orchestrator (Monster persona, commands)
 ├── scripts/
-│   └── state-manager.cjs       # State read/write utilities
-├── commands/
+│   ├── state-manager.cjs       # Game state persistence
+│   └── knowledge-manager.cjs   # Codebase knowledge persistence
+├── instructions/
 │   ├── prepare-game.md         # Prepare command details
 │   ├── play-game.md            # Play command details
 │   ├── status.md               # Status command details
 │   ├── hint.md                 # Hint system details
 │   └── reset-game.md           # Reset command details
 └── references/
-    └── THE-INVESTIGATION.md    # Chapter 1 full instructions
+    ├── THE-INVESTIGATION.md    # Chapter 1 full instructions
+    ├── THE-HANDS-ON.md         # Chapter 2 full instructions
+    ├── THE-DEEP-DIVE.md        # Chapter 3 full instructions
+    ├── THE-HUNT.md             # Chapter 4 full instructions
+    └── THE-BOSS-BATTLE.md      # Chapter 5 full instructions
 ```
 
 ### Runtime Files
@@ -429,10 +434,15 @@ Created in target repo during gameplay:
 
 ```
 .onboardme/
-├── state.json                  # Game progress
+├── state.json                  # Game progress, score, mood
 ├── state.backup.json           # Auto-backup
+├── context/
+│   └── repo-knowledge.json     # Monster's answer key + discoveries
 └── artifacts/
-    └── CASE_FILE.md            # Investigation artifact
+    ├── CASE_FILE.md            # Chapter 1 artifact
+    ├── FLOW_MAP.md             # Chapter 3 artifact
+    ├── IMPACT_ANALYSIS.md      # Chapter 4 artifact
+    └── CODEBASE_KNOWLEDGE.md   # Chapter 5 artifact
 ```
 
 ---
@@ -443,24 +453,26 @@ Created in target repo during gameplay:
 
 ### Potential Future Features
 
-- **Additional Chapters**: Chapters 2-5 reference files
 - **Team Mode**: Multiple engineers compete/collaborate
 - **Leaderboards**: Team-based victory summaries
 - **Custom Chapters**: Teams create their own challenges
 - **Replay Mode**: Re-challenge the Monster with harder questions
-- **Snark Slider**: Adjust Monster tone (friendly → full-monster)
 - **Memory Logs**: Unlockable backstory fragments from git history
 
-### Current MVP Scope
+### Current Scope (v1.0)
 
-The implemented MVP includes:
-- ✅ Full Monster orchestrator skill
-- ✅ State management with persistence
-- ✅ Chapter 1: The Investigation
-- ✅ All 5 commands (prepare, play, status, hint, reset)
-- ✅ CASE_FILE.md artifact generation
-- ✅ Mood system and emotional arc
-- 🔜 Chapters 2-5 reference files
+The implemented version includes:
+- ✅ Full Monster orchestrator skill with persona lock
+- ✅ State management with persistence and auto-backup
+- ✅ Knowledge management with answer key and discovery accumulation
+- ✅ All 5 chapters: Investigation, Hands-On, Deep Dive, Hunt, Boss Battle
+- ✅ All 6 commands (prepare, play, status, hint, reset, change tone)
+- ✅ All artifacts: CASE_FILE.md, FLOW_MAP.md, IMPACT_ANALYSIS.md, CODEBASE_KNOWLEDGE.md
+- ✅ Mood system and full emotional arc (dismissive → peaceful)
+- ✅ Snark slider (friendly / balanced / spicy / full-monster)
+- ✅ Memorable exchange logging
+- ✅ Game-over and game-complete flows
+- ✅ Session continuity across multiple conversations
 
 ---
 
@@ -477,6 +489,6 @@ The implemented MVP includes:
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026-02-05*
-*Status: MVP Implemented — Chapter 1 Playable*
+*Document Version: 2.0*
+*Last Updated: 2026-02-06*
+*Status: v1.0 Complete — All 5 chapters playable*

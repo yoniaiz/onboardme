@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 5 Complete  
-> **Current Focus**: Ready for Milestone 6
+> **Status**: Milestone 7 Complete  
+> **Current Focus**: Ready for release
 
 ---
 
@@ -578,27 +578,24 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 
 ---
 
-## Milestone 6: Polish + Testing
+## Milestone 7: Open Source Preparation
 
-**Goal**: Quality assurance and testing framework.
-
-**Success Criteria**:
-- [ ] Golden transcript tests (expected conversation flows)
-- [ ] Character consistency testing
-- [ ] State migration tests
-- [ ] Edge case handling (stuck players, invalid input)
-
----
-
-## Milestone 7: Documentation Rewrite
-
-**Goal**: Update all documentation to reflect the implemented system.
+**Goal**: Prepare the repo for high-quality open source consumption — clean up legacy code, create README + LICENSE, ensure skills.sh discoverability.
 
 **Success Criteria**:
-- [x] PRD.md reflects agent-skills reality
-- [x] ARCHITECTURE.md updated for skill-based system
-- [ ] README.md with setup instructions
-- [ ] Archive deprecated CLI documentation
+- [x] Delete legacy CLI code (src/, tests/, CLI deps)
+- [x] Delete stale context docs (games/, visuals/, technical/, evaluation/)
+- [x] Delete dev artifacts (.cursor/plans/, .cursor/commands/, .agents/skills/)
+- [x] Delete unused configs (biome.json, knip.json, tsconfig.json)
+- [x] Create README.md with install instructions, quick start, chapters, commands
+- [x] Create MIT LICENSE file
+- [x] Strip package.json to minimal metadata
+- [x] Update .gitignore for clean repo
+- [x] Update SKILL.md frontmatter (author: yonatanai)
+- [x] Update AGENTS.md (remove CLI references)
+- [x] Update PRD.md (install command, current scope)
+- [x] Update ARCHITECTURE.md (remove legacy section)
+- [x] Final verification — repo clean, .gitignore correct, all files accounted for
 
 ---
 
@@ -680,18 +677,6 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 
 ---
 
-## Legacy: CLI Implementation
-
-The original CLI implementation (Milestone 1-3 of old plan) exists in `src/` but is being superseded by the agent-skills approach. Key learnings from CLI work:
-
-- Game plugin architecture (reusable concepts)
-- State management patterns (adapted for state.json)
-- File-detective game logic (informing Chapter 1 design)
-
-This code may be archived or adapted for the state-manager.ts utilities.
-
----
-
 ## Notes
 
 ### Decisions Made
@@ -700,14 +685,13 @@ This code may be archived or adapted for the state-manager.ts utilities.
 - Editor files as game boards (CASE_FILE.md, etc.)
 - 5 consolidated chapters (not 9+ individual games)
 - Slash commands for agent interaction
-
-### Open Questions
-- How to handle multiple coding agent platforms (Cursor vs Claude Code)?
-- State file location: `.onboardme/` in target repo or elsewhere?
+- Legacy CLI code deleted in Milestone 7 (clean slate for open source)
+- State files in `.onboardme/` in the target repository
+- Distribution via skills.sh ecosystem (`npx skills add yonatanai/onboardme`)
 
 ### Blockers
 - None currently
 
 ---
 
-*Last Updated: 2026-02-06 (Milestone 5 complete — Full game integration, explicit state commands in all chapters, Ch1→Ch5 pipeline verified)*
+*Last Updated: 2026-02-06 (Milestone 7 complete — Open source preparation, README, LICENSE, legacy cleanup)*

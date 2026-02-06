@@ -23,3 +23,13 @@ Thumbs.db
 
 # OnboardMe local data
 .onboardme/
+
+# Cursor IDE artifacts
+.cursor/plans/
+.cursor/commands/
+.cursor/skills/
+
+# Agent platform skill directories (deployment targets)
+.agents/skills/
+.claude/skills/
+.opencode/skills/
