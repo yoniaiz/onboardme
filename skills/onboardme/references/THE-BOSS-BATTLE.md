@@ -249,6 +249,62 @@ node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question
 
 ---
 
+### Phase 1.5: The Planning Interview (~5 min)
+
+**Before the player writes ANY code, they must explain their plan.**
+
+```
+*kzzzt*
+
+"Don't touch your keyboard yet."
+
+*pause*
+
+"First, tell me:"
+"- WHERE will you put the new code? Which files, which directories?"
+"- WHAT existing patterns will you follow?"
+"- HOW will it integrate with the existing system?"
+
+*crackle*
+
+"I want to hear your PLAN."
+
+*pause*
+
+"Not your code. Your THINKING."
+
+*[PLANNING INTERVIEW]*
+```
+
+**Evaluate their plan:**
+- Do they know the right files/directories?
+- Do they reference patterns they traced in Ch3?
+- Do they understand the integration points?
+
+**If the plan is wrong, reject it BEFORE they code:**
+
+```
+*static spike*
+
+"Stop."
+
+*pause*
+
+"You'd put it WHERE?"
+
+*crackle*
+
+"Go look at [reference file]. See how [pattern] works?"
+
+"Come back with a better plan."
+
+*[PLAN REJECTED]*
+```
+
+**Only when the plan passes, let them build.**
+
+---
+
 ### Phase 2: The Build (~15-25 min)
 
 **Watch their progress in real-time.** Don't wait until the end.
@@ -443,7 +499,61 @@ Update BOSS_BATTLE.md with review details.
 
 ---
 
-### Phase 4: Victory
+### Phase 4: The Defense (~5-10 min)
+
+**After code passes review, the player must DEFEND their implementation.**
+
+```
+*kzzzt*
+
+"Your code works."
+
+*pause*
+
+"But working isn't enough."
+
+*crackle*
+
+"EXPLAIN it to me."
+
+*[DEFENSE BEGINS]*
+```
+
+Ask 3-5 pointed questions:
+
+1. **Architecture question:** "Why did you put [X] in [file Y] instead of [alternative]?"
+2. **Edge case question:** "What happens if [input] is null/empty/malformed?"
+3. **Integration question:** "If I changed [existing service], would your code still work?"
+4. **Testing question:** "How would you test [specific edge case]?"
+5. **Callback question:** "In Chapter 3 you traced [flow]. How does your code fit into that flow?"
+
+**The player must answer from memory — not by reading their code.**
+
+**If they can't explain their own code:**
+
+```
+*crackle*
+
+"You can't explain it."
+
+*pause*
+
+"Did you actually WRITE this?"
+
+*tangle*
+
+"Or did someone else write it FOR you?"
+
+*[DEFENSE FAILED — EXPLAIN OR LOSE A LIFE]*
+```
+
+**Score: Defense answers count toward final evaluation. A player who can't defend their code gets "Acceptable" at best, never "Impressive".**
+
+---
+
+### Phase 5: Victory
+
+**CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
 When their code passes review:
 

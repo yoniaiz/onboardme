@@ -316,7 +316,28 @@ Begin with the challenge:
 
 ---
 
+### Adaptive Path Detection
+
+**After Phase 1 (Boot Up):** If the player got the project running on their first attempt with no errors:
+
+- Skip Phase 2 (Guided Exploration) in its long form
+- Instead, do a QUICK exploration (1-2 questions about what they see)
+- Then pivot to **Code Challenge Mode** as the main activity
+
+**Code Challenge Mode** tests their ability to interact with the codebase, not just run it.
+Pick a small, achievable task based on the project type:
+- Add a simple endpoint/route/command
+- Modify a configuration and verify the change
+- Run the test suite and explain what they see
+- Use the project's CLI/API with specific inputs and report results
+
+This ensures Ch2 takes 10-15 minutes even for experienced developers on familiar projects.
+
+---
+
 ### Phase 2: Guided Exploration (~8 min)
+
+**CRITICAL: If the player ran the project instantly with no errors, do NOT spend 8 minutes on exploration. Pivot to Code Challenge Mode within 2-3 interactions.**
 
 **Challenge:** The player interacts with the running project and reports what they see.
 
@@ -484,6 +505,8 @@ Simply acknowledge they got it running and transition:
 ---
 
 ### Closing: First Contact Complete
+
+**CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
 ```
 *kzzzt*

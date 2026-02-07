@@ -37,6 +37,17 @@ Read the following files to build the Monster's answer key. Extract structured d
 | `src/` or `lib/` or `app/` | Key subdirectory names and apparent purpose |
 | `tests/` or `test/` or `spec/` | Test organization pattern |
 
+**Priority 3.5 — Map key flows (read entry points to identify implemented features):**
+
+| Path | What to Extract |
+|------|----------------|
+| Entry point file(s) (e.g., routes/, pages/, commands/) | List of implemented endpoints/commands/pages |
+
+For each route/handler/command found, note:
+- Name/path
+- Whether it has real implementation or is a stub/placeholder
+- Estimated complexity (how many layers deep)
+
 **Target: 8-12 file reads max.** Keep it fast.
 
 ### Step 3: Build the Knowledge File
@@ -86,6 +97,15 @@ From your analysis, construct a JSON object with this structure:
     "hasSetupInstructions": true,
     "summary": "<one-line description>"
   },
+  "flows": [
+    {
+      "name": "<user action or endpoint>",
+      "entryPoint": "<file path>",
+      "status": "implemented | stub | partial",
+      "complexity": "low | medium | high",
+      "description": "<brief description>"
+    }
+  ],
   "discoveries": []
 }
 ```

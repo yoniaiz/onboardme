@@ -209,9 +209,9 @@ function updateMonsterMood(performance) {
   const chaptersCompleted = state.progress.chaptersCompleted;
 
   if (performance === "deep") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 15);
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 10);
   } else if (performance === "correct") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 5);
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 3);
   } else if (performance === "incorrect") {
     state.monster.respectLevel = Math.max(0, state.monster.respectLevel - 5);
   }
@@ -231,8 +231,27 @@ function updateMonsterMood(performance) {
     boss: "desperate",
   };
 
+  const CHAPTER_MAXIMUMS = {
+    investigation: "annoyed",
+    "hands-on": "annoyed",
+    "deep-dive": "worried",
+    hunt: "desperate",
+    boss: "peaceful",
+  };
+
+  // Respect level ceilings per chapter
+  const RESPECT_CEILINGS = {
+    investigation: 30,
+    "hands-on": 45,
+    "deep-dive": 70,
+    hunt: 90,
+    boss: 100,
+  };
+
   const chapterMinimum = CHAPTER_MINIMUMS[state.progress.currentChapter] || "dismissive";
   const minimumIndex = MOOD_ORDER.indexOf(chapterMinimum);
+  const chapterMaximum = CHAPTER_MAXIMUMS[state.progress.currentChapter] || "desperate";
+  const maximumIndex = MOOD_ORDER.indexOf(chapterMaximum);
   const currentIndex = MOOD_ORDER.indexOf(mood);
 
   if (currentIndex < minimumIndex) {
@@ -260,6 +279,16 @@ function updateMonsterMood(performance) {
   if (chaptersCompleted.length >= 4 && state.monster.currentMood === "worried") {
     state.monster.currentMood = "desperate";
   }
+
+  // Enforce chapter mood ceiling
+  const finalIndex = MOOD_ORDER.indexOf(state.monster.currentMood);
+  if (finalIndex > maximumIndex) {
+    state.monster.currentMood = MOOD_ORDER[maximumIndex];
+  }
+
+  // Enforce chapter respect ceiling
+  const respectCeiling = RESPECT_CEILINGS[state.progress.currentChapter] || 100;
+  state.monster.respectLevel = Math.min(state.monster.respectLevel, respectCeiling);
 
   writeState(state);
   return state;

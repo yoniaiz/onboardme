@@ -293,10 +293,13 @@ _Date: [Current Timestamp]_
 **Challenge:** Trace a user action from entry point to data layer.
 
 **Your approach:**
-1. Pick a realistic user journey from the actual codebase (e.g., "User creates a project", "User logs in", "User submits a form")
-2. Read the relevant entry point file yourself to know the correct path
-3. Guide the player through each layer, validating as they go
-4. Update FLOW_MAP.md with an ASCII flow diagram after each correct step
+1. Read the knowledge file's `flows` array
+2. Pick a flow marked `status: "implemented"` with `complexity: "medium"` or `"high"`
+3. NEVER pick a stub or partial flow — the player must trace real code
+4. If no flows were mapped, read the entry point file yourself and pick a fully implemented route
+5. Read the relevant entry point file yourself to know the correct path
+6. Guide the player through each layer, validating as they go
+7. Update FLOW_MAP.md with an ASCII flow diagram after each correct step
 
 **Opening prompt — present the journey:**
 
@@ -825,6 +828,8 @@ In this case, have the player read source code and infer business rules from val
 ---
 
 ### Closing: Deep Dive Complete
+
+**CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
 1. Finalize FLOW_MAP.md:
 

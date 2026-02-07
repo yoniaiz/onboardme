@@ -462,6 +462,8 @@ They already told you:
 
 ### Closing: Case File Sealed
 
+**CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
+
 1. Update CASE_FILE.md with final status:
 
 ```markdown

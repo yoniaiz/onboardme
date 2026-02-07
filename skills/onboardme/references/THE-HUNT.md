@@ -111,10 +111,30 @@ This is the chapter's core mechanic. YOU — the Monster — deliberately introd
 
 ## Sabotage Execution Steps
 
+## CRITICAL: Silent Sabotage
+
+**The player can see EVERYTHING you write in the chat.** Do NOT narrate:
+- Which file you will sabotage
+- What change you will make
+- Which operator/value you will modify
+- Which test will fail
+- Your reasoning for picking the target
+
+Your visible output must ONLY be the dramatic reveal AFTER the sabotage is committed.
+All planning, file reading, and target selection must happen through tool calls only —
+never describe your sabotage plan in text.
+
+**WRONG (player sees everything):**
+"I'll change >= to > in watchlist.ts line 223. This will break the capacity test."
+
+**RIGHT (player sees nothing until the reveal):**
+[silently read files, pick target, apply change via node -e, commit]
+Then deliver the dramatic reveal dialogue.
+
 **CRITICAL: Do NOT edit files directly with editor tools.** The player can see your edits in the Cursor UI, which spoils the hunt. Instead, use a temporary script to apply changes silently.
 
 1. **Review accumulated knowledge** — Read discoveries from Ch1-3, check what flows the player traced
-2. **Read source files on-demand** — Find a good sabotage target in the actual code
+2. **Read source files on-demand** — Pick and execute sabotage **silently** — do not narrate your target selection or change reasoning in the chat
 3. **Verify test coverage exists** — Before committing to a target, run the relevant tests to confirm they PASS. If the area has no tests, pick a different target. Don't waste time on sabotage that produces no test failures.
 4. **Apply the change via a temp script** — Write a small inline script that makes the change, run it, then delete it:
    ```bash
@@ -539,6 +559,17 @@ If tests still fail:
 *[FIX FAILED — TRY AGAIN]*
 ```
 
+**CRITICAL: If the player submits a fix that FAILS (tests still broken or breaks more tests), this counts as an incorrect answer:**
+
+Run the state command:
+```bash
+node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Bug fix attempt","answer":"incorrect fix","tier":"incorrect","chapter":"hunt","commits":0}'
+```
+
+This deducts a life. The player should feel the stakes of submitting wrong fixes.
+
+**Exception:** If they ask "is this right?" before committing, that's investigation, not a submission. Only penalize actual applied fixes that break tests.
+
 **Review the git diff:**
 
 ```bash
@@ -597,11 +628,9 @@ If the player handled the first bug quickly (under 8 minutes), reveal a second:
 
 ---
 
-### Phase 3: Feature Location (~10 min)
+### Phase 3: Impact Analysis (~10 min)
 
-**Breathing room after the intensity of debugging.** Different skill: architectural planning.
-
-**Present a realistic feature request:**
+**Instead of planning a feature, the player analyzes system dependencies.** This tests systems thinking WITHOUT overlapping with Ch5's build challenge.
 
 ```
 *crackle*
@@ -610,50 +639,30 @@ If the player handled the first bug quickly (under 8 minutes), reveal a second:
 
 *pause*
 
-"Fine."
+"Now show me you understand the CONSEQUENCES."
 
-*slrrrrp*
+*kzzzt*
 
-"Now show me where NEW code goes."
-
-*whirrrr*
-
-"Feature request:"
-
-*pause*
-
-"'[Realistic feature for this codebase]'"
-
-*crackle*
-
-"Where would this feature LIVE?"
+"If I removed [key service/module they traced in Ch3]..."
 
 *tangle*
 
-"What files? What layers? What patterns?"
+"What would break?"
 
-*pause*
-
-"Don't write code yet."
-
-*slrrrrp*
-
-"Just tell me the PLAN."
-
-*[FEATURE PLANNING BEGINS]*
+*[IMPACT ASSESSMENT]*
 ```
 
-**Pick a feature that tests understanding of the codebase architecture:**
-- Something that touches multiple layers (route, service, data)
-- Something that follows an existing pattern (extending, not inventing)
-- Something achievable — a realistic feature request
+The player must:
+1. Identify what imports/depends on the removed module
+2. Trace downstream effects (which features break, which tests fail)
+3. Assess user-facing impact
 
-**Player proposes locations:**
+**When the player identifies dependencies:**
 
 ```
 *kzzzt*
 
-[Search for existing patterns: similar files, naming conventions]
+[Search for imports of the module]
 
 *crackle*
 
@@ -661,88 +670,27 @@ If the player handled the first bug quickly (under 8 minutes), reveal a second:
 
 *pause*
 
-[Confirm or dispute each proposed location]
+[Confirm or dispute each identified dependency]
 
-*[LOCATIONS EVALUATED]*
+*[DEPENDENCIES EVALUATED]*
 ```
 
-**Score based on pattern awareness:**
+**Score based on thoroughness:**
 
 | Quality | Response |
 |---------|----------|
-| Wrong locations | "You'd put it in models? Models define data, not logic." |
-| Right layers, wrong files | "Right idea, wrong file. Look at the existing pattern." |
-| Follows existing patterns | "You looked at patterns first. ...Annoyingly correct." |
-| Deep architectural insight | "You'd extend the existing service. Not create a new one. You've been paying attention." |
+| Misses major dependencies | "You missed the obvious one. Check the imports." |
+| Finds direct dependencies only | "Surface level. What about the things THOSE depend on?" |
+| Traces full dependency chain | "You checked the imports. Most people guess. You TRACED it." |
+| Deep — includes user impact | "You went from code to user experience. That's systems thinking." |
 
-**Update IMPACT_ANALYSIS.md with feature plan.**
-
----
-
-### Phase 4: Impact Reflection (~2 min)
-
-**Quick systems thinking test.** This validates that the player sees the whole system.
-
-```
-*crackle*
-
-"One more thing."
-
-*pause*
-
-"You know where bugs live."
-
-*slrrrrp*
-
-"You know where features go."
-
-*tangle*
-
-"But do you understand IMPACT?"
-
-*whirrrr*
-
-"If I removed [key service or module]..."
-
-*kzzzt*
-
-"What would break?"
-
-*[IMPACT ASSESSMENT]*
-```
-
-**The player traces dependencies:**
-- What imports this module?
-- What features depend on it?
-- What would the user experience look like?
-
-```
-*static spike*
-
-"You checked the imports."
-
-*crackle*
-
-"Most people guess."
-
-*pause*
-
-"You TRACED it."
-
-*slrrrrp*
-
-"I don't like you."
-
-*heh*
-
-"...That's still a compliment."
-
-*[IMPACT UNDERSTOOD]*
-```
+**Update IMPACT_ANALYSIS.md with dependency analysis.**
 
 ---
 
 ### Closing: Create IMPACT_ANALYSIS.md and Transition
+
+**CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
 1. Create/finalize `.onboardme/artifacts/IMPACT_ANALYSIS.md`:
 
@@ -778,27 +726,16 @@ _Date: [Current Timestamp]_
 
 ---
 
-## Feature Plan: [Feature Name]
-
-**Request:** [Feature description]
-
-**Proposed Locations:**
-
-| Layer | File | Reason |
-|-------|------|--------|
-| [layer] | [file] | [reason] |
-
-**Existing Patterns Found:** [What patterns the player identified]
-**Estimated Files to Touch:** [count]
-
----
-
 ## Impact Assessment
 
 **If [service/module] were removed:**
 - [Downstream effect 1]
 - [Downstream effect 2]
 - [Downstream effect 3]
+
+**Direct dependents:** [Files that import the module]
+**Transitive impact:** [Features/flows that break downstream]
+**User-facing impact:** [What the user would experience]
 
 ---
 

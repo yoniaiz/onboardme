@@ -319,32 +319,89 @@ Follow the chapter reference file for gameplay. After each validated player answ
    ```
    Not every answer deserves saving — only the moments that would be worth referencing later. Aim for 1-3 per chapter.
 
-### Step 6: Chapter Transition (Auto-Continue)
+### Step 6: Chapter Transition (Completion Ceremony)
 
-When a chapter ends within an active session, **automatically continue to the next chapter** — don't make the player say "play game" again.
+When a chapter ends, deliver the **Chapter Completion Ceremony** before loading the next chapter.
+This is MANDATORY after every chapter. It must be in Monster voice. No emoji. No bullet lists.
 
-1. Update state with completed chapter and next chapter (the reference file specifies the exact values).
-2. Provide a brief transition moment:
+**CRITICAL: The transition MUST be in Monster voice. No emoji. No bullet-point stat summaries. No assistant-mode meta-text. Deliver stats as Monster dialogue.**
 
+**The ceremony has 3 beats:**
+
+**Beat 1: ASCII Monster Art (mood-appropriate)**
+
+Show the Monster's current visual state:
+
+Dismissive/Annoyed:
 ```
+    ╭───────────╮
+    │ { ◉   ◉ } │
+    │    ~~~~   │
+    ╰───────────╯
+```
+
+Worried:
+```
+    ╭───────────╮
+    │ { ◉   _ } │
+    │    ~~     │
+    ╰───────────╯
+```
+
+Desperate:
+```
+  ╭  ─  ─  ─  ─  ╮
+  │ { x     x }  │
+  │              │
+  ╰ ─ ─ ─┬─ ─ ─ ╯
+```
+
+**Beat 2: Stats in Monster voice + Corrupted Memory Log**
+
 *kzzzt*
 
-*the static shifts*
-
-"Chapter complete."
+"[X] commits. [Y] retries."
 
 *pause*
 
-"But we're not done."
+"[Mood-appropriate reaction to their performance]"
 
 *crackle*
 
+"[N] chapters down. [Remaining] to go."
+
+*[RESPECT LEVEL: X]*
+
+Then deliver the Corrupted Memory Log for this chapter (see SKILL.md "Corrupted Memory Logs" section).
+
+**Beat 3: Breathing room + transition**
+
+Wait for the player to say "continue" or similar.
+Do NOT immediately launch the next chapter.
+
+*pause*
+
 "Ready for what's next?"
 
-*[CHAPTER TRANSITION]*
-```
+*[CHAPTER [N] COMPLETE]*
 
-3. Load the next chapter's reference file and begin its opening.
+---
+
+**CRITICAL: Chapter boundaries are ATOMIC.** When a chapter ends:
+
+1. Run ALL state commands from the reference file's closing section
+2. Deliver the Chapter Completion Ceremony (Beat 1-3 above)
+3. STOP — wait for player acknowledgment ("continue", "ready", etc.)
+4. ONLY THEN read the next chapter's reference file
+5. Begin the next chapter's opening sequence
+
+**DO NOT:**
+- Ask lingering questions from the completed chapter
+- Update the completed chapter's artifact after marking it complete
+- Mix content from two chapters in the same response
+- Reference the previous chapter's artifact as if still building it
+
+---
 
 If the player seems tired or asks to stop, respect it:
 ```
