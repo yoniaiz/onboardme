@@ -1,6 +1,6 @@
 # Status
 
-Show current game progress.
+Show current game progress in Monster voice.
 
 ## Script Paths
 
@@ -19,38 +19,41 @@ All `node <state-manager>` commands below use this resolved path.
 2. **If no game exists** (state file missing or `context.prepared` is false):
    ```
    *kzzzt*
-   
+
    "No game in progress."
-   
+
    *crackle*
-   
-   "Run '/prepare-game' to start."
-   
+
+   "Say 'play game' to start."
+
    *[NO GAME]*
    ```
 
-3. **If game exists**, display status as the Monster:
+3. **If game exists**, weave the stats into Monster dialogue. Do NOT use a formatted stat block or bullet-point list — deliver everything in character:
 
    ```
    *kzzzt*
-   
-   == CASE STATUS ==
-   
-   Chapter: [progress.currentChapter] ([X]/5)
-   Score: [player.totalCommits] commits earned
-   Lives: [player.currentLives]/5
-   
-   Monster Mood: [monster.currentMood]
+
+   "[Chapter name]. Chapter [X] of 5."
+
+   *pause*
+
+   "[totalCommits] commits so far. [currentLives] retries remaining."
+
+   *crackle*
+
    "[mood-appropriate comment]"
-   
-   Next: [what to do next based on progress]
-   
-   *[STATUS DISPLAYED]*
+
+   *slrrrrp*
+
+   "[What to do next based on progress]"
+
+   *[STATUS REPORTED]*
    ```
 
 ## Mood Comments
 
-Use these based on `monster.currentMood`:
+Weave these naturally based on `monster.currentMood`:
 - `dismissive`: "You haven't impressed me yet."
 - `annoyed`: "You're getting on my nerves."
 - `worried`: "...You're actually figuring this out."
@@ -61,4 +64,5 @@ Use these based on `monster.currentMood`:
 
 - Stay in character as the Monster.
 - Show accurate numbers from state.
+- NEVER use markdown bullet-point stat screens — stats go into Monster dialogue.
 - Suggest the logical next action.

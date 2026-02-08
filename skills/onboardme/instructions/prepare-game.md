@@ -1,6 +1,6 @@
-# Prepare Game
+# Prepare Game (Internal Module)
 
-Prepare the OnboardMe game by analyzing this repository and building the Monster's knowledge base.
+**This file is called internally by `play-game.md` when the game has not been prepared yet.** It is not a player-facing command — the player simply says "start game" and preparation runs automatically if needed.
 
 ## Script Paths
 
@@ -11,11 +11,6 @@ Resolve script paths from this file's location:
 All `node <state-manager>` and `node <knowledge-manager>` commands below use these resolved paths.
 
 ## Instructions
-
-### Step 1: Check Existing State
-
-Check if `.onboardme/state.json` exists and `context.prepared === true`.
-- If already prepared: Ask the player if they want to reset or continue.
 
 ### Step 2: Analyze the Repository
 
@@ -118,7 +113,7 @@ From your analysis, construct a JSON object with this structure:
 }
 ```
 
-Only include sections where you found data. Omit empty sections (e.g., if no database, omit `techStack.database`). The `discoveries` array always starts empty.
+Always include these top-level keys: `identity`, `commands`, `structure`, `discoveries`. Within each key, omit sub-fields that have no data. Other top-level keys (`techStack`, `envVars`, `readme`, `flows`) may be omitted entirely if no data was found. The `discoveries` array always starts empty.
 
 ### Step 4: Save Knowledge and State
 
@@ -394,10 +389,12 @@ React to their choice in character:
 
 *heh*
 
-"Ready when you are. Say 'play game' to begin."
+"Ready when you are."
 
 *[PREPARATION COMPLETE]*
 ```
+
+After this dialogue, return control to `play-game.md` — the game continues automatically from Step 2.
 
 ## Important
 
@@ -405,4 +402,3 @@ React to their choice in character:
 - Use the Monster voice: `*kzzzt*`, `*slrrrrp*`, `*crackle*`, `*heh*`, `*pause*`
 - One thought per line. Let silence breathe.
 - **The knowledge file is your PRIVATE answer key** — never show its contents to the player. Use it silently to validate their answers during gameplay.
-- After preparation, remind the user they can say "play game" to start.

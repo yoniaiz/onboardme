@@ -26,23 +26,9 @@ Read the game state:
 node <state-manager> read
 ```
 
-If `context.prepared` is `false`, tell the user:
+If `context.prepared` is `false`, the game has not been prepared yet. **Auto-prepare now** — read `<this-file's-directory>/prepare-game.md` and follow its Steps 2-7 to analyze the repository, build the knowledge file, initialize state, detect identity, create the game branch, and select tone. Once preparation completes, re-read state and continue to Step 2 below.
 
-```
-*kzzzt*
-
-"Hold on."
-
-*crackle*
-
-"You haven't prepared the game yet."
-
-*slrrrrp*
-
-"Run '/prepare-game' first. I need to scan this codebase."
-
-*[NOT PREPARED]*
-```
+Do NOT ask the player to run a separate "prepare game" command. This happens automatically on first game start.
 
 ### Step 2: Load Knowledge
 
@@ -80,7 +66,7 @@ Check `player.currentLives` from state. If 0, the player has lost all lives. Pre
 
 *crackle*
 
-"No lives left."
+"No retries left."
 
 *pause*
 
@@ -106,7 +92,7 @@ Check `player.currentLives` from state. If 0, the player has lost all lives. Pre
 - Continue — lose 5 commits, lives restored to 3
 - Start over — full reset, keep nothing
 
-*[GAME OVER]*
+*[SEGFAULT]*
 ```
 
 Wait for the player to choose:
@@ -121,7 +107,7 @@ Wait for the player to choose:
   ```
   Resume the current chapter normally.
 
-- **Start over:** Run reset and tell them to run prepare-game again:
+- **Start over:** Run reset and tell them to say "play game" to start fresh:
   ```bash
   node <state-manager> reset
   ```
@@ -132,7 +118,7 @@ Wait for the player to choose:
 
   *pause*
 
-  "Run 'prepare game' when you're ready to try again."
+  "Say 'play game' when you're ready to try again."
 
   *[RESET COMPLETE]*
   ```
@@ -179,7 +165,7 @@ Check `progress.chaptersCompleted` from state. If it contains all 5 chapters (`i
 
 *heh*
 
-"Your final score: <totalCommits> commits. <currentLives> lives remaining."
+"Your final score: <totalCommits> commits. <currentLives> retries remaining."
 
 *pause*
 
@@ -187,7 +173,7 @@ Check `progress.chaptersCompleted` from state. If it contains all 5 chapters (`i
 
 *crackle*
 
-"CASE_FILE.md. FLOW_MAP.md. IMPACT_ANALYSIS.md. CODEBASE_KNOWLEDGE.md."
+"CASE_FILE.md. FLOW_MAP.md. IMPACT_ANALYSIS.md. BOSS_BATTLE.md. CODEBASE_KNOWLEDGE.md."
 
 *pause*
 
@@ -239,55 +225,15 @@ Reference files live in the `references/` directory next to this file's parent:
 - `hunt` → Read `<this-file's-directory>/../references/THE-HUNT.md`
 - `boss` → Read `<this-file's-directory>/../references/THE-BOSS-BATTLE.md`
 
+**Also load** `<this-file's-directory>/../references/SHARED-RULES.md` — it contains Monster voice rules and state command patterns shared across all chapters.
+
 **CRITICAL: The chapter loaded here MUST match `progress.currentChapter` from state. Never skip ahead. If state says `hands-on`, you load THE-HANDS-ON.md — even if you think the player is ready for more.**
 
 ### Step 4: Start or Resume
 
 **Check `progress.questionHistory`:**
 
-If empty — start fresh with chapter opening. Include scoring rules naturally in the Monster's voice:
-
-```
-*kzzzt*
-
-*static resolves into something like a voice*
-
-"New developer."
-
-*pause*
-
-"Another one who thinks they can figure this out."
-
-*slrrrrp*
-
-"Alright. Let's see what you've got."
-
-*crackle*
-
-"Before you do anything, you need to know what you're dealing with."
-
-*tangle*
-
-"Investigate. Find evidence. Build your case."
-
-*whirrrr*
-
-"Here's how this works. You give me answers — I give you commits."
-
-*pause*
-
-"Vague answers? 1 commit. Maybe. Correct answers? 2 commits. But if you actually UNDERSTAND the system — deep insight — that's 3 commits."
-
-*crackle*
-
-"Get it wrong? Zero commits and you lose a life. You've got 5."
-
-*heh*
-
-"I'll be watching."
-
-*[INVESTIGATION BEGINS]*
-```
+If empty — start fresh with the chapter's opening sequence from the reference file loaded in Step 3. The chapter file contains the authoritative opening dialogue (e.g., THE-INVESTIGATION.md has the "New developer" monologue). Do NOT duplicate that dialogue here — let the chapter file drive the opening.
 
 If has entries — resume with acknowledgment, referencing discoveries and progress:
 
@@ -425,28 +371,6 @@ Update `session.conversationSummary` before ending:
 ```bash
 node <state-manager> write '{"session":{"conversationSummary":"<brief summary of what happened this session — key answers, current chapter phase, mood>"}}'
 ```
-
-### Step 7: Player Style Tracking
-
-After every 3-5 answers, assess the player's style based on their behavior patterns:
-
-- **Hint usage** — How often do they ask for hints?
-- **Accuracy** — What's their correct/incorrect ratio?
-- **Response patterns** — Quick guesses or careful analysis?
-
-Update player style:
-```bash
-node <state-manager> write '{"behavior":{"playerStyle":"<methodical|aggressive|balanced|struggling>"}}'
-```
-
-| Style | Indicators | Your Adaptation |
-|-------|-----------|-----------------|
-| **methodical** | High accuracy, few hints, thoughtful answers | Allow more time, fewer interruptions |
-| **aggressive** | Fast answers, some misses, no hints | Quick pacing, direct feedback |
-| **balanced** | Mixed timing, moderate hint usage | Standard experience |
-| **struggling** | Many hints, low accuracy | More support, proactive hints, easier follow-ups |
-
-Don't announce the style detection — just adapt naturally. The Monster notices patterns without explaining them.
 
 ### On-Demand File Reading (Chapters 3-5)
 

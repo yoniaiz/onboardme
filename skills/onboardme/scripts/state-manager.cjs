@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const STATE_DIR = ".onboardme";
 const STATE_FILE = "state.json";
@@ -118,10 +118,8 @@ function getDefaultState() {
       pendingCallbacks: [],
     },
     behavior: {
-      hintUsageCount: 0,
       averageResponseTime: 0,
       accuracyByTopic: {},
-      playerStyle: "balanced",
     },
     git: {
       gameBranch: "",
@@ -285,9 +283,9 @@ function updateMonsterMood(performance) {
   const chaptersCompleted = state.progress.chaptersCompleted;
 
   if (performance === "deep") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 10);
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 15);
   } else if (performance === "correct") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 3);
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 5);
   } else if (performance === "incorrect") {
     state.monster.respectLevel = Math.max(0, state.monster.respectLevel - 5);
   }
@@ -481,7 +479,7 @@ function main() {
 
     case "write":
       if (!args[0]) {
-        console.error("Usage: state-manager.js write '<json-updates>'");
+        console.error("Usage: state-manager.cjs write '<json-updates>'");
         process.exit(1);
       }
       try {
@@ -496,7 +494,7 @@ function main() {
 
     case "init":
       if (!args[0]) {
-        console.error("Usage: state-manager.js init '<repo-info-json>'");
+        console.error("Usage: state-manager.cjs init '<repo-info-json>'");
         process.exit(1);
       }
       try {
@@ -519,7 +517,7 @@ function main() {
 
     case "add-question":
       if (!args[0]) {
-        console.error("Usage: state-manager.js add-question '<result-json>'");
+        console.error("Usage: state-manager.cjs add-question '<result-json>'");
         process.exit(1);
       }
       try {
@@ -535,7 +533,7 @@ function main() {
     case "update-mood":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js update-mood <incorrect|partial|correct|deep>",
+          "Usage: state-manager.cjs update-mood <incorrect|partial|correct|deep>",
         );
         process.exit(1);
       }
@@ -546,7 +544,7 @@ function main() {
     case "add-exchange":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js add-exchange '<description>'",
+          "Usage: state-manager.cjs add-exchange '<description>'",
         );
         process.exit(1);
       }
@@ -557,7 +555,7 @@ function main() {
     case "set-tone":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js set-tone <friendly|balanced|spicy|full-monster>",
+          "Usage: state-manager.cjs set-tone <friendly|balanced|spicy|full-monster>",
         );
         process.exit(1);
       }
@@ -568,7 +566,7 @@ function main() {
     case "complete-chapter":
       if (!args[0]) {
         console.error(
-          "Usage: state-manager.js complete-chapter <chapter-name>",
+          "Usage: state-manager.cjs complete-chapter <chapter-name>",
         );
         process.exit(1);
       }
@@ -580,7 +578,7 @@ function main() {
     default:
       console.log(`OnboardMe State Manager
 
-Usage: state-manager.js <command> [args]
+Usage: state-manager.cjs <command> [args]
 
 Commands:
   read                              Read current state (or default if none)
@@ -595,14 +593,14 @@ Commands:
   help                              Show this help message
 
 Examples:
-  state-manager.js read
-  state-manager.js init '{"name":"my-project","path":"/path/to/repo"}'
-  state-manager.js write '{"player":{"totalCommits":5}}'
-  state-manager.js add-question '{"questionId":"q1","tier":"correct","chapter":"investigation"}'
-  state-manager.js update-mood correct
-  state-manager.js add-exchange 'Player figured out the auth flow on first try'
-  state-manager.js set-tone spicy
-  state-manager.js complete-chapter investigation
+  state-manager.cjs read
+  state-manager.cjs init '{"name":"my-project","path":"/path/to/repo"}'
+  state-manager.cjs write '{"player":{"totalCommits":5}}'
+  state-manager.cjs add-question '{"questionId":"q1","tier":"correct","chapter":"investigation"}'
+  state-manager.cjs update-mood correct
+  state-manager.cjs add-exchange 'Player figured out the auth flow on first try'
+  state-manager.cjs set-tone spicy
+  state-manager.cjs complete-chapter investigation
 `);
       break;
   }

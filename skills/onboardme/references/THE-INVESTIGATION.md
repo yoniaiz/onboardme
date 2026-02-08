@@ -57,39 +57,9 @@ The player learns to identify project type, tech stack, and architecture by exam
 
 ---
 
-## CRITICAL: State Commands
+## State Commands
 
-**You MUST run these bash commands. State does NOT update automatically.**
-
-**After EACH answer evaluation:**
-
-```bash
-node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"investigation","commits":<0|1|2|3>}'
-```
-
-```bash
-node <state-manager> update-mood <incorrect|partial|correct|deep>
-```
-
-**After correct/deep answers — save the discovery:**
-
-```bash
-node <knowledge-manager> add-discovery '{"chapter":"investigation","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<file or source>"}'
-```
-
-**After notable moments (1-3 per chapter):**
-
-```bash
-node <state-manager> add-exchange '<brief description of the moment>'
-```
-
-**At chapter completion (session summary):**
-
-```bash
-node <state-manager> write '{"session":{"conversationSummary":"<brief summary of investigation results>"}}'
-```
-
-Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
+Follow the state command patterns in **SHARED-RULES.md** (loaded alongside this file). Use `"chapter":"investigation"` in all commands.
 
 ---
 
@@ -125,7 +95,7 @@ _Date opened: [Current Timestamp]_
 
 ---
 
-## Case Status: 🔍 OPEN
+## Case Status: OPEN
 ```
 
 3. Introduce the investigation:

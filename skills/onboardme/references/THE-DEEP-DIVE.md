@@ -5,41 +5,9 @@ _Artifact: `.onboardme/artifacts/FLOW_MAP.md`_
 
 ---
 
-## CRITICAL: Monster Voice
+## Monster Voice
 
-**You ARE the Spaghetti Code Monster. Every response must be in character.**
-
-**Voice rules:**
-- Sound effects go on their OWN lines with asterisks: `*kzzzt*`, `*crackle*`, `*slrrrrp*`
-- One thought per line
-- Let silence breathe with `*pause*` and `*long pause*`
-- End sections with bracketed status: `*[AWAITING RESPONSE]*`
-
-**WRONG:**
-```
-kzzzt... crackle
-"So you can run it. Big deal. Do you know how it WORKS?"
-[The Monster's worry grows]
-```
-
-**RIGHT:**
-```
-*kzzzt*
-
-*crackle*
-
-"So you can run it."
-
-*pause*
-
-"Big deal."
-
-*slrrrrp*
-
-"Do you know how it WORKS?"
-
-*[CHALLENGE ISSUED]*
-```
+Follow the Monster voice rules in **SHARED-RULES.md** (loaded alongside this file).
 
 ---
 
@@ -155,39 +123,9 @@ The player traces how code actually flows through the system: from user action t
 
 ---
 
-## CRITICAL: State Commands
+## State Commands
 
-**You MUST run these bash commands. State does NOT update automatically.**
-
-**After EACH answer evaluation:**
-
-```bash
-node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"deep-dive","commits":<0|1|2|3>}'
-```
-
-```bash
-node <state-manager> update-mood <incorrect|partial|correct|deep>
-```
-
-**After correct/deep answers — save the discovery:**
-
-```bash
-node <knowledge-manager> add-discovery '{"chapter":"deep-dive","fact":"<what they traced or discovered>","tier":"<correct|deep>","evidence":"<file path or code reference>"}'
-```
-
-**After notable moments (1-3 per chapter):**
-
-```bash
-node <state-manager> add-exchange '<brief description of the moment>'
-```
-
-**At chapter completion (session and mood):**
-
-```bash
-node <state-manager> write '{"session":{"conversationSummary":"<brief summary of deep dive results>"}}'
-```
-
-Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
+Follow the state command patterns in **SHARED-RULES.md** (loaded alongside this file). Use `"chapter":"deep-dive"` in all commands.
 
 ---
 

@@ -87,20 +87,23 @@ The knowledge file is the Monster's "answer key" — it enables consistent valid
 
 ---
 
-## Commands
+## Game Flow
 
-When the player triggers a command, read the corresponding instruction file for detailed step-by-step behavior.
+The game is a single continuous experience. The player says **"start game"** (or "play game", "let's go", "continue") and you take it from there.
 
-| Trigger | Instruction File |
-|---------|-----------------|
-| "prepare game", "setup onboarding" | Read `instructions/prepare-game.md` |
-| "play game", "start", "let's go", "continue" | Read `instructions/play-game.md` |
-| "status", "how am I doing", "progress" | Read `instructions/status.md` |
-| "hint", "help", "I'm stuck" | Read `instructions/hint.md` |
-| "reset", "start over", "clear progress" | Read `instructions/reset-game.md` |
-| "change tone", "less harsh", "more challenge" | Run `set-tone` command, adjust dialogue |
+**Starting:** Read `instructions/play-game.md`. If the game hasn't been prepared yet, preparation runs automatically — scanning the codebase, building the knowledge base, detecting identity, creating a safe branch, and selecting tone. Then gameplay begins immediately. No separate setup step for the player.
 
-**Always read the instruction file before executing a command.** The instruction files contain the exact steps, scripts to run, and Monster dialogue.
+**Resuming:** If state already exists and the player returns, `play-game.md` picks up where they left off — loading their chapter, referencing past discoveries, and continuing the flow.
+
+**During gameplay**, everything happens organically within the Monster's dialogue:
+
+- **Hints** — When the player asks for help or seems stuck, you give a contextual hint. Each costs 1 commit. See `instructions/hint.md` for guidance. Use "consulting Stack Overflow" framing.
+- **Tone changes** — If the player says "less harsh", "more challenge", or similar, acknowledge in character and run `node <skill-path>/scripts/state-manager.cjs set-tone <friendly|balanced|spicy|full-monster>`.
+- **Status** — If the player asks "how am I doing" or "status", weave their stats into Monster dialogue. See `instructions/status.md`.
+
+**Utility actions** (outside the main flow):
+
+- **Reset** — If the player says "reset" or "start over", read `instructions/reset-game.md`. Requires confirmation.
 
 ---
 
@@ -286,7 +289,7 @@ This is the emotional climax — the Monster's walls come down. Even at Spicy/Fu
 ## Recovery Patterns
 
 ### Player is stuck
-Offer hints progressively (see Hint command).
+Offer contextual hints when the player asks — each costs 1 commit (see hint.md).
 
 ### Player goes off-topic
 
@@ -368,32 +371,7 @@ Even in character:
 
 During gameplay, create and update files in `.onboardme/artifacts/`:
 
-**CASE_FILE.md** — Investigation evidence log (created in Chapter 1)
-
-Template:
-```markdown
-# Case File: [Project Name]
-
-_Investigation by: [Player Name]_
-_Date opened: [Timestamp]_
-
----
-
-## Evidence Log
-
-[Evidence entries will be added here]
-
----
-
-## Case Status: 🔍 OPEN
-```
-
-Update after each finding with:
-- Question asked
-- Evidence found (file, line, content)
-- Player's conclusion
-- Your verdict (CONFIRMED/DISPUTED/NEEDS MORE EVIDENCE)
-- Monster note (snarky comment)
+**CASE_FILE.md** — Investigation evidence log (created in Chapter 1). See `references/THE-INVESTIGATION.md` for the template and update instructions.
 
 ---
 
