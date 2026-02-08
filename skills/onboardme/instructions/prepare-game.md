@@ -2,6 +2,14 @@
 
 Prepare the OnboardMe game by analyzing this repository and building the Monster's knowledge base.
 
+## Script Paths
+
+Resolve script paths from this file's location:
+- **State manager:** `<this-file's-directory>/../scripts/state-manager.cjs`
+- **Knowledge manager:** `<this-file's-directory>/../scripts/knowledge-manager.cjs`
+
+All `node <state-manager>` and `node <knowledge-manager>` commands below use these resolved paths.
+
 ## Instructions
 
 ### Step 1: Check Existing State
@@ -116,12 +124,12 @@ Only include sections where you found data. Omit empty sections (e.g., if no dat
 
 1. Save the knowledge file:
    ```bash
-   node .cursor/skills/onboardme/scripts/knowledge-manager.cjs write '<the-json-you-built>'
+   node <knowledge-manager> write '<the-json-you-built>'
    ```
 
 2. Initialize game state:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs init '{"name":"<project-name>","path":"<repo-path>"}'
+   node <state-manager> init '{"name":"<project-name>","path":"<repo-path>"}'
    ```
 
 3. Create artifacts directory:
@@ -140,13 +148,13 @@ git config user.name
 If the result is non-empty, save it:
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"player":{"name":"<detected-name>"}}'
+node <state-manager> write '{"player":{"name":"<detected-name>"}}'
 ```
 
 If git config is empty or git is unavailable, fall back to `"Unknown Agent"`:
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"player":{"name":"Unknown Agent"}}'
+node <state-manager> write '{"player":{"name":"Unknown Agent"}}'
 ```
 
 The Monster reacts to their name without asking — seamless, no prompts:
@@ -226,7 +234,7 @@ Set up a safe branch for gameplay. This keeps the player's original code untouch
 
 5. **Save git state:**
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"git":{"gameBranch":"onboardme/game","originalBranch":"<original-branch-name>","branchCreated":true}}'
+   node <state-manager> write '{"git":{"gameBranch":"onboardme/game","originalBranch":"<original-branch-name>","branchCreated":true}}'
    ```
 
 6. **Confirm to the player:**
@@ -280,7 +288,7 @@ Wait for the player to choose. If they don't answer or say "default", use `balan
 Save their choice:
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs set-tone <friendly|balanced|spicy|full-monster>
+node <state-manager> set-tone <friendly|balanced|spicy|full-monster>
 ```
 
 React to their choice in character:

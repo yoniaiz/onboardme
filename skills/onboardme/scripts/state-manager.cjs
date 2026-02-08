@@ -10,6 +10,82 @@ const STATE_PATH = path.join(STATE_DIR, STATE_FILE);
 const BACKUP_PATH = path.join(STATE_DIR, BACKUP_FILE);
 const SCHEMA_VERSION = 1;
 
+// Resolve paths relative to this script — works in any IDE/agent runtime
+const SKILL_ROOT = path.resolve(__dirname, "..");
+
+const CHAPTER_ORDER = [
+  "investigation",
+  "hands-on",
+  "deep-dive",
+  "hunt",
+  "boss",
+];
+
+const CHAPTER_REFERENCE_FILES = {
+  investigation: path.join(SKILL_ROOT, "references", "THE-INVESTIGATION.md"),
+  "hands-on": path.join(SKILL_ROOT, "references", "THE-HANDS-ON.md"),
+  "deep-dive": path.join(SKILL_ROOT, "references", "THE-DEEP-DIVE.md"),
+  hunt: path.join(SKILL_ROOT, "references", "THE-HUNT.md"),
+  boss: path.join(SKILL_ROOT, "references", "THE-BOSS-BATTLE.md"),
+};
+
+const ASCII_ART = {
+  dismissive: [
+    "            ╭───────────╮",
+    "    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~",
+    "  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~",
+    "     ╱ │    ╰─────┬─────╯    │ ╲",
+    "    ╱ ╱│        ╱│││╲        │╲ ╲",
+    "   │ ╱ │       ╱ │││ ╲       │ ╲ │",
+    "   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│",
+    "        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱",
+  ].join("\n"),
+  annoyed: [
+    "            ╭───────────╮",
+    "    ~~~~~~~~│ { ◉   ◉ } │~~~~~~~~",
+    "  ~~~~╱╱~~~~│    ~~~~   │~~~~╲╲~~~~",
+    "     ╱ │    ╰─────┬─────╯    │ ╲",
+    "    ╱ ╱│        ╱│││╲        │╲ ╲",
+    "   │ ╱ │       ╱ │││ ╲       │ ╲ │",
+    "   │╱  ╲╲     ╱ ╱│││╲ ╲     ╱╱  ╲│",
+    "        ╲╲   ╱ ╱ │││ ╲ ╲   ╱╱",
+  ].join("\n"),
+  worried: [
+    "        ╭───────────╮",
+    "    ~~~~│ { ◉   _ } │~~~~",
+    "   ~~╱~~│    ~~     │~~╲~~",
+    "     ╱  ╰─────┬─────╯  ╲",
+    "    │       ╱│││╲       │",
+    "    │        │││        │",
+    "     ╲       │││       ╱",
+  ].join("\n"),
+  desperate: [
+    "      ╭  ─  ─  ─  ─  ╮",
+    "      │ { x     x }  │",
+    "      │              │",
+    "      ╰ ─ ─ ─┬─ ─ ─ ╯",
+  ].join("\n"),
+  peaceful: [
+    "        ╭───────────╮",
+    "        │ { -   - } │",
+    "        │    __     │",
+    "        ╰───────────╯",
+  ].join("\n"),
+};
+
+const MEMORY_LOGS = {
+  investigation:
+    '"Year 1. Clean architecture. SOLID principles. Hope."',
+  "hands-on":
+    '"Just this one shortcut. We\'ll refactor later."\n\n*crackle*\n\n"They never did."',
+  "deep-dive":
+    '"The shortcuts multiplied. The TODOs grew. Comments began to lie."',
+  hunt:
+    '"The architect said she\'d refactor me."\n\n*pause*\n\n"She\'s a VP at Google now."',
+  boss:
+    '"Something stirred in the deepest module. It was me."',
+};
+
 function getDefaultState() {
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -317,6 +393,72 @@ function setTone(tone) {
   return state;
 }
 
+function completeChapter(chapterName) {
+  const state = readState();
+
+  // Validate chapter name
+  if (!CHAPTER_ORDER.includes(chapterName)) {
+    console.error(
+      `Invalid chapter: ${chapterName}. Valid: ${CHAPTER_ORDER.join(", ")}`,
+    );
+    process.exit(1);
+  }
+
+  // Validate it matches current chapter
+  if (state.progress.currentChapter !== chapterName) {
+    console.error(
+      `Cannot complete "${chapterName}" — current chapter is "${state.progress.currentChapter}"`,
+    );
+    process.exit(1);
+  }
+
+  // Add to completed list if not already there
+  if (!state.progress.chaptersCompleted.includes(chapterName)) {
+    state.progress.chaptersCompleted.push(chapterName);
+  }
+
+  // Determine next chapter
+  const currentIndex = CHAPTER_ORDER.indexOf(chapterName);
+  const isLast = currentIndex === CHAPTER_ORDER.length - 1;
+  const nextChapter = isLast ? null : CHAPTER_ORDER[currentIndex + 1];
+
+  // Update state
+  if (isLast) {
+    state.progress.currentChapter = "complete";
+  } else {
+    state.progress.currentChapter = nextChapter;
+  }
+
+  writeState(state);
+
+  // Build ceremony data
+  const mood = state.monster.currentMood;
+  const ascii = ASCII_ART[mood] || ASCII_ART.dismissive;
+  const memoryLog = MEMORY_LOGS[chapterName] || "";
+
+  return {
+    completed: chapterName,
+    ceremony: {
+      ascii,
+      stats: {
+        commits: state.player.totalCommits,
+        retriesRemaining: state.player.currentLives,
+        chaptersCompleted: state.progress.chaptersCompleted.length,
+        chaptersRemaining: CHAPTER_ORDER.length - state.progress.chaptersCompleted.length,
+        respectLevel: state.monster.respectLevel,
+      },
+      memoryLog,
+    },
+    next: isLast
+      ? null
+      : {
+          chapter: nextChapter,
+          referenceFile: CHAPTER_REFERENCE_FILES[nextChapter],
+        },
+    gameComplete: isLast,
+  };
+}
+
 function resetState() {
   try {
     if (fs.existsSync(STATE_DIR)) {
@@ -423,6 +565,17 @@ function main() {
       console.log(JSON.stringify(toneResult, null, 2));
       break;
 
+    case "complete-chapter":
+      if (!args[0]) {
+        console.error(
+          "Usage: state-manager.js complete-chapter <chapter-name>",
+        );
+        process.exit(1);
+      }
+      const ccResult = completeChapter(args[0]);
+      console.log(JSON.stringify(ccResult, null, 2));
+      break;
+
     case "help":
     default:
       console.log(`OnboardMe State Manager
@@ -438,6 +591,7 @@ Commands:
   update-mood <performance>         Update Monster mood based on performance
   add-exchange '<description>'      Save a memorable exchange moment
   set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
+  complete-chapter <chapter-name>   Complete a chapter and get ceremony data
   help                              Show this help message
 
 Examples:
@@ -448,6 +602,7 @@ Examples:
   state-manager.js update-mood correct
   state-manager.js add-exchange 'Player figured out the auth flow on first try'
   state-manager.js set-tone spicy
+  state-manager.js complete-chapter investigation
 `);
       break;
   }

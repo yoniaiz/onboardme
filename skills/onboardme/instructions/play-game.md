@@ -2,6 +2,20 @@
 
 Start or resume the OnboardMe game.
 
+## Script Paths
+
+The scripts referenced below live in the `scripts/` directory next to this file.
+Resolve the path from wherever you found this instruction file:
+
+- **State manager:** `<this-file's-directory>/../scripts/state-manager.cjs`
+- **Knowledge manager:** `<this-file's-directory>/../scripts/knowledge-manager.cjs`
+
+For example, if you read this file from `/home/user/.cursor/skills/onboardme/instructions/play-game.md`,
+the state manager is at `/home/user/.cursor/skills/onboardme/scripts/state-manager.cjs`.
+
+All `node <state-manager>` and `node <knowledge-manager>` commands below
+use these resolved paths.
+
 ## Instructions
 
 ### Step 1: Load Game State
@@ -9,7 +23,7 @@ Start or resume the OnboardMe game.
 Read the game state:
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs read
+node <state-manager> read
 ```
 
 If `context.prepared` is `false`, tell the user:
@@ -35,7 +49,7 @@ If `context.prepared` is `false`, tell the user:
 Read the Monster's answer key:
 
 ```bash
-node .cursor/skills/onboardme/scripts/knowledge-manager.cjs read
+node <knowledge-manager> read
 ```
 
 This gives you the codebase facts you gathered during prepare. Use it to:
@@ -99,17 +113,17 @@ Wait for the player to choose:
 
 - **Continue:** Deduct 5 commits (minimum 0) and restore 3 lives:
   ```bash
-  node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"player":{"currentLives":3}}'
+  node <state-manager> write '{"player":{"currentLives":3}}'
   ```
   Then calculate new commit total (read current `totalCommits`, subtract 5, minimum 0):
   ```bash
-  node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"player":{"totalCommits":<new-total>}}'
+  node <state-manager> write '{"player":{"totalCommits":<new-total>}}'
   ```
   Resume the current chapter normally.
 
 - **Start over:** Run reset and tell them to run prepare-game again:
   ```bash
-  node .cursor/skills/onboardme/scripts/state-manager.cjs reset
+  node <state-manager> reset
   ```
   ```
   *kzzzt*
@@ -209,20 +223,23 @@ Handle the player's branch choice:
 
 After branch cleanup, update mood to peaceful:
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"peaceful"}}'
+node <state-manager> write '{"monster":{"currentMood":"peaceful"}}'
 ```
 
 Stop here — the game is over. Do not continue to Step 3.
 
 ### Step 3: Load Chapter Reference
 
-Check `progress.currentChapter` and read the appropriate reference file:
+Check `progress.currentChapter` from state and read the appropriate reference file.
+Reference files live in the `references/` directory next to this file's parent:
 
-- `investigation` → Read `.cursor/skills/onboardme/references/THE-INVESTIGATION.md`
-- `hands-on` → Read `.cursor/skills/onboardme/references/THE-HANDS-ON.md`
-- `deep-dive` → Read `.cursor/skills/onboardme/references/THE-DEEP-DIVE.md`
-- `hunt` → Read `.cursor/skills/onboardme/references/THE-HUNT.md`
-- `boss` → Read `.cursor/skills/onboardme/references/THE-BOSS-BATTLE.md`
+- `investigation` → Read `<this-file's-directory>/../references/THE-INVESTIGATION.md`
+- `hands-on` → Read `<this-file's-directory>/../references/THE-HANDS-ON.md`
+- `deep-dive` → Read `<this-file's-directory>/../references/THE-DEEP-DIVE.md`
+- `hunt` → Read `<this-file's-directory>/../references/THE-HUNT.md`
+- `boss` → Read `<this-file's-directory>/../references/THE-BOSS-BATTLE.md`
+
+**CRITICAL: The chapter loaded here MUST match `progress.currentChapter` from state. Never skip ahead. If state says `hands-on`, you load THE-HANDS-ON.md — even if you think the player is ready for more.**
 
 ### Step 4: Start or Resume
 
@@ -299,68 +316,45 @@ Follow the chapter reference file for gameplay. After each validated player answ
 1. **Update state** (score, question history):
 
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what player said>","tier":"<incorrect|partial|correct|deep>","chapter":"<current-chapter>","commits":<commits-awarded>}'
+   node <state-manager> add-question '{"question":"<what you asked>","answer":"<what player said>","tier":"<incorrect|partial|correct|deep>","chapter":"<current-chapter>","commits":<commits-awarded>}'
    ```
 
 2. **Save discovery** if the answer was correct or deep:
 
    ```bash
-   node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"<current-chapter>","fact":"<the validated fact>","tier":"<correct|deep>","evidence":"<file or source that confirms it>"}'
+   node <knowledge-manager> add-discovery '{"chapter":"<current-chapter>","fact":"<the validated fact>","tier":"<correct|deep>","evidence":"<file or source that confirms it>"}'
    ```
 
 3. **Update mood** based on performance:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+   node <state-manager> update-mood <incorrect|partial|correct|deep>
    ```
 
 4. **Save memorable exchanges** when something notable happens (deep answers, clever observations, funny moments, spectacular failures):
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+   node <state-manager> add-exchange '<brief description of the moment>'
    ```
    Not every answer deserves saving — only the moments that would be worth referencing later. Aim for 1-3 per chapter.
 
 ### Step 6: Chapter Transition (Completion Ceremony)
 
-When a chapter ends, deliver the **Chapter Completion Ceremony** before loading the next chapter.
-This is MANDATORY after every chapter. It must be in Monster voice. No emoji. No bullet lists.
+When a chapter ends, run the completion command:
 
-**CRITICAL: The transition MUST be in Monster voice. No emoji. No bullet-point stat summaries. No assistant-mode meta-text. Deliver stats as Monster dialogue.**
-
-**The ceremony has 3 beats:**
-
-**Beat 1: ASCII Monster Art (mood-appropriate)**
-
-Show the Monster's current visual state:
-
-Dismissive/Annoyed:
-```
-    ╭───────────╮
-    │ { ◉   ◉ } │
-    │    ~~~~   │
-    ╰───────────╯
+```bash
+node <state-manager> complete-chapter <chapter-name>
 ```
 
-Worried:
-```
-    ╭───────────╮
-    │ { ◉   _ } │
-    │    ~~     │
-    ╰───────────╯
-```
+This returns structured ceremony data as JSON. Use it to deliver the 3-beat ceremony:
 
-Desperate:
-```
-  ╭  ─  ─  ─  ─  ╮
-  │ { x     x }  │
-  │              │
-  ╰ ─ ─ ─┬─ ─ ─ ╯
-```
+**CRITICAL: Do NOT write meta-text like "Now I'll deliver the Chapter Completion Ceremony in Monster voice:" — that breaks character. Just deliver the ceremony directly in Monster voice.**
 
-**Beat 2: Stats in Monster voice + Corrupted Memory Log**
+**Beat 1:** Print the returned `ceremony.ascii` art exactly as-is — this is the mood-appropriate Monster visual.
+
+**Beat 2:** Weave `ceremony.stats` into Monster dialogue:
 
 *kzzzt*
 
-"[X] commits. [Y] retries."
+"[commits] commits. [retriesRemaining] retries remaining."
 
 *pause*
 
@@ -368,16 +362,19 @@ Desperate:
 
 *crackle*
 
-"[N] chapters down. [Remaining] to go."
+"[chaptersCompleted] down. [chaptersRemaining] to go."
 
-*[RESPECT LEVEL: X]*
+*[RESPECT LEVEL: respectLevel]*
 
-Then deliver the Corrupted Memory Log for this chapter (see SKILL.md "Corrupted Memory Logs" section).
+Then deliver the returned `ceremony.memoryLog` as a Corrupted Memory Log — a Monster backstory fragment wrapped in static:
 
-**Beat 3: Breathing room + transition**
+*the static wavers*
 
-Wait for the player to say "continue" or similar.
-Do NOT immediately launch the next chapter.
+[ceremony.memoryLog content]
+
+*[CORRUPTED MEMORY: chapter theme]*
+
+**Beat 3:** Wait for the player to say "continue" or similar. Do NOT immediately launch the next chapter.
 
 *pause*
 
@@ -387,12 +384,20 @@ Do NOT immediately launch the next chapter.
 
 ---
 
+**CRITICAL:** After ceremony, check the returned JSON:
+- If `gameComplete` is true → deliver the victory sequence (see Step 2.8) instead of loading a next chapter.
+- Otherwise → read `next.referenceFile` to load the next chapter.
+
+**NEVER determine the next chapter yourself. The `complete-chapter` script output is the source of truth.**
+
+---
+
 **CRITICAL: Chapter boundaries are ATOMIC.** When a chapter ends:
 
-1. Run ALL state commands from the reference file's closing section
-2. Deliver the Chapter Completion Ceremony (Beat 1-3 above)
+1. Run the `complete-chapter` command (this handles ALL state updates for chapter progression)
+2. Deliver the Chapter Completion Ceremony using the returned data (Beat 1-3 above)
 3. STOP — wait for player acknowledgment ("continue", "ready", etc.)
-4. ONLY THEN read the next chapter's reference file
+4. ONLY THEN read the next chapter's reference file from `next.referenceFile`
 5. Begin the next chapter's opening sequence
 
 **DO NOT:**
@@ -418,7 +423,7 @@ If the player seems tired or asks to stop, respect it:
 
 Update `session.conversationSummary` before ending:
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of what happened this session — key answers, current chapter phase, mood>"}}'
+node <state-manager> write '{"session":{"conversationSummary":"<brief summary of what happened this session — key answers, current chapter phase, mood>"}}'
 ```
 
 ### Step 7: Player Style Tracking
@@ -431,7 +436,7 @@ After every 3-5 answers, assess the player's style based on their behavior patte
 
 Update player style:
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"behavior":{"playerStyle":"<methodical|aggressive|balanced|struggling>"}}'
+node <state-manager> write '{"behavior":{"playerStyle":"<methodical|aggressive|balanced|struggling>"}}'
 ```
 
 | Style | Indicators | Your Adaptation |

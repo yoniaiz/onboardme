@@ -61,9 +61,9 @@ Victory when their contribution passes your review.
 - `monster.respectLevel` — Increase as they succeed
 - `monster.memorableExchanges[]` — Save the final moments (their best contribution insight, the Monster's reaction)
 
-**At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"boss"`
-- `monster.currentMood` — Set to `peaceful`
+**At chapter end:**
+- Run `complete-chapter boss` (handles progression automatically)
+- Save mood and notable exchange (see closing section)
 
 ---
 
@@ -244,7 +244,7 @@ _Date: [Timestamp]_
 
 Save state after creating the artifact:
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Boss Battle: [challenge description]","answer":"challenge-issued","tier":"partial","chapter":"boss","commits":0}'
+node <state-manager> add-question '{"question":"Boss Battle: [challenge description]","answer":"challenge-issued","tier":"partial","chapter":"boss","commits":0}'
 ```
 
 ---
@@ -501,6 +501,11 @@ Update BOSS_BATTLE.md with review details.
 
 ### Phase 4: The Defense (~5-10 min)
 
+**CRITICAL: You MUST run the Defense phase. Do NOT skip from code review to victory.**
+After Phase 3 (code review passes), you MUST ask 3-5 defense questions before any victory sequence.
+The player must EXPLAIN their code, not just show it works.
+Phase 5 (Victory) cannot begin until at least 3 defense questions have been asked and answered.
+
 **After code passes review, the player must DEFEND their implementation.**
 
 ```
@@ -636,22 +641,18 @@ When their code passes review:
 *[DOCUMENTED — CONTRIBUTOR ACHIEVED]*
 ```
 
-**Update state:**
+**Update state** (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Boss Battle: Final Review","answer":"contribution-accepted","tier":"deep","chapter":"boss","commits":3}'
+node <state-manager> add-question '{"question":"Boss Battle: Final Review","answer":"contribution-accepted","tier":"deep","chapter":"boss","commits":3}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt","boss"],"currentChapter":"complete"}}'
+node <state-manager> write '{"monster":{"currentMood":"peaceful","respectLevel":100}}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"peaceful","respectLevel":100}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Victory — player completed the Boss Battle and earned Contributor status'
+node <state-manager> add-exchange 'Victory — player completed the Boss Battle and earned Contributor status'
 ```
 
 **Create `.onboardme/artifacts/CODEBASE_KNOWLEDGE.md`** using this template:

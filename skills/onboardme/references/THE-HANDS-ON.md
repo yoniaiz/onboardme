@@ -107,9 +107,9 @@ The player gets the project running locally and interacts with it. They've inves
 - `monster.respectLevel` — First-try success = +respect
 - `monster.memorableExchanges[]` — Save standout moments (first-try commands, creative problem-solving)
 
-**At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"hands-on"`
-- `progress.currentChapter` — Set to `"deep-dive"`
+**At chapter end:**
+- Run `complete-chapter hands-on` (handles progression automatically)
+- Save session summary and notable exchange (see closing section)
 
 ---
 
@@ -120,34 +120,32 @@ The player gets the project running locally and interacts with it. They've inves
 **After EACH answer evaluation:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hands-on","commits":<0|1|2|3>}'
+node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hands-on","commits":<0|1|2|3>}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+node <state-manager> update-mood <incorrect|partial|correct|deep>
 ```
 
 **After correct/deep answers — save the discovery:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"hands-on","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<command or output>"}'
+node <knowledge-manager> add-discovery '{"chapter":"hands-on","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<command or output>"}'
 ```
 
 **After notable moments (1-3 per chapter):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+node <state-manager> add-exchange '<brief description of the moment>'
 ```
 
-**At chapter completion:**
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on"],"currentChapter":"deep-dive"}}'
-```
+**At chapter completion (session summary):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of hands-on results>"}}'
+node <state-manager> write '{"session":{"conversationSummary":"<brief summary of hands-on results>"}}'
 ```
+
+Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
 
 ---
 
@@ -350,6 +348,15 @@ Whether or not you can run the project yourself (TTY requirements, browser-based
 3. Validate their answers against what you know from the codebase
 4. Probe deeper when their descriptions are vague
 
+**CRITICAL: Adapt exploration prompts to the project type from the knowledge file.**
+
+- **Server/API:** "Run it. Hit an endpoint. What comes back?" — NEVER say "open in browser" for a pure server.
+- **Web app:** "Open it in your browser. What do you see?"
+- **CLI tool:** "Run the command. What's the output?"
+- **Library:** "Run the tests. Import it. Use it."
+
+Read `identity.type` from the knowledge file to pick the right prompt.
+
 **Opening — send the player to explore:**
 
 ```
@@ -363,7 +370,7 @@ Whether or not you can run the project yourself (TTY requirements, browser-based
 
 *crackle*
 
-"Go. Run it in your terminal. Open it in your browser. Whatever it needs."
+"Go. Run it. Whatever it takes to bring it to life."
 
 *slrrrrp*
 
@@ -552,18 +559,14 @@ Simply acknowledge they got it running and transition:
 *[CHAPTER 2 COMPLETE — CHAPTER 3 UNLOCKED]*
 ```
 
-Update state:
+Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on"],"currentChapter":"deep-dive"}}'
+node <state-manager> write '{"session":{"conversationSummary":"Hands-on complete — player got the project running and explored its behavior."}}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Hands-on complete — player got the project running and explored its behavior."}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Hands-on complete — project running successfully'
+node <state-manager> add-exchange 'Hands-on complete — project running successfully'
 ```
 
 ---

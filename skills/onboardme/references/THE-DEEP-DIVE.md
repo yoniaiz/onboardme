@@ -149,10 +149,9 @@ The player traces how code actually flows through the system: from user action t
 - `monster.respectLevel` — Increase for good traces (+10 for correct flow, +15 for deep)
 - `monster.memorableExchanges[]` — Save "aha" moments for later chapters
 
-**At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"deep-dive"`
-- `progress.currentChapter` — Set to `"hunt"`
-- `monster.currentMood` — Should be `worried` by now
+**At chapter end:**
+- Run `complete-chapter deep-dive` (handles progression automatically)
+- Save session summary, mood, and notable exchange (see closing section)
 
 ---
 
@@ -163,38 +162,32 @@ The player traces how code actually flows through the system: from user action t
 **After EACH answer evaluation:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"deep-dive","commits":<0|1|2|3>}'
+node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"deep-dive","commits":<0|1|2|3>}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+node <state-manager> update-mood <incorrect|partial|correct|deep>
 ```
 
 **After correct/deep answers — save the discovery:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"deep-dive","fact":"<what they traced or discovered>","tier":"<correct|deep>","evidence":"<file path or code reference>"}'
+node <knowledge-manager> add-discovery '{"chapter":"deep-dive","fact":"<what they traced or discovered>","tier":"<correct|deep>","evidence":"<file path or code reference>"}'
 ```
 
 **After notable moments (1-3 per chapter):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+node <state-manager> add-exchange '<brief description of the moment>'
 ```
 
-**At chapter completion:**
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive"],"currentChapter":"hunt"}}'
-```
+**At chapter completion (session and mood):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"worried"}}'
+node <state-manager> write '{"session":{"conversationSummary":"<brief summary of deep dive results>"}}'
 ```
 
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of deep dive results>"}}'
-```
+Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
 
 ---
 
@@ -851,22 +844,14 @@ _— The Spaghetti Code Monster_
 _[RELUCTANT APPROVAL GRANTED]_
 ```
 
-2. Update state:
+2. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive"],"currentChapter":"hunt"}}'
+node <state-manager> write '{"session":{"conversationSummary":"Deep dive complete — player traced flows, mapped entities, and extracted test insights."}}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"worried"}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Deep dive complete — player traced flows, mapped entities, and extracted test insights."}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Deep dive complete — FLOW_MAP.md finalized'
+node <state-manager> add-exchange 'Deep dive complete — FLOW_MAP.md finalized'
 ```
 
 3. Transition to next chapter:

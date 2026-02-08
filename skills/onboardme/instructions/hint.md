@@ -2,11 +2,18 @@
 
 Provide a hint for the current challenge.
 
+## Script Paths
+
+Resolve script paths from this file's location:
+- **State manager:** `<this-file's-directory>/../scripts/state-manager.cjs`
+
+All `node <state-manager>` commands below use this resolved path.
+
 ## Instructions
 
 1. **Read current state** to check hint count:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs read
+   node <state-manager> read
    ```
 
 2. **Check `behavior.hintUsageCount`** to determine hint level.
@@ -83,12 +90,12 @@ Provide a hint for the current challenge.
 
 4. **Update state** after giving hint:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"behavior":{"hintUsageCount":[new count]}}'
+   node <state-manager> write '{"behavior":{"hintUsageCount":[new count]}}'
    ```
 
 5. **Deduct commits** (unless 4th hint):
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"player":{"totalCommits":[current - 1]}}'
+   node <state-manager> write '{"player":{"totalCommits":[current - 1]}}'
    ```
 
 ## Important

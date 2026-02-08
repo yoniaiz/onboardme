@@ -2,11 +2,18 @@
 
 Show current game progress.
 
+## Script Paths
+
+Resolve script paths from this file's location:
+- **State manager:** `<this-file's-directory>/../scripts/state-manager.cjs`
+
+All `node <state-manager>` commands below use this resolved path.
+
 ## Instructions
 
 1. **Read the current state**:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs read
+   node <state-manager> read
    ```
 
 2. **If no game exists** (state file missing or `context.prepared` is false):

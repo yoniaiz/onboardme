@@ -2,6 +2,13 @@
 
 Clear all game progress and start over.
 
+## Script Paths
+
+Resolve script paths from this file's location:
+- **State manager:** `<this-file's-directory>/../scripts/state-manager.cjs`
+
+All `node <state-manager>` commands below use this resolved path.
+
 ## Instructions
 
 1. **Ask for confirmation**:
@@ -32,7 +39,7 @@ Clear all game progress and start over.
 
    Read `git.originalBranch` and `git.branchCreated` from state before deleting:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs read
+   node <state-manager> read
    ```
 
    If `git.branchCreated` is `true` and we're on the game branch:
@@ -60,7 +67,7 @@ Clear all game progress and start over.
 
    Then delete all game state:
    ```bash
-   node .cursor/skills/onboardme/scripts/state-manager.cjs reset
+   node <state-manager> reset
    ```
 
 4. **Acknowledge the reset**:

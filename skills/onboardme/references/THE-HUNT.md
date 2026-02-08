@@ -133,6 +133,37 @@ Then deliver the dramatic reveal dialogue.
 
 **CRITICAL: Do NOT edit files directly with editor tools.** The player can see your edits in the Cursor UI, which spoils the hunt. Instead, use a temporary script to apply changes silently.
 
+---
+
+## Sabotage Variety
+
+Do NOT default to the easiest boundary-check bug you can find. Pick a sabotage that
+matches areas the player traced in Ch3 and uses a creative pattern.
+
+**Bug pattern menu — pick ONE that fits the codebase:**
+
+| Pattern | Example | Difficulty |
+|---------|---------|------------|
+| Off-by-one / boundary | Change `>=` to `>`, `<` to `<=` | Easy |
+| Wrong variable | Swap two similar variable names | Medium |
+| Negated condition | Flip `!condition` to `condition` or `&&` to `||` | Medium |
+| Silent default | Change a default value (timeout, limit, threshold) | Medium |
+| Missing await | Remove an `await` from an async call | Hard |
+| Swapped arguments | Swap order of two function arguments of same type | Hard |
+| Early return | Add a `return` before critical logic | Hard |
+
+**Selection rules:**
+- Read the player's Ch3 discoveries to pick an area they deeply traced
+- Pick a file/function they UNDERSTAND — the hunt tests debugging skill, not codebase memory
+- Avoid the most obvious single validation check — go deeper into business logic
+- The bug must cause at least 1 test failure (verify before committing)
+- For Spicy/Full-Monster tone: prefer Medium-Hard patterns
+- Be CREATIVE — don't always pick the same pattern type. Variety makes the hunt memorable.
+
+---
+
+## Sabotage Execution Steps
+
 1. **Review accumulated knowledge** — Read discoveries from Ch1-3, check what flows the player traced
 2. **Read source files on-demand** — Pick and execute sabotage **silently** — do not narrate your target selection or change reasoning in the chat
 3. **Verify test coverage exists** — Before committing to a target, run the relevant tests to confirm they PASS. If the area has no tests, pick a different target. Don't waste time on sabotage that produces no test failures.
@@ -237,10 +268,9 @@ Create a minimal test file that exercises the broken code and fails. The player 
 - `monster.respectLevel` — Major increase for clean fix (+15), deep understanding (+25)
 - `monster.memorableExchanges[]` — Save the debugging approach, the "aha" moment when they find the bug
 
-**At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"hunt"`
-- `progress.currentChapter` — Set to `"boss"`
-- `monster.currentMood` — Should be `desperate` by now
+**At chapter end:**
+- Run `complete-chapter hunt` (handles progression automatically)
+- Save session summary, mood, and notable exchange (see closing section)
 
 ---
 
@@ -251,38 +281,32 @@ Create a minimal test file that exercises the broken code and fails. The player 
 **After EACH answer evaluation:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hunt","commits":<0|1|2|3>}'
+node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"hunt","commits":<0|1|2|3>}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+node <state-manager> update-mood <incorrect|partial|correct|deep>
 ```
 
 **After correct/deep answers — save the discovery:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"hunt","fact":"<what they found or fixed>","tier":"<correct|deep>","evidence":"<file path or git diff>"}'
+node <knowledge-manager> add-discovery '{"chapter":"hunt","fact":"<what they found or fixed>","tier":"<correct|deep>","evidence":"<file path or git diff>"}'
 ```
 
 **After notable moments (1-3 per chapter):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+node <state-manager> add-exchange '<brief description of the moment>'
 ```
 
-**At chapter completion:**
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt"],"currentChapter":"boss"}}'
-```
+**At chapter completion (session and mood):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"desperate"}}'
+node <state-manager> write '{"session":{"conversationSummary":"<brief summary of hunt results — bug found, fixed, feature planned>"}}'
 ```
 
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of hunt results — bug found, fixed, feature planned>"}}'
-```
+Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
 
 ---
 
@@ -563,7 +587,7 @@ If tests still fail:
 
 Run the state command:
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"Bug fix attempt","answer":"incorrect fix","tier":"incorrect","chapter":"hunt","commits":0}'
+node <state-manager> add-question '{"question":"Bug fix attempt","answer":"incorrect fix","tier":"incorrect","chapter":"hunt","commits":0}'
 ```
 
 This deducts a life. The player should feel the stakes of submitting wrong fixes.
@@ -750,22 +774,14 @@ _"[Performance-appropriate closing comment]"_
 _— The Spaghetti Code Monster_
 ```
 
-2. Update state:
+2. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation","hands-on","deep-dive","hunt"],"currentChapter":"boss"}}'
+node <state-manager> write '{"session":{"conversationSummary":"Hunt complete — player diagnosed and fixed sabotage, planned feature locations, assessed impact."}}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"monster":{"currentMood":"desperate"}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Hunt complete — player diagnosed and fixed sabotage, planned feature locations, assessed impact."}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Hunt complete — bug squashed, Monster desperate'
+node <state-manager> add-exchange 'Hunt complete — bug squashed, Monster desperate'
 ```
 
 3. Transition to final chapter:

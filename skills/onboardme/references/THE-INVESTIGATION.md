@@ -51,9 +51,9 @@ The player learns to identify project type, tech stack, and architecture by exam
 - `session.conversationSummary` — Brief investigation status
 - `monster.memorableExchanges[]` — Save standout moments (first correct answer, clever deductions, spectacular misses)
 
-**At chapter end, update:**
-- `progress.chaptersCompleted` — Add `"investigation"`
-- `progress.currentChapter` — Set to `"hands-on"`
+**At chapter end:**
+- Run `complete-chapter investigation` (handles progression automatically)
+- Save session summary and notable exchange (see closing section)
 
 ---
 
@@ -64,34 +64,32 @@ The player learns to identify project type, tech stack, and architecture by exam
 **After EACH answer evaluation:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"investigation","commits":<0|1|2|3>}'
+node <state-manager> add-question '{"question":"<what you asked>","answer":"<what they said>","tier":"<incorrect|partial|correct|deep>","chapter":"investigation","commits":<0|1|2|3>}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs update-mood <incorrect|partial|correct|deep>
+node <state-manager> update-mood <incorrect|partial|correct|deep>
 ```
 
 **After correct/deep answers — save the discovery:**
 
 ```bash
-node .cursor/skills/onboardme/scripts/knowledge-manager.cjs add-discovery '{"chapter":"investigation","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<file or source>"}'
+node <knowledge-manager> add-discovery '{"chapter":"investigation","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<file or source>"}'
 ```
 
 **After notable moments (1-3 per chapter):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange '<brief description of the moment>'
+node <state-manager> add-exchange '<brief description of the moment>'
 ```
 
-**At chapter completion:**
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation"],"currentChapter":"hands-on"}}'
-```
+**At chapter completion (session summary):**
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"<brief summary of investigation results>"}}'
+node <state-manager> write '{"session":{"conversationSummary":"<brief summary of investigation results>"}}'
 ```
+
+Note: Do NOT write `chaptersCompleted` or `currentChapter` here — the `complete-chapter` command in play-game.md Step 6 handles all progression.
 
 ---
 
@@ -490,18 +488,14 @@ _[GRUDGING APPROVAL GRANTED / BARELY ACCEPTABLE / etc.]_
 ## Case Status: 📁 CLOSED
 ```
 
-2. Update state:
+2. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"progress":{"chaptersCompleted":["investigation"],"currentChapter":"hands-on"}}'
+node <state-manager> write '{"session":{"conversationSummary":"Investigation complete — player identified project type, tech stack, and architecture."}}'
 ```
 
 ```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs write '{"session":{"conversationSummary":"Investigation complete — player identified project type, tech stack, and architecture."}}'
-```
-
-```bash
-node .cursor/skills/onboardme/scripts/state-manager.cjs add-exchange 'Investigation complete — case file sealed'
+node <state-manager> add-exchange 'Investigation complete — case file sealed'
 ```
 
 3. Transition to next chapter:
