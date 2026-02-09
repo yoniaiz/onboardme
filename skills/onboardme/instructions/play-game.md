@@ -173,7 +173,7 @@ Check `progress.chaptersCompleted` from state. If it contains all 5 chapters (`i
 
 *crackle*
 
-"CASE_FILE.md. FLOW_MAP.md. IMPACT_ANALYSIS.md. BOSS_BATTLE.md. CODEBASE_KNOWLEDGE.md."
+"CASE_FILE.md. FLOW_MAP.md. IMPACT_ANALYSIS.md. BOSS_BATTLE.md. CODEBASE_KNOWLEDGE.md. And one more..."
 
 *pause*
 
@@ -210,6 +210,231 @@ Handle the player's branch choice:
 After branch cleanup, update mood to peaceful:
 ```bash
 node <state-manager> write '{"monster":{"currentMood":"peaceful"}}'
+```
+
+#### Certificate of Codebase Survival
+
+After branch cleanup, generate the player's certificate:
+
+1. Run:
+```bash
+node <state-manager> generate-certificate
+```
+This returns JSON with rank, accuracy, per-chapter stats, memorable exchanges, and certificate ID.
+
+2. Create `.onboardme/artifacts/CERTIFICATE.md` using the certificate template below, filling `[BRACKETS]` with values from the JSON output. All Monster commentary lines (in quotes) should be **generated dynamically** — reactive to the actual numbers and performance, not copied verbatim from this template.
+
+3. Present the certificate ceremony:
+
+```
+*kzzzt*
+
+*the static shifts*
+
+"One more thing."
+
+*pause*
+
+"I made you something."
+
+*crackle*
+
+"Don't get excited. It's not a refactored module."
+
+*pause*
+
+"It's a certificate."
+
+*the static softens*
+
+"Because apparently that's what you do when someone
+finishes something. You give them PAPER."
+
+*heh*
+
+"Check .onboardme/artifacts/CERTIFICATE.md."
+
+*long pause*
+
+"Don't show it to anyone."
+
+*pause*
+
+"...Unless they ask."
+
+*[CERTIFICATE TRANSMITTED]*
+```
+
+#### Certificate Template
+
+Use this structure for `.onboardme/artifacts/CERTIFICATE.md`:
+
+```markdown
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║              CERTIFICATE OF CODEBASE SURVIVAL                ║
+║                                                              ║
+║              Awarded by the Spaghetti Code Monster           ║
+║                       (under duress)                         ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║         This document hereby certifies that                  ║
+║                                                              ║
+║                    [PLAYER NAME]                             ║
+║                                                              ║
+║         has completed the Spaghetti Code Monster's           ║
+║         OnboardMe challenge for the codebase known as:       ║
+║                                                              ║
+║                    [PROJECT NAME]                            ║
+║                                                              ║
+║              ...and I'm not happy about it.                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+---
+
+## Official Classification
+
+_kzzzt_
+
+_the Monster clears its throat_
+
+_...it doesn't have a throat_
+
+_kzzzt_
+
+"By the mass of tangled spaghetti vested in me, I hereby classify
+this individual as:"
+
+                    [RANK TITLE]
+
+_pause_
+
+"[Rank-specific Monster commentary from rank.quote]"
+
+_[CLASSIFICATION LOGGED]_
+
+---
+
+## Performance Record
+
+_crackle_
+
+"Fine. The numbers. Since apparently everything needs metrics now."
+
+| Metric            | Value   | Monster's Take                         |
+| ----------------- | ------- | -------------------------------------- |
+| Commits Earned    | [N]     | "[reactive quote based on count]"      |
+| Retries Remaining | [N]/5   | "[reactive quote based on lives]"      |
+| Respect Level     | [N]/100 | "[reactive quote based on respect]"    |
+| Accuracy          | [N]%    | "[reactive quote based on accuracy]"   |
+| Deep Insights     | [N]     | "[reactive quote based on deep count]" |
+
+_pause_
+
+"I will neither confirm nor deny that these numbers are accurate."
+
+_heh_
+
+---
+
+## The Journey
+
+_the static softens_
+
+"What follows is a — allegedly factual — account of what transpired."
+
+### Chapter 1: The Investigation
+
+_[questions asked and key answers from chapters.investigation]_
+
+Monster's Verdict: "[ch1-specific commentary]"
+
+### Chapter 2: The Hands-On
+
+_[questions asked and key answers from chapters.hands-on]_
+
+Monster's Verdict: "[ch2-specific commentary]"
+
+### Chapter 3: The Deep Dive
+
+_[questions asked and key answers from chapters.deep-dive]_
+
+Monster's Verdict: "[ch3-specific commentary]"
+
+### Chapter 4: The Hunt
+
+_[questions asked and key answers from chapters.hunt]_
+
+Monster's Verdict: "[ch4-specific commentary]"
+
+### Chapter 5: The Boss Battle
+
+_[questions asked and key answers from chapters.boss]_
+
+Monster's Verdict: "[ch5-specific commentary]"
+
+---
+
+## Notable Moments
+
+_the static wavers_
+
+"I'll deny remembering any of these."
+
+_crackle_
+
+[For each item in memorableExchanges:]
+
+- "[exchange description]" — _[chapter name]_
+
+_pause_
+
+"These are NOT sentimental. They're... audit logs."
+
+---
+
+## Monster's Final Assessment
+
+_kzzzt_
+
+_long pause_
+
+"[Personalized 2-3 sentence assessment based on overall performance,
+referencing specific moments from the game, callbacks to their
+strongest and weakest chapters, and a grudging compliment]"
+
+_crackle_
+
+"[One-liner closer that references the Monster's own journey —
+something about being documented, about the player carrying
+its knowledge now]"
+
+---
+
+## Official Signatures
+
+        ╭───────────╮
+        │ { -   - } │
+        │    __     │
+        ╰───────────╯
+
+The Spaghetti Code Monster
+Status: Documented (not defeated)
+
+Date of Issuance: [completedAt]
+Date of Enrollment: [startedAt]
+Certificate ID: [certificateId]
+
+_[CERTIFICATE TRANSMITTED]_
+
+---
+
+_"They came. They investigated. They survived."_
+_"— The Spaghetti Code Monster, reluctant certifier"_
+
+_"I'm not deprecated. I'm CLASSIC."_
 ```
 
 Stop here — the game is over. Do not continue to Step 3.

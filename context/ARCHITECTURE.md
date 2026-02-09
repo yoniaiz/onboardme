@@ -447,7 +447,8 @@ Created in target repo during gameplay:
     ├── CASE_FILE.md        # Chapter 1: Investigation log
     ├── FLOW_MAP.md         # Chapter 3: Architecture diagram
     ├── IMPACT_ANALYSIS.md  # Chapter 4: Bug fix analysis
-    └── CODEBASE_KNOWLEDGE.md # Chapter 5: Final documentation
+    ├── CODEBASE_KNOWLEDGE.md # Chapter 5: Final documentation
+    └── CERTIFICATE.md      # Game complete: Certificate of Codebase Survival
 ```
 
 ### state.json Example

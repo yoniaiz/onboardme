@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 7 Complete  
-> **Current Focus**: Ready for release
+> **Status**: Milestone 8 Complete  
+> **Current Focus**: Certificate of Codebase Survival shipped
 
 ---
 
@@ -599,6 +599,51 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 
 ---
 
+## Milestone 8: Certificate of Codebase Survival
+
+**Goal**: Generate a personalized CERTIFICATE.md artifact when the player completes all 5 chapters — the Monster's farewell gift.
+
+**Success Criteria**:
+- [x] `generate-certificate` command in state-manager.cjs (rank, accuracy, per-chapter stats, JSON output)
+- [x] Certificate template and generation flow in play-game.md Step 2.8
+- [x] CERTIFICATE.md referenced in SKILL.md artifacts and Game Complete section
+- [x] CERTIFICATE.md added to PRD.md and ARCHITECTURE.md artifact listings
+- [x] Skill deployed via install-skill.sh
+
+---
+
+### Tasks
+
+#### 8.1 State Manager: generate-certificate Command
+`completed`
+
+Added `generateCertificate()` function and `generate-certificate` CLI command. Computes rank (5-tier system based on accuracy/deep insights/incorrect count), accuracy percentage, per-chapter question stats, and returns structured JSON for template rendering.
+
+---
+
+#### 8.2 Play Game: Certificate Flow
+`completed`
+
+Updated Step 2.8 in play-game.md: after branch cleanup, agent runs `generate-certificate`, creates `.onboardme/artifacts/CERTIFICATE.md` from template with dynamic Monster commentary, and presents the certificate ceremony.
+
+---
+
+#### 8.3 Documentation Updates
+`completed`
+
+- SKILL.md: Added CERTIFICATE.md to File Artifacts section and Game Complete flow
+- PRD.md: Added CERTIFICATE.md to artifacts table and runtime files listing
+- ARCHITECTURE.md: Added CERTIFICATE.md to runtime files directory tree
+
+---
+
+#### 8.4 Deploy
+`completed`
+
+Ran `bash scripts/install-skill.sh` — skill files deployed to `.cursor/skills/onboardme/`.
+
+---
+
 ## Completed Milestones
 
 ### Milestone 5: Full Game Integration ✓
@@ -694,4 +739,4 @@ Simulated full Ch1→Ch2→Ch3→Ch4→Ch5 state pipeline. Verified:
 
 ---
 
-*Last Updated: 2026-02-06 (Milestone 7 complete — Open source preparation, README, LICENSE, legacy cleanup)*
+*Last Updated: 2026-02-09 (Milestone 8 complete — Certificate of Codebase Survival)*

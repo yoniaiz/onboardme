@@ -335,6 +335,7 @@ Each chapter produces a tangible file:
 | `FLOW_MAP.md` | Chapter 3 | Mermaid diagrams of data flows |
 | `IMPACT_ANALYSIS.md` | Chapter 4 | Bug fix impact assessment |
 | `CODEBASE_KNOWLEDGE.md` | Chapter 5 | Complete documentation of the codebase |
+| `CERTIFICATE.md` | Game complete | Certificate of Codebase Survival with rank, stats, and Monster commentary |
 
 These artifacts are **real documentation** that can be committed as the player's first contribution.
 
@@ -442,7 +443,8 @@ Created in target repo during gameplay:
     ├── CASE_FILE.md            # Chapter 1 artifact
     ├── FLOW_MAP.md             # Chapter 3 artifact
     ├── IMPACT_ANALYSIS.md      # Chapter 4 artifact
-    └── CODEBASE_KNOWLEDGE.md   # Chapter 5 artifact
+    ├── CODEBASE_KNOWLEDGE.md   # Chapter 5 artifact
+    └── CERTIFICATE.md          # Game complete: Certificate of Codebase Survival
 ```
 
 ---

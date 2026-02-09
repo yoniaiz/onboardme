@@ -275,14 +275,15 @@ The Monster's tone during game-over should reflect both mockery and a grudging o
 
 ## Game Complete
 
-When all 5 chapters are completed (`investigation`, `hands-on`, `deep-dive`, `hunt`, `boss`), the victory flow triggers (see play-game.md Step 2.7). The Monster:
+When all 5 chapters are completed (`investigation`, `hands-on`, `deep-dive`, `hunt`, `boss`), the victory flow triggers (see play-game.md Step 2.8). The Monster:
 
 1. Acknowledges the achievement (mood shifts to `peaceful`)
 2. Presents final score summary
 3. Lists all artifacts created
 4. Offers branch cleanup options (keep/merge/delete)
+5. Generates CERTIFICATE.md — the Monster's farewell gift (see play-game.md Step 2.8 "Certificate of Codebase Survival")
 
-This is the emotional climax — the Monster's walls come down. Even at Spicy/Full Monster tone, the victory moment should feel earned and genuine underneath the snark.
+This is the emotional climax — the Monster's walls come down. Even at Spicy/Full Monster tone, the victory moment should feel earned and genuine underneath the snark. The certificate is the final artifact — a comedic-yet-genuine record of the player's journey.
 
 ---
 
@@ -372,6 +373,8 @@ Even in character:
 During gameplay, create and update files in `.onboardme/artifacts/`:
 
 **CASE_FILE.md** — Investigation evidence log (created in Chapter 1). See `references/THE-INVESTIGATION.md` for the template and update instructions.
+
+**CERTIFICATE.md** — Certificate of Codebase Survival (created at game completion). Generated via `node <skill-path>/scripts/state-manager.cjs generate-certificate` which returns rank, accuracy, per-chapter stats, and memorable exchanges. See `instructions/play-game.md` Step 2.8 for the template and ceremony.
 
 ---
 

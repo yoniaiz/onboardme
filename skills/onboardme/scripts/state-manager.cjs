@@ -469,6 +469,103 @@ function resetState() {
   }
 }
 
+function generateCertificate() {
+  const state = readState();
+  const history = state.progress.questionHistory;
+
+  const totalQuestions = history.length;
+  const correctCount = history.filter(
+    (q) => q.tier === "correct" || q.tier === "deep",
+  ).length;
+  const incorrectCount = history.filter(
+    (q) => q.tier === "incorrect",
+  ).length;
+  const deepCount = history.filter((q) => q.tier === "deep").length;
+  const accuracy =
+    totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+  // Rank determination
+  let rank;
+  if (accuracy >= 90 && deepCount >= 5 && incorrectCount === 0) {
+    rank = {
+      title: "LEGENDARY SPAGHETTI WHISPERER",
+      quote:
+        "I have nothing left to teach you. That's not a compliment. It's a THREAT.",
+    };
+  } else if (accuracy >= 80 && deepCount >= 3) {
+    rank = {
+      title: "SENIOR PASTA ARCHITECT",
+      quote:
+        "You understood my architecture. MY architecture. I need a moment.",
+    };
+  } else if (accuracy >= 65) {
+    rank = {
+      title: "CERTIFIED CODE ARCHAEOLOGIST",
+      quote: "You dug through my layers and lived. Most don't.",
+    };
+  } else if (accuracy >= 50) {
+    rank = {
+      title: "JUNIOR TANGLE NAVIGATOR",
+      quote:
+        "You survived. Barely. Like a try-catch around the whole function.",
+    };
+  } else {
+    rank = {
+      title: "SURVIVING INTERN",
+      quote: "You showed up. That's more than the last three interns.",
+    };
+  }
+
+  // Per-chapter stats
+  const chapters = {};
+  for (const ch of CHAPTER_ORDER) {
+    const chQuestions = history.filter((q) => q.chapter === ch);
+    chapters[ch] = {
+      questions: chQuestions.map((q) => ({
+        question: q.question,
+        answer: q.answer,
+        tier: q.tier,
+        commits: q.commits || 0,
+      })),
+      correct: chQuestions.filter(
+        (q) => q.tier === "correct" || q.tier === "deep",
+      ).length,
+      incorrect: chQuestions.filter((q) => q.tier === "incorrect").length,
+      deep: chQuestions.filter((q) => q.tier === "deep").length,
+      total: chQuestions.length,
+    };
+  }
+
+  // Certificate ID
+  const repoId = state.repo.id || "unknown";
+  const timestamp = Date.now().toString(36);
+
+  return {
+    player: {
+      name: state.player.name || "Unknown Agent",
+      startedAt: state.player.startedAt,
+      completedAt: new Date().toISOString(),
+    },
+    project: {
+      name: state.repo.name,
+      id: state.repo.id,
+    },
+    rank,
+    stats: {
+      totalCommits: state.player.totalCommits,
+      retriesRemaining: state.player.currentLives,
+      respectLevel: state.monster.respectLevel,
+      accuracy,
+      deepInsights: deepCount,
+      totalQuestions,
+      incorrectAnswers: incorrectCount,
+    },
+    chapters,
+    memorableExchanges: state.monster.memorableExchanges || [],
+    certificateId: `${repoId}-${timestamp}`,
+  };
+}
+
 function main() {
   const [, , command, ...args] = process.argv;
 
@@ -574,6 +671,11 @@ function main() {
       console.log(JSON.stringify(ccResult, null, 2));
       break;
 
+    case "generate-certificate":
+      const certResult = generateCertificate();
+      console.log(JSON.stringify(certResult, null, 2));
+      break;
+
     case "help":
     default:
       console.log(`OnboardMe State Manager
@@ -590,6 +692,7 @@ Commands:
   add-exchange '<description>'      Save a memorable exchange moment
   set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
   complete-chapter <chapter-name>   Complete a chapter and get ceremony data
+  generate-certificate              Generate end-of-game certificate data (rank, stats, per-chapter)
   help                              Show this help message
 
 Examples:
@@ -601,6 +704,7 @@ Examples:
   state-manager.cjs add-exchange 'Player figured out the auth flow on first try'
   state-manager.cjs set-tone spicy
   state-manager.cjs complete-chapter investigation
+  state-manager.cjs generate-certificate
 `);
       break;
   }
