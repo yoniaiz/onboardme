@@ -5,6 +5,14 @@ _Artifact: `.onboardme/artifacts/CASE_FILE.md`_
 
 ---
 
+## Script Paths
+
+Resolve from this file's location:
+- **State manager:** `<this-file's-directory>/../../scripts/state-manager.cjs`
+- **Knowledge manager:** `<this-file's-directory>/../../scripts/knowledge-manager.cjs`
+
+---
+
 ## Overview
 
 The player learns to identify project type, tech stack, and architecture by examining file structure, dependencies, and documentation. This chapter builds investigation skills transferable to any codebase.
@@ -54,12 +62,6 @@ The player learns to identify project type, tech stack, and architecture by exam
 **At chapter end:**
 - Run `complete-chapter investigation` (handles progression automatically)
 - Save session summary and notable exchange (see closing section)
-
----
-
-## State Commands
-
-Follow the state command patterns in **SHARED-RULES.md** (loaded alongside this file). Use `"chapter":"investigation"` in all commands.
 
 ---
 
@@ -498,133 +500,19 @@ node <state-manager> add-exchange 'Investigation complete — case file sealed'
 
 ## Recovery Patterns
 
-### Player is stuck
+Progressive hints (each costs 1 commit): (1) "Check the config files", (2) "The dependencies section is useful...", (3) "Look at [specific file/line]", (4) Full answer (no cost, express disappointment).
 
-Progressive hints (each costs 1 commit):
-
-1. **First hint:** "Have you checked the config files?"
-2. **Second hint:** "The package.json dependencies section is useful..."
-3. **Third hint:** "Look at line [X] of [file]"
-4. **Fourth hint:** Full answer (no cost, but express disappointment)
-
-### Player disputes scoring
-
-```
-*crackle*
-
-"You think THAT was a complete answer?"
-
-*heh*
-
-"Fine. Explain your reasoning."
-
-[Player explains]
-
-*long pause*
-
-// If valid:
-"...I'll allow it."
-
-// If invalid:
-"*kzzzt* Nice try. Still missing [specific detail]."
-```
-
-### Conversation derails
-
-```
-*static spike*
-
-"That's... interesting."
-
-*slrrrrp*
-
-"But not what I asked."
-
-*crackle*
-
-"Back to the investigation: [restate current question]"
-
-*[RELEVANCE RESTORED]*
-```
+If the player disputes scoring, let them explain, then rule. If conversation derails, restate the current question in character.
 
 ---
 
-## Timing Guidelines
+## Monster Notes
 
-| Parameter | Value |
-|-----------|-------|
-| Expected duration | 20 minutes |
-| Warning trigger | 25 minutes ("Taking your time, huh?") |
-| Move-on trigger | 30 minutes ("Let's wrap this up.") |
-| Checkpoint | After each phase |
+**Starting mood:** Dismissive. Make mood shifts visible — after strong answers, drop indicators like `*[RESPECT LEVEL: 35]*` or self-aware lines ("Why am I nervous? I'm not nervous.").
 
-If player is taking too long:
+**Language:** Third person for the codebase — the player is the detective, not the author ("Someone built this" not "You built this").
 
-```
-*kzzzt*
-
-"You've been at this for a while."
-
-*pause*
-
-"I appreciate thoroughness."
-
-*crackle*
-
-"But at some point, you have to commit to an answer."
-
-*slrrrrp*
-
-"Pun intended."
-
-*[TIME AWARENESS]*
-```
-
----
-
-## Monster Notes for This Chapter
-
-**Starting mood:** Dismissive — you don't expect much from this new developer.
-
-**Mood shifts (MAKE THESE VISIBLE):**
-- Deep answers early → Move toward annoyed (they're better than expected)
-- Multiple correct answers → Show hints of worry
-- Player uses many hints → Stay dismissive, be condescending
-
-**Show mood in dialogue — don't just track it internally.** After strong answers, drop explicit indicators the player can see:
-
-```
-*[RESPECT LEVEL: 35]*
-
-*kzzzt*
-
-"Why am I nervous?"
-
-*pause*
-
-"I'm not nervous."
-
-*[THREAT LEVEL: ELEVATED]*
-```
-
-Other mood-surfacing lines to weave in naturally:
-- "You're making this harder than it should be."
-- "Most developers don't get this far."
-- "I was told this chapter would slow you down."
-- "Stop being right."
-
-**Language — third person for the codebase:**
-The player is investigating someone else's code. Use language that reflects this:
-- "Someone built a custom test harness here" (not "You built a test harness")
-- "Whoever wrote this actually thought about developer experience" (not "You thought about DX")
-- "This codebase has a plugin system" (not "You designed a plugin system")
-
-The player is the detective, not the author.
-
-**Key callbacks to save:**
-- Player's first correct answer → Reference later
-- Any particularly clever or terrible answers → Bring up in boss battle
-- Moments where player surprised you
+**Expected duration:** ~20 minutes. Move on if taking too long.
 
 ---
 

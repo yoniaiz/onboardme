@@ -566,6 +566,26 @@ function generateCertificate() {
   };
 }
 
+function getScore() {
+  const state = readState();
+  const history = state.progress.questionHistory;
+  const chapterNum = CHAPTER_ORDER.indexOf(state.progress.currentChapter) + 1;
+  const completed = state.progress.chaptersCompleted.length;
+  return {
+    commits: state.player.totalCommits,
+    retries: state.player.currentLives,
+    maxRetries: 5,
+    respect: state.monster.respectLevel,
+    mood: state.monster.currentMood,
+    chapter: state.progress.currentChapter,
+    chapterNumber: chapterNum,
+    chaptersCompleted: completed,
+    totalChapters: CHAPTER_ORDER.length,
+    questionsAnswered: history.length,
+    deepInsights: history.filter((q) => q.tier === "deep").length,
+  };
+}
+
 function main() {
   const [, , command, ...args] = process.argv;
 
@@ -671,6 +691,11 @@ function main() {
       console.log(JSON.stringify(ccResult, null, 2));
       break;
 
+    case "get-score":
+      const scoreResult = getScore();
+      console.log(JSON.stringify(scoreResult, null, 2));
+      break;
+
     case "generate-certificate":
       const certResult = generateCertificate();
       console.log(JSON.stringify(certResult, null, 2));
@@ -692,6 +717,7 @@ Commands:
   add-exchange '<description>'      Save a memorable exchange moment
   set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
   complete-chapter <chapter-name>   Complete a chapter and get ceremony data
+  get-score                         Get compact current score (commits, retries, respect, chapter)
   generate-certificate              Generate end-of-game certificate data (rank, stats, per-chapter)
   help                              Show this help message
 

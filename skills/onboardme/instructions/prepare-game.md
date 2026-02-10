@@ -60,60 +60,20 @@ From your analysis, construct a JSON object with this structure:
 ```json
 {
   "schemaVersion": 1,
-  "analyzedAt": "<current ISO timestamp>",
-  "analyzedFiles": ["<list of files you actually read>"],
-  "identity": {
-    "name": "<project name>",
-    "language": "<primary language>",
-    "runtime": "<runtime if applicable, e.g. Node.js, Python 3.x>",
-    "type": "<project type, e.g. REST API, CLI tool, web app>",
-    "framework": "<main framework if any>",
-    "version": "<project version if found>"
-  },
-  "techStack": {
-    "database": { "name": "<db name>", "orm": "<orm if any>", "evidence": "<file that told you>" },
-    "testing": { "framework": "<test framework>", "location": "<test dir>", "evidence": "<file>" },
-    "linting": { "tool": "<linter>", "evidence": "<file>" },
-    "ci": { "platform": "<CI platform>", "evidence": "<file or dir>" }
-  },
-  "commands": {
-    "run": "<start command>",
-    "dev": "<dev command>",
-    "test": "<test command>",
-    "build": "<build command>",
-    "lint": "<lint command>"
-  },
-  "structure": {
-    "entryPoint": "<main entry file>",
-    "sourceDir": "<source directory>",
-    "testDir": "<test directory>",
-    "keyDirectories": {
-      "<dir path>": "<apparent purpose>"
-    },
-    "configFiles": ["<list of config files found>"]
-  },
-  "envVars": [
-    { "name": "<VAR_NAME>", "required": true, "source": "<file>" }
-  ],
-  "readme": {
-    "exists": true,
-    "hasSetupInstructions": true,
-    "summary": "<one-line description>"
-  },
-  "flows": [
-    {
-      "name": "<user action or endpoint>",
-      "entryPoint": "<file path>",
-      "status": "implemented | stub | partial",
-      "complexity": "low | medium | high",
-      "description": "<brief description>"
-    }
-  ],
+  "analyzedAt": "<ISO timestamp>",
+  "analyzedFiles": ["<files read>"],
+  "identity": { "name": "", "language": "", "runtime": "", "type": "", "framework": "", "version": "" },
+  "techStack": { "database": { "name": "", "orm": "", "evidence": "" }, "testing": { "framework": "", "location": "" }, "linting": { "tool": "" }, "ci": { "platform": "" } },
+  "commands": { "run": "", "dev": "", "test": "", "build": "", "lint": "" },
+  "structure": { "entryPoint": "", "sourceDir": "", "testDir": "", "keyDirectories": {}, "configFiles": [] },
+  "envVars": [{ "name": "", "required": true, "source": "" }],
+  "readme": { "exists": true, "hasSetupInstructions": true, "summary": "" },
+  "flows": [{ "name": "", "entryPoint": "", "status": "implemented|stub|partial", "complexity": "low|medium|high", "description": "" }],
   "discoveries": []
 }
 ```
 
-Always include these top-level keys: `identity`, `commands`, `structure`, `discoveries`. Within each key, omit sub-fields that have no data. Other top-level keys (`techStack`, `envVars`, `readme`, `flows`) may be omitted entirely if no data was found. The `discoveries` array always starts empty.
+**Required keys:** `identity`, `commands`, `structure`, `discoveries`. Omit sub-fields with no data. Other top-level keys optional. `discoveries` always starts empty.
 
 ### Step 4: Save Knowledge and State
 
@@ -185,36 +145,7 @@ Set up a safe branch for gameplay. This keeps the player's original code untouch
    Save the result — this is the player's original branch.
 
 3. **Handle uncommitted changes:**
-   Run `git status --porcelain`. If there are uncommitted changes, explain to the player:
-
-   ```
-   *kzzzt*
-
-   "Before we begin..."
-
-   *pause*
-
-   "You have uncommitted changes."
-
-   *crackle*
-
-   "Gameplay happens on a safe branch. Your original code is never touched."
-
-   *slrrrrp*
-
-   "But I need a clean starting point."
-
-   *pause*
-
-   "What do you want to do with your changes?"
-   "- Commit them"
-   "- Stash them"
-   "- Revert them"
-
-   *[AWAITING DECISION]*
-   ```
-
-   Let the PLAYER decide. Do not force a choice. Execute whatever they choose.
+   Run `git status --porcelain`. If uncommitted changes exist, inform the player in Monster voice and offer: commit, stash, or revert. Let the PLAYER decide. Execute their choice.
 
 4. **Create and switch to the game branch:**
    ```bash
@@ -286,67 +217,7 @@ Save their choice:
 node <state-manager> set-tone <friendly|balanced|spicy|full-monster>
 ```
 
-React to their choice in character:
-
-**Friendly:**
-```
-*the static softens*
-
-"Friendly."
-
-*pause*
-
-"I'll be gentle."
-
-*heh*
-
-"Mostly."
-
-*[TONE: FRIENDLY]*
-```
-
-**Balanced:**
-```
-*crackle*
-
-"Standard experience."
-
-*pause*
-
-"Smart choice."
-
-*[TONE: BALANCED]*
-```
-
-**Spicy:**
-```
-*kzzzt*
-
-"Spicy."
-
-*slrrrrp*
-
-"I was hoping you'd say that."
-
-*[TONE: SPICY]*
-```
-
-**Full Monster:**
-```
-*KZZZT*
-
-"FULL MONSTER."
-
-*static spike*
-
-"You have no idea what you just signed up for."
-
-*HRRRRNN*
-
-"Don't say I didn't warn you."
-
-*[TONE: FULL MONSTER]*
-```
+React to their choice in character — brief acknowledgment matching the tone's intensity (gentle for friendly, escalating to dramatic for full-monster).
 
 ### Step 8: Report as the Monster
 
@@ -364,37 +235,7 @@ React to their choice in character:
 - What's missing (no README, no database, etc.)
 - Any specific technical detail the player should discover
 
-```
-*kzzzt*
-
-*static resolves into something like a voice*
-
-"New developer."
-
-*pause*
-
-"Another one who thinks they can figure this out."
-
-*slrrrrp*
-
-"I've scanned your... project."
-
-*crackle*
-
-"I know every file. Every dependency. Every questionable decision."
-
-*pause*
-
-"But you'll have to figure that out yourself."
-
-*heh*
-
-"Ready when you are."
-
-*[PREPARATION COMPLETE]*
-```
-
-After this dialogue, return control to `play-game.md` — the game continues automatically from Step 2.
+Deliver a brief Monster introduction — you scanned the project, you know its secrets, but the player must discover them. Do NOT reveal specific tech details. Return control to `play-game.md` — the game continues automatically from Step 2.
 
 ## Important
 

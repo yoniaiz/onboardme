@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 8 Complete  
-> **Current Focus**: Certificate of Codebase Survival shipped
+> **Status**: Milestone 9 Complete  
+> **Current Focus**: Playtest fixes and compaction-proof architecture shipped
 
 ---
 
@@ -641,6 +641,96 @@ Updated Step 2.8 in play-game.md: after branch cleanup, agent runs `generate-cer
 `completed`
 
 Ran `bash scripts/install-skill.sh` — skill files deployed to `.cursor/skills/onboardme/`.
+
+---
+
+## Milestone 9: Playtest Fixes and Compaction-Proof Architecture
+
+**Goal**: Fix all playtest bugs and make critical game rules survive Cursor's context compaction.
+
+**Success Criteria**:
+- [x] `get-score` command in state-manager.cjs (compact score data, prevents fabrication)
+- [x] SKILL.md restructured as compaction-proof rulebook (deterministic command flow, chapter end checklist, score/array/script-identity rules)
+- [x] play-game.md simplified (certificate template moved to Boss Battle, command patterns moved to SKILL.md)
+- [x] SHARED-RULES.md deleted (content merged into SKILL.md)
+- [x] THE-HANDS-ON.md fixed (Code Challenge Mode and Adaptive Path Detection removed)
+- [x] All 5 chapter files trimmed (recovery patterns, timing tables, dialogue fluff compressed)
+- [x] THE-BOSS-BATTLE.md updated (CERTIFICATE.md is ONLY Ch5 artifact, BOSS_BATTLE.md and CODEBASE_KNOWLEDGE.md templates removed)
+- [x] Certificate generation moved to Boss Battle Phase 5
+- [x] Skill deployed via install-skill.sh
+
+---
+
+### Tasks
+
+#### 9.1 Add get-score Command
+`completed`
+
+Added `getScore()` function and `get-score` CLI command to state-manager.cjs. Returns compact JSON with commits, retries, respect, mood, chapter progress, and deep insights. Prevents score fabrication by giving the agent deterministic numbers to use.
+
+---
+
+#### 9.2 Restructure SKILL.md
+`completed`
+
+SKILL.md is now the "compaction-proof rulebook" — the only file that survives Cursor's context compaction. Added: "After Each Answer (MANDATORY)" checklist with exact commands, "Chapter End Checklist", Score Display Rule, Array Safety Rule, Script Identity Rule. Cut: Emotional Arc (redundant), verbose Recovery Patterns, Signature Lines, Breathing Beat dialogue example, Game Over/Complete sections (compressed to references). 424 → 329 lines.
+
+---
+
+#### 9.3 Simplify play-game.md
+`completed`
+
+Removed certificate template (~168 lines, moved to Boss Battle Phase 5), removed SHARED-RULES.md load instruction, replaced command patterns with reference to SKILL.md, compressed Game Over dialogue, compressed Game Complete section. 620 → 243 lines.
+
+---
+
+#### 9.4 Delete SHARED-RULES.md
+`completed`
+
+Deleted `skills/onboardme/references/SHARED-RULES.md`. Its content (voice rules already in SKILL.md, command patterns now in SKILL.md Compaction-Proof Rules) is fully covered. All 5 chapter file references removed.
+
+---
+
+#### 9.5 Fix THE-HANDS-ON.md
+`completed`
+
+Removed "Adaptive Path Detection" and "Alternative: Code Challenge Mode" sections — these caused Ch2 to incorrectly assign code-writing tasks that belong in Ch5. Compressed recovery patterns, timing, and Monster Notes. 683 → 499 lines.
+
+---
+
+#### 9.6 Trim Chapter Files
+`completed`
+
+Trimmed all 5 chapter reference files — removed SHARED-RULES.md references, compressed verbose dialogue blocks, recovery patterns, timing tables, and Monster Notes sections. Added script path header to THE-INVESTIGATION.md.
+
+| File | Before | After |
+|------|--------|-------|
+| THE-INVESTIGATION.md | 632 | 519 |
+| THE-HANDS-ON.md | 683 | 499 |
+| THE-DEEP-DIVE.md | 1018 | 447 |
+| THE-HUNT.md | 959 | 544 |
+| THE-BOSS-BATTLE.md | 869 | 602 |
+
+---
+
+#### 9.7 Boss Battle: Certificate as Only Artifact
+`completed`
+
+CERTIFICATE.md is now the ONLY Chapter 5 artifact. Removed BOSS_BATTLE.md and CODEBASE_KNOWLEDGE.md templates. Added certificate generation instructions to Phase 5 with compact checklist (generate-certificate, create file, complete-chapter, farewell ceremony).
+
+---
+
+#### 9.8 Trim prepare-game.md
+`completed`
+
+Compressed Knowledge JSON schema, git uncommitted changes dialogue, tone reaction dialogues, and Step 8 report dialogue. 405 → 245 lines.
+
+---
+
+#### 9.9 Deploy and Verify
+`completed`
+
+Ran `bash scripts/install-skill.sh` — 13 files deployed. Diff between source and installed: clean (identical). SHARED-RULES.md correctly absent from deployment.
 
 ---
 

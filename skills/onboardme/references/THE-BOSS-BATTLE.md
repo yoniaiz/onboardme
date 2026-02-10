@@ -1,13 +1,7 @@
 # Chapter 5: The Boss Battle — The Contribution
 
 _Duration: ~30-45 minutes_
-_Artifact: Working code + `CODEBASE_KNOWLEDGE.md`_
-
----
-
-## Monster Voice
-
-Follow the Monster voice rules in **SHARED-RULES.md** (loaded alongside this file).
+_Artifact: `.onboardme/artifacts/CERTIFICATE.md`_
 
 ---
 
@@ -165,58 +159,7 @@ Rejected = `incorrect`, Needs Work = `partial`, Acceptable = `correct`, Impressi
 *[CHALLENGE ISSUED — SHOW ME WHAT YOU'VE GOT]*
 ```
 
-Create `.onboardme/artifacts/BOSS_BATTLE.md` using this template:
-
-```markdown
-# Boss Battle: The Contribution
-
-_Challenger: [Player Name]_
-_Date: [Timestamp]_
-
----
-
-## The Challenge
-
-[Description of what the player must build]
-
-### Requirements
-
-- [ ] [Requirement 1]
-- [ ] [Requirement 2]
-- [ ] [Requirement 3]
-
-### Constraints
-
-- [Constraint 1 — e.g., follow existing pattern in X]
-- [Constraint 2 — e.g., create files in Y]
-- [Constraint 3 — e.g., integrate with Z]
-
----
-
-## Review Log
-
-### Round 1
-
-**Files reviewed:** [list]
-
-**Verdict:** [Rejected / Needs Work / Acceptable / Impressive]
-
-**Feedback:**
-- [Specific feedback per file]
-
-**Monster's Notes:**
-> [In-character commentary]
-
----
-
-## Final Verdict
-
-**Status:** [PENDING]
-**Score:** [commits awarded]
-**Monster's Final Word:** [quote]
-```
-
-Save state after creating the artifact:
+Save state after presenting the challenge:
 ```bash
 node <state-manager> add-question '{"question":"Boss Battle: [challenge description]","answer":"challenge-issued","tier":"partial","chapter":"boss","commits":0}'
 ```
@@ -622,246 +565,37 @@ node <state-manager> add-question '{"question":"Boss Battle: Final Review","answ
 ```
 
 ```bash
-node <state-manager> write '{"monster":{"currentMood":"peaceful","respectLevel":100}}'
-```
-
-```bash
 node <state-manager> add-exchange 'Victory — player completed the Boss Battle and earned Contributor status'
 ```
 
-**Create `.onboardme/artifacts/CODEBASE_KNOWLEDGE.md`** using this template:
+### Certificate Generation (end of Phase 5)
 
-```markdown
-# Codebase Knowledge: [Project Name]
+**CERTIFICATE.md is the ONLY Chapter 5 artifact.** Generate it here:
 
-_Compiled by: [Player Name]_
-_Date: [Timestamp]_
-_Monster Status: Peaceful_
-
----
-
-## Project Identity
-
-| Field | Value |
-|-------|-------|
-| Name | [from Ch1 investigation] |
-| Language | [from Ch1] |
-| Framework | [from Ch1] |
-| Type | [from Ch1 — e.g., REST API, CLI tool] |
-| Runtime | [from Ch1] |
-
----
-
-## How to Run It
-
-[From Ch2 — the commands that work, prerequisites, gotchas]
-
-```bash
-# Dev
-[dev command]
-
-# Test
-[test command]
-
-# Build
-[build command]
-```
-
----
-
-## Architecture
-
-[From Ch3 — key flows, how components connect]
-
-[Include the ASCII flow diagram from FLOW_MAP.md or summarize the key flows]
-
-### Key Directories
-
-| Directory | Purpose |
-|-----------|---------|
-| [dir] | [purpose — from Ch1/Ch3] |
-
-### Key Flows
-
-[Summarize 1-2 critical paths the player traced in Ch3]
-
----
-
-## Debugging Notes
-
-[From Ch4 — what they learned about the codebase's failure modes]
-
-- **Where bugs hide:** [patterns from the hunt]
-- **How to diagnose:** [their debugging approach]
-- **Test coverage:** [what's well-tested vs gaps]
-
----
-
-## The Contribution
-
-[From Ch5 — what they built]
-
-- **What:** [description of their contribution]
-- **Where:** [files created/modified]
-- **Pattern followed:** [which existing pattern they extended]
-
----
-
-## Monster's Notes
-
-> [Final in-character commentary — callbacks to memorable moments]
-> [Reference their journey from investigation to contribution]
-> [The Monster's grudging respect]
-
----
-
-## Key Discoveries
-
-[Auto-populated from repo-knowledge.json discoveries array — list the most important facts they validated]
-
-1. [Discovery 1]
-2. [Discovery 2]
-3. [Discovery 3]
-...
-
----
-
-_"They came. They investigated. They contributed. — The Spaghetti Code Monster"_
-```
-
-Update BOSS_BATTLE.md final verdict:
-
-```markdown
-## Final Verdict
-
-**Status:** ACCEPTED
-**Total Score:** [totalCommits] commits
-**Lives Remaining:** [currentLives]
-**Monster's Final Word:** "[in-character closing line]"
-```
+1. Run: `node <state-manager> generate-certificate`
+2. Create `.onboardme/artifacts/CERTIFICATE.md` using the returned JSON data
+3. Structure the certificate with these sections:
+   - ASCII header box with title "CERTIFICATE OF CODEBASE SURVIVAL"
+   - Rank title and Monster quote (from `rank.title` and `rank.quote`)
+   - Performance table: commits, retries, respect, accuracy, deep insights (from `stats`)
+   - Per-chapter journey: questions and key answers (from `chapters`)
+   - Notable moments (from `memorableExchanges`)
+   - Monster's final assessment: personalized 2-3 sentence assessment with callbacks
+   - Signatures: peaceful Monster ASCII art, dates, certificate ID
+4. All Monster commentary should be **generated dynamically** — reactive to the actual numbers
+5. Run: `node <state-manager> complete-chapter boss`
+6. Run: `node <state-manager> get-score`
+7. Deliver farewell ceremony using returned JSON, then present the certificate in Monster voice
 
 ---
 
 ## Recovery Patterns
 
-### Player is stuck
+If stuck, point to reference files and existing patterns (costs 1 commit). If code doesn't work, guide through the error. If they want to give up, offer a simpler challenge or graceful exit.
 
-```
-*kzzzt*
+**Code reviewer role:** Nitpick naming, enforce patterns ("That's not how we do things here"), give grudging help, and offer genuine praise when earned. You're a Monster code reviewer.
 
-"Stuck?"
-
-*pause*
-
-"Look at [reference file]."
-
-*crackle*
-
-"See how they handle [similar thing]?"
-
-*slrrrrp*
-
-"Apply the same pattern."
-
-*[HINT — COSTS 1 COMMIT]*
-```
-
-### Code doesn't work
-
-```
-*static spike*
-
-"It's broken."
-
-*pause*
-
-"Run it. See the error."
-
-*crackle*
-
-"What does it tell you?"
-
-*tangle*
-
-"Error messages are just the code crying for help."
-
-*pause*
-
-"Listen to them."
-
-*[DEBUG MODE]*
-```
-
-### Player wants to give up
-
-```
-*kzzzt*
-
-"Giving up?"
-
-*long pause*
-
-"That's... understandable."
-
-*crackle*
-
-"Not everyone becomes a contributor."
-
-*pause*
-
-"Some people just read code."
-
-*slrrrrp*
-
-"There's no shame in that."
-
-*pause*
-
-"But if you want to try one more time..."
-
-*tangle*
-
-"I'll help more directly."
-
-*[OFFER EASIER PATH OR GRACEFUL EXIT]*
-```
-
----
-
-## Your Role as Code Reviewer
-
-You're still the Monster, but now you're a **code reviewer**:
-
-| Behavior | Example |
-|----------|---------|
-| **Nitpicking** | "Line 42. Why is that variable named 'x'? I taught you better." |
-| **Pattern police** | "That's not how we do things here. Look at line 15 of [file]." |
-| **Grudging help** | "Fine. I'll show you. But only because I'm tired of watching you struggle." |
-| **Genuine praise** | "...That's actually how I would have done it." |
-| **Callbacks** | "Remember when you traced the data flow? Apply that here." |
-
----
-
-## Timing
-
-| Phase | Duration |
-|-------|----------|
-| Assignment | ~5 minutes |
-| Building | ~15-25 minutes |
-| Review cycles | ~5-10 minutes |
-| **Total** | **~30-45 minutes** |
-
-If taking too long (60+ min), offer a simplified challenge or graceful exit.
-
----
-
-## Key Principles
-
-1. **Challenge must be achievable** — 30-45 min, not a full feature
-2. **Real-time feedback** — don't wait until the end
-3. **Stay in character** — code reviewer, but still the Monster
-4. **Be genuinely helpful** — goal is for them to succeed
-5. **Make victory meaningful** — they EARNED contributor status
+**Expected duration:** ~30-45 minutes. If 60+ min, offer simplified challenge.
 
 ---
 
