@@ -1,7 +1,6 @@
 # Chapter 2: The Hands-On
 
 _Duration: ~15 minutes_
-_Artifact: Running project + verified commands_
 
 ---
 

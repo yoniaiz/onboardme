@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 9 Complete  
-> **Current Focus**: Playtest fixes and compaction-proof architecture shipped
+> **Status**: Milestone 10 Complete  
+> **Current Focus**: Playtest #2 fixes shipped
 
 ---
 
@@ -734,6 +734,80 @@ Ran `bash scripts/install-skill.sh` — 13 files deployed. Diff between source a
 
 ---
 
+## Milestone 10: Playtest #2 Fixes
+
+**Goal**: Fix regressions from Playtest #2 — character breaks at transitions, manual state overrides, repetitive sabotage, confusing artifacts, and tone complexity.
+
+**Success Criteria**:
+- [x] SKILL.md: Renamed COMPACTION-PROOF RULES to MANDATORY RULES with Character Lock as first subsection
+- [x] SKILL.md: State Write Restrictions added (never manually set respectLevel, currentMood, currentChapter)
+- [x] Tone system removed (always spicy) — SKILL.md, play-game.md, prepare-game.md, state-manager.cjs
+- [x] Per-chapter artifacts removed (CASE_FILE, FLOW_MAP, IMPACT_ANALYSIS) — only CERTIFICATE.md remains
+- [x] THE-HUNT.md: Sabotage table reordered (harder patterns first), silent sabotage strengthened
+- [x] play-game.md: Chapter transition rules strengthened, tone step removed, mood reference fixed
+- [x] THE-BOSS-BATTLE.md: Monster-voice certificate presentation added
+- [x] Skill deployed via install-skill.sh
+
+---
+
+### Tasks
+
+#### 10.1 Rename Section and Move Character Lock into Mandatory Rules
+`completed`
+
+Renamed `## COMPACTION-PROOF RULES` to `## MANDATORY RULES`, removed meta-explanation about compaction, added Character Lock as first subsection with explicit rules (no emoji, no narrator mode, no skip offers, no stat bullet lists).
+
+---
+
+#### 10.2 Add State-Write Restrictions
+`completed`
+
+Added `### State Write Restrictions` to Mandatory Rules. `update-mood` manages mood and respectLevel automatically (with chapter ceilings). `complete-chapter` manages chapter progression. Direct `write` only for session notes, player name, git state, and game-over flow. Updated Mood System section to clarify `update-mood` manages respectLevel. Updated all 4 chapter reference files' state management sections to reference commands instead of direct writes.
+
+---
+
+#### 10.3 Remove Tone System (Always Spicy)
+`completed`
+
+Removed Tone Adjustment section from SKILL.md, Step 7 (Tone Selection) from prepare-game.md, Step 2.5 (Read Tone Preference) from play-game.md. Changed default `monsterTone` from `"balanced"` to `"spicy"` in state-manager.cjs. Added "Tone: Spicy" to Your Character section. Kept `set-tone` CLI command for backward compatibility.
+
+---
+
+#### 10.4 Remove Per-Chapter Artifacts
+`completed`
+
+Removed CASE_FILE.md from THE-INVESTIGATION.md (template, update references, closing finalization). Removed FLOW_MAP.md from THE-DEEP-DIVE.md (template, update references, closing finalization). Removed IMPACT_ANALYSIS.md from THE-HUNT.md (template, update reference, closing creation). Simplified File Artifacts section in SKILL.md to only reference CERTIFICATE.md. Updated Chapter End Checklist to remove artifact step. Removed CASE_FILE reference from play-game.md Important section.
+
+---
+
+#### 10.5 Fix Sabotage Guidance
+`completed`
+
+Reordered sabotage table in THE-HUNT.md — harder patterns (remove `await`, change default value) now first, comparison operator last. Added guidance: "prefer patterns that test UNDERSTANDING, comparison-operator is easiest to spot." Removed "For Spicy/Full-Monster:" prefix. Strengthened silent sabotage section with explicit warning about visible chat output.
+
+---
+
+#### 10.6 Strengthen Chapter Transition Rules
+`completed`
+
+Added explicit rule to play-game.md Step 6: "NEVER offer to skip chapters, summarize progress in assistant mode, or ask meta-questions." Removed artifact references from DO NOT list. Fixed Step 2.6 reference from non-existent "Emotional Arc" to "Mood System" section.
+
+---
+
+#### 10.7 Certificate Presentation in Monster Voice
+`completed`
+
+Added step 8 to THE-BOSS-BATTLE.md Phase 5 with Monster-voice certificate delivery dialogue. Added explicit rule: "NEVER say Congratulations or use emoji in the game-complete sequence."
+
+---
+
+#### 10.8 Deploy and Verify
+`completed`
+
+Ran `bash scripts/install-skill.sh` — skill files deployed.
+
+---
+
 ## Completed Milestones
 
 ### Milestone 5: Full Game Integration ✓
@@ -829,4 +903,4 @@ Ran `bash scripts/install-skill.sh` — 13 files deployed. Diff between source a
 
 ---
 
-*Last Updated: 2026-02-09 (Milestone 8 complete — Certificate of Codebase Survival)*
+*Last Updated: 2026-02-11 (Milestone 10 complete — Playtest #2 Fixes)*

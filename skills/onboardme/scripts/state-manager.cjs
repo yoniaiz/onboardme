@@ -132,7 +132,7 @@ function getDefaultState() {
       contextFiles: [],
     },
     preferences: {
-      monsterTone: "balanced",
+      monsterTone: "spicy",
     },
   };
 }

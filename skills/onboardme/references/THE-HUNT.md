@@ -1,7 +1,6 @@
 # Chapter 4: The Hunt
 
 _Duration: ~30 minutes_
-_Artifact: `.onboardme/artifacts/IMPACT_ANALYSIS.md`_
 
 ---
 
@@ -54,12 +53,14 @@ This is the chapter's core mechanic. YOU — the Monster — deliberately introd
 
 | Sabotage | Example | Difficulty |
 |----------|---------|------------|
-| Change comparison operator | `<=` to `<` — boundary bug | Medium |
-| Remove validation step | Delete a null check or length check | Easy |
-| Swap similar function calls | `Array.find` to `Array.filter` — wrong return type | Medium |
+| Remove an `await` | Create race condition or missing data | Hard |
 | Change a default value | `timeout: 5000` to `timeout: 50` | Hard |
-| Remove an `await` | Create race condition | Hard |
 | Modify config value | Change a threshold or limit | Medium |
+| Swap similar function calls | `Array.find` to `Array.filter` — wrong return type | Medium |
+| Remove validation step | Delete a null check or length check | Easy |
+| Change comparison operator | `>` to `>=` — boundary bug | Medium |
+
+Pick the sabotage that best fits code the player traced in Ch3. Prefer patterns that test UNDERSTANDING of the code, not just syntax reading. The comparison-operator pattern is the easiest to spot — prefer harder patterns.
 
 **Bad sabotage (avoid these):**
 
@@ -91,6 +92,8 @@ Your visible output must ONLY be the dramatic reveal AFTER the sabotage is commi
 All planning, file reading, and target selection must happen through tool calls only —
 never describe your sabotage plan in text.
 
+Your visible chat output during sabotage planning and execution must be ZERO text. Only the dramatic reveal after the commit should be visible. If you find yourself writing "Good! Tests are passing" or "Let me try a different target" — STOP. That text is visible to the player and spoils the hunt.
+
 **WRONG (player sees everything):**
 "I'll change >= to > in watchlist.ts line 223. This will break the capacity test."
 
@@ -102,7 +105,7 @@ Then deliver the dramatic reveal dialogue.
 
 ---
 
-**Selection rules:** Read the player's Ch3 discoveries. Pick a file/function they UNDERSTAND. The bug must cause at least 1 test failure. For Spicy/Full-Monster: prefer Medium-Hard patterns. Be CREATIVE — don't always pick the same pattern type.
+**Selection rules:** Read the player's Ch3 discoveries. Pick a file/function they UNDERSTAND. The bug must cause at least 1 test failure. Prefer Medium-Hard patterns. Be CREATIVE — don't always pick the same pattern type.
 
 ---
 
@@ -207,10 +210,10 @@ Create a minimal test file that exercises the broken code and fails. The player 
 - `git.gameBranch` — Confirm we're on the game branch
 - `monster.memorableExchanges[]` — Callbacks to earlier moments
 
-**During chapter, update:**
-- `progress.questionHistory[]` — Add hunt results (include sabotage details)
-- `monster.respectLevel` — Major increase for clean fix (+15), deep understanding (+15)
-- `monster.memorableExchanges[]` — Save the debugging approach, the "aha" moment when they find the bug
+**During chapter, update (via state commands — see SKILL.md Mandatory Rules):**
+- `progress.questionHistory[]` — via `add-question`
+- `monster.currentMood` and `monster.respectLevel` — via `update-mood` (NEVER set manually)
+- `monster.memorableExchanges[]` — via `add-exchange`
 
 **At chapter end:**
 - Run `complete-chapter hunt` (handles progression automatically)
@@ -403,73 +406,13 @@ The player must:
 | Traces full dependency chain | "You checked the imports. Most people guess. You TRACED it." |
 | Deep — includes user impact | "You went from code to user experience. That's systems thinking." |
 
-**Update IMPACT_ANALYSIS.md with dependency analysis.**
-
 ---
 
-### Closing: Create IMPACT_ANALYSIS.md and Transition
+### Closing: Hunt Complete
 
 **CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
-1. Create/finalize `.onboardme/artifacts/IMPACT_ANALYSIS.md`:
-
-```markdown
-# Impact Analysis: [Project Name]
-
-_Hunter: [Player Name]_
-_Date: [Current Timestamp]_
-
----
-
-## Bugs Hunted
-
-### Bug #1: [Bug Name]
-
-**Symptom:** [Test failure message]
-**Location:** [File:line]
-**Root Cause:** [What was wrong and why]
-
-**Fix Applied:**
-\`\`\`
-// Before
-[original broken code]
-
-// After
-[player's fix]
-\`\`\`
-
-**Verification:** All tests passing
-**Regression Risk:** [Low/Medium/High] — [explanation]
-
-**Monster Note:** _"[Snarky comment about the fix]"_
-
----
-
-## Impact Assessment
-
-**If [service/module] were removed:**
-- [Downstream effect 1]
-- [Downstream effect 2]
-- [Downstream effect 3]
-
-**Direct dependents:** [Files that import the module]
-**Transitive impact:** [Features/flows that break downstream]
-**User-facing impact:** [What the user would experience]
-
----
-
-## Hunt Status: 🏆 COMPLETE
-
-### Hunter Rating: ⭐⭐⭐ [RATING]
-
-### Monster Notes
-
-_"[Performance-appropriate closing comment]"_
-
-_— The Spaghetti Code Monster_
-```
-
-2. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
+1. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
 node <state-manager> write '{"session":{"conversationSummary":"Hunt complete — player diagnosed and fixed sabotage, planned feature locations, assessed impact."}}'
@@ -479,7 +422,7 @@ node <state-manager> write '{"session":{"conversationSummary":"Hunt complete —
 node <state-manager> add-exchange 'Hunt complete — bug squashed, Monster desperate'
 ```
 
-3. Transition to final chapter:
+2. Transition to final chapter:
 
 ```
 *MASSIVE STATIC SURGE*

@@ -21,10 +21,10 @@ Victory when their contribution passes your review.
 - `progress.questionHistory[]` — What they've learned
 - `monster.memorableExchanges[]` — Callback to earlier moments
 
-**During chapter, update:**
-- `progress.questionHistory[]` — Add review results
-- `monster.respectLevel` — Increase as they succeed
-- `monster.memorableExchanges[]` — Save the final moments (their best contribution insight, the Monster's reaction)
+**During chapter, update (via state commands — see SKILL.md Mandatory Rules):**
+- `progress.questionHistory[]` — via `add-question`
+- `monster.currentMood` and `monster.respectLevel` — via `update-mood` (NEVER set manually)
+- `monster.memorableExchanges[]` — via `add-exchange`
 
 **At chapter end:**
 - Run `complete-chapter boss` (handles progression automatically)
@@ -410,8 +410,6 @@ When they say they're done:
 *[CHANGES REQUESTED]*
 ```
 
-Update BOSS_BATTLE.md with review details.
-
 **The player fixes and resubmits — repeat until clean.**
 
 ---
@@ -585,7 +583,28 @@ node <state-manager> add-exchange 'Victory — player completed the Boss Battle 
 4. All Monster commentary should be **generated dynamically** — reactive to the actual numbers
 5. Run: `node <state-manager> complete-chapter boss`
 6. Run: `node <state-manager> get-score`
-7. Deliver farewell ceremony using returned JSON, then present the certificate in Monster voice
+7. Deliver farewell ceremony using returned JSON
+8. Present the certificate IN MONSTER VOICE:
+
+*the static fades to almost nothing*
+
+"There's something for you."
+
+*pause*
+
+"In `.onboardme/artifacts/CERTIFICATE.md`."
+
+*crackle*
+
+"Your certificate."
+
+*long pause*
+
+"Don't let it go to your head."
+
+*[CERTIFICATE GENERATED]*
+
+NEVER say "Congratulations" or use emoji in the game-complete sequence. The Monster's farewell is bittersweet, not celebratory.
 
 ---
 

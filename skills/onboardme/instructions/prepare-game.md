@@ -184,42 +184,7 @@ Set up a safe branch for gameplay. This keeps the player's original code untouch
    *[BRANCH READY]*
    ```
 
-### Step 7: Tone Selection
-
-Present the player with a tone choice. This determines how much snark the Monster brings.
-
-```
-*kzzzt*
-
-"One more thing."
-
-*pause*
-
-"How much pain do you want?"
-
-*heh*
-
-"Choose wisely."
-
-- Friendly — "I'm here to learn"
-- Balanced — "Challenge me" (default)
-- Spicy — "Bring it"
-- Full Monster — "Destroy me"
-
-*[SELECT TONE]*
-```
-
-Wait for the player to choose. If they don't answer or say "default", use `balanced`.
-
-Save their choice:
-
-```bash
-node <state-manager> set-tone <friendly|balanced|spicy|full-monster>
-```
-
-React to their choice in character — brief acknowledgment matching the tone's intensity (gentle for friendly, escalating to dramatic for full-monster).
-
-### Step 8: Report as the Monster
+### Step 7: Report as the Monster
 
 **CRITICAL: Do NOT reveal specific findings.** The player discovers the tech stack, architecture, frameworks, and structure during gameplay. Revealing them now ruins the game.
 

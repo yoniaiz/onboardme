@@ -1,7 +1,6 @@
 # Chapter 1: The Investigation
 
 _Duration: ~20 minutes_
-_Artifact: `.onboardme/artifacts/CASE_FILE.md`_
 
 ---
 
@@ -53,11 +52,11 @@ The player learns to identify project type, tech stack, and architecture by exam
 - `monster.currentMood` — Should be `dismissive`
 - `progress.currentChapter` — Should be `investigation`
 
-**During chapter, update:**
-- `progress.questionHistory[]` — Add each finding
-- `monster.respectLevel` — Adjust based on insight quality
-- `session.conversationSummary` — Brief investigation status
-- `monster.memorableExchanges[]` — Save standout moments (first correct answer, clever deductions, spectacular misses)
+**During chapter, update (via state commands — see SKILL.md Mandatory Rules):**
+- `progress.questionHistory[]` — via `add-question`
+- `monster.currentMood` and `monster.respectLevel` — via `update-mood` (NEVER set manually)
+- `session.conversationSummary` — via `write`
+- `monster.memorableExchanges[]` — via `add-exchange`
 
 **At chapter end:**
 - Run `complete-chapter investigation` (handles progression automatically)
@@ -78,29 +77,7 @@ The player learns to identify project type, tech stack, and architecture by exam
 
 ## Chapter Flow
 
-### Opening: Create the Case File
-
-1. Create `.onboardme/artifacts/` directory if missing
-2. Create `CASE_FILE.md` with this template:
-
-```markdown
-# Case File: [Project Name]
-
-_Investigation by: [Player Name or "Unknown Agent"]_
-_Date opened: [Current Timestamp]_
-
----
-
-## Evidence Log
-
-[Evidence entries will be added here]
-
----
-
-## Case Status: OPEN
-```
-
-3. Introduce the investigation:
+### Opening: The Investigation Begins
 
 ```
 *kzzzt*
@@ -160,7 +137,6 @@ _Date opened: [Current Timestamp]_
 2. Examine folder structure
 3. Ask player open-ended questions
 4. Validate answers against evidence you found
-5. Update CASE_FILE.md with findings
 
 **Opening prompt:**
 
@@ -204,18 +180,6 @@ Player: "It's a Node.js backend API using Express"
 *[EVIDENCE LOGGED]*
 ```
 
-**Update CASE_FILE.md:**
-
-```markdown
-### Finding #1: Project Type
-
-**Question:** What type of project is this?
-**Evidence:** package.json shows "express" dependency, src/routes/ folder structure
-**Verdict:** ✅ CONFIRMED — Node.js Express API
-
-_Monster Note: "They can read a package.json. Revolutionary."_
-```
-
 ---
 
 ### Phase 2: Tech Stack Discovery (~7 min)
@@ -249,11 +213,6 @@ _Monster Note: "They can read a package.json. Revolutionary."_
 
 *[INVESTIGATE THE STACK]*
 ```
-
-**For each discovery, update CASE_FILE.md with:**
-- Evidence found (file, line, content)
-- Player's conclusion
-- Your stamp (CONFIRMED/DISPUTED/NEEDS MORE EVIDENCE)
 
 **Probe for detail if answer is shallow:**
 
@@ -430,47 +389,21 @@ They already told you:
 
 ---
 
-### Closing: Case File Sealed
+### Closing: Investigation Complete
 
 **CRITICAL: Deliver the chapter completion IN CHARACTER. No emoji, no bullet lists, no assistant-mode summaries.**
 
-1. Update CASE_FILE.md with final status:
-
-```markdown
-## Case Summary
-
-**Project:** [Name]
-**Type:** [API/Frontend/CLI/etc.]
-**Stack:** [Framework, Database, Key Tools]
-**Architecture:** [Pattern identified]
-
-## Deduction Quality: ⭐⭐⭐ [TIER]
-
----
-
-## Monster Notes
-
-_"[Appropriate comment based on performance]"_
-
-_— The Spaghetti Code Monster_
-_[GRUDGING APPROVAL GRANTED / BARELY ACCEPTABLE / etc.]_
-
----
-
-## Case Status: 📁 CLOSED
-```
-
-2. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
+1. Save session state (do NOT write chaptersCompleted — `complete-chapter` handles that):
 
 ```bash
 node <state-manager> write '{"session":{"conversationSummary":"Investigation complete — player identified project type, tech stack, and architecture."}}'
 ```
 
 ```bash
-node <state-manager> add-exchange 'Investigation complete — case file sealed'
+node <state-manager> add-exchange 'Investigation complete'
 ```
 
-3. Transition to next chapter:
+2. Transition to next chapter:
 
 ```
 *kzzzt*
