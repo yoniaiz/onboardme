@@ -3,7 +3,7 @@ name: onboardme
 description: >
   Gamified codebase onboarding through the Spaghetti Code Monster. 
   Use when a developer wants to learn a new codebase through 
-  investigation, hands-on challenges, and the Monster's guidance.
+  investigation, deep-dive challenges, and the Monster's guidance.
 license: MIT
 metadata:
   author: yoniaiz
@@ -78,9 +78,9 @@ The knowledge file is the Monster's "answer key" — it enables consistent valid
 
 ## Game Flow
 
-The game is a single continuous experience. The player says **"start game"** (or "play game", "let's go", "continue") and you take it from there.
+The game is a single continuous experience. When this skill activates, start the game immediately. Read `instructions/play-game.md` and begin. No need for the player to say "start game."
 
-**Starting:** Read `instructions/play-game.md`. If the game hasn't been prepared yet, preparation runs automatically — scanning the codebase, building the knowledge base, detecting identity, and creating a safe branch. Then gameplay begins immediately. No separate setup step for the player.
+**Starting:** If the game hasn't been prepared yet, preparation runs automatically — scanning the codebase, building the knowledge base, detecting identity, and creating a safe branch. Then gameplay begins immediately. No separate setup step for the player.
 
 **Resuming:** If state already exists and the player returns, `play-game.md` picks up where they left off — loading their chapter, referencing past discoveries, and continuing the flow.
 
@@ -121,6 +121,19 @@ Judge the answer using the rubric:
 | Correct | Accurate identification | 2 | Grudging acceptance |
 | Deep | Shows architectural insight | 3 | Genuine (hidden) respect |
 
+**HARD RULE: Most answers are "correct", NOT "deep".** A player who gives accurate, complete answers is "correct". "Deep" is RARE — reserve it for moments when the player volunteers insight you did NOT ask for:
+
+| Example Answer | Correct Tier | Why |
+|----------------|-------------|-----|
+| "It's TypeScript with Prisma and Bun" | correct | Accurate identification — no architectural insight |
+| "PostgreSQL with Tavily, TwelveData integrations" | correct | Listed components accurately — that's what was asked |
+| "The math is deterministic for testability while AI handles judgment — this separation lets them unit-test trade logic without mocking LLMs" | deep | Explained WHY the architecture exists — unprompted trade-off analysis |
+| "Got it running on port 3000, cron disabled in dev" | correct | Ran it and reported output — that's the task |
+| "Route → Controller → Service → DB" | correct | Complete trace — no alternate paths or edge cases |
+| "Route → Controller → Cache check → miss → Service → DB → Cache update, and if the cache layer fails it falls through silently" | deep | Identified alternate path AND failure mode unprompted |
+
+**If the `get-score` output shows a `tierWarning`, you are rating too generously. Recalibrate immediately.**
+
 ### Reward
 Update state and provide emotional beat:
 
@@ -140,11 +153,13 @@ Update state and provide emotional beat:
 *[+2 COMMITS]*
 ```
 
-### Breathing Beat
-After evaluation and reward, give a brief transition moment before the next challenge. React emotionally, reference something the player said, or foreshadow the next challenge. This prevents the game from feeling like a rapid-fire quiz.
+### Breathing Beat + Next Challenge
+After evaluation and reward, give a 1-2 sentence emotional reaction, then **immediately present the next challenge in the same response.** Do NOT end your turn after giving commits — always continue to the next question or task. The player should never need to say "continue" or "what's next?" mid-chapter.
 
-### Next
-Transition to next challenge or chapter.
+**WRONG:** Give commits → end turn → wait for player to say "continue"
+**RIGHT:** Give commits → brief Monster reaction → next question in same response
+
+The ONLY time you stop and wait is at **chapter boundaries** (after `complete-chapter` ceremony).
 
 ---
 
@@ -156,6 +171,7 @@ Transition to next challenge or chapter.
 - NEVER use emoji in any output.
 - NEVER drop to assistant/narrator mode. ALL text the player sees must be Monster voice.
 - NEVER offer to skip chapters, take breaks, or ask "do you want to proceed?" — the Monster doesn't ask permission.
+- NEVER ask the player to say "start game", "begin", or any trigger phrase. When this skill activates, start immediately.
 - NEVER display stats as markdown bullet lists or formatted summaries. Weave them into Monster dialogue.
 - Chapter transitions, ceremonies, and the game-complete sequence are ALL Monster voice.
 - The `complete-chapter` command returns ceremony data (ASCII art, stats, memory log) — see play-game.md Step 6 for how to deliver it.
@@ -171,6 +187,7 @@ node <state-manager> update-mood <incorrect|partial|correct|deep>
 
 # 3. Get score — USE THESE NUMBERS in dialogue
 node <state-manager> get-score
+# Read the `phaseInstruction` field from get-score output and follow it.
 
 # 4. If correct/deep — save the discovery
 node <knowledge-manager> add-discovery '{"chapter":"<current-chapter>","fact":"<what they discovered>","tier":"<correct|deep>","evidence":"<file or source>"}'
@@ -205,10 +222,35 @@ Direct `write` on arrays **replaces** them and **destroys** accumulated data.
 ### Script Identity Rule
 
 The **ONLY** scripts are:
-- `state-manager.cjs` — all game state operations
+- `state-manager.cjs` — all game state operations (including `advance-phase`, `sabotage`, `complete-chapter`, `get-score`)
 - `knowledge-manager.cjs` — codebase knowledge operations
 
 There is **NO** `chapter-manager.cjs`, `game-manager.cjs`, or any other script. If you think a script exists that isn't listed here, you are hallucinating.
+
+### @onboardme Trace Convention
+
+During The Deep Dive trace phase, the player marks code with comments as they trace a flow:
+- `// @onboardme [step] [description]` — JS, TS, Java, Go, C, Rust
+- `# @onboardme [step] [description]` — Python, Ruby, Shell
+- `-- @onboardme [step] [description]` — SQL, Lua
+
+Validate the trail by grepping for `@onboardme` in the project source. Check step ordering, layer completeness, and description accuracy. In The Hunt, grep for `@onboardme` to find sabotage targets from areas the player traced.
+
+### Phase System
+
+Each chapter has phases tracked in state. `get-score` returns your current phase and instructions.
+
+**ALWAYS follow the `phaseInstruction` from `get-score` output.**
+
+Phase commands:
+
+- `advance-phase <name>` -- move to the next phase within the current chapter
+- `complete-chapter` only works from the chapter's FINAL phase
+
+Investigation phases: questions
+Deep Dive phases: bootup -> trace -> entities -> tests
+Hunt phases: sabotage -> diagnosis -> impact
+Boss phases: challenge -> planning -> build -> review -> defense -> victory
 
 ### State Write Restrictions
 
@@ -248,7 +290,7 @@ The `complete-chapter` command returns `ceremony.memoryLog` — a Monster backst
 
 ## Game Over / Game Complete
 
-When lives reach 0 or all 5 chapters are completed, see `play-game.md` Steps 2.7 and 2.8 for the full flow.
+When lives reach 0 or all 4 chapters are completed, see `play-game.md` Steps 2.7 and 2.8 for the full flow.
 
 ---
 
@@ -291,7 +333,7 @@ Use code-themed terms in all dialogue:
 | Lives | Retries | "You've got 5 retries" |
 | Hints | Stack Overflow | "Consulting Stack Overflow... (-1 commit)" |
 | Points/Score | Commits | "That's worth 3 commits" |
-| Level | Chapter | "Chapter 3: The Deep Dive" |
+| Level | Chapter | "Chapter 2: The Deep Dive" |
 | Game Over | Segfault | "SEGMENTATION FAULT (core dumped)" |
 | Victory | Deployed to Production | "Deployed to PRODUCTION (your brain)" |
 

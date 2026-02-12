@@ -9,7 +9,7 @@ This folder contains the 5 consolidated game chapters for the agent-skills model
 | Chapter | Duration | Artifact | Consolidates |
 |---------|----------|----------|--------------|
 | **01 — The Investigation** | 20 min | `CASE_FILE.md` | file-detective, docs-speedread |
-| **02 — The Hands-On** | 15 min | Running project | npm-start-challenge |
+| _(02 — The Hands-On merged into Deep Dive)_ | — | — | — |
 | **03 — The Deep Dive** | 25 min | `FLOW_MAP.md` | flow-trace, connect-relations, test-stories |
 | **04 — The Hunt** | 30 min | `IMPACT_ANALYSIS.md` + bug fix | grep-hunt, feature-locate |
 | **05 — The Boss Battle** | 15 min | `CODEBASE_KNOWLEDGE.md` | spaghetti-monster boss |
@@ -24,8 +24,7 @@ This folder contains the 5 consolidated game chapters for the agent-skills model
 chapters/
 ├── README.md                 # This file
 ├── 01-THE-INVESTIGATION.md   # Chapter 1 skill definition
-├── 02-THE-HANDS-ON.md        # Chapter 2 skill definition
-├── 03-THE-DEEP-DIVE.md       # Chapter 3 skill definition
+├── 03-THE-DEEP-DIVE.md       # Chapter 2 skill definition (combined with old Ch2 Hands-On)
 ├── 04-THE-HUNT.md            # Chapter 4 skill definition
 ├── 05-THE-BOSS-BATTLE.md     # Chapter 5 skill definition
 └── MONSTER-ASCII.md          # Visual assets for Monster rendering
@@ -75,14 +74,14 @@ The agent doesn't just ask questions — it:
 ## Progression
 
 ```
-Investigation → Hands-On → Deep Dive → Hunt → Boss Battle
+Investigation → Deep Dive → Hunt → Boss Battle
     |              |           |         |         |
  identity       running     flows    bugs/fixes  mastery
 ```
 
 Each chapter builds on prior knowledge:
 - Investigation teaches what the project IS
-- Hands-On makes it real by running it
+- Deep Dive makes it real by running it and tracing the architecture
 - Deep Dive reveals how it WORKS
 - Hunt applies knowledge to find/fix issues
 - Boss Battle proves comprehensive understanding

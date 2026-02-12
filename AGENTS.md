@@ -34,7 +34,7 @@ The OnboardMe game runs as an **agent skill** — markdown files that instruct c
 skills/onboardme/
 ├── SKILL.md              # Monster persona, compaction-proof rules, gameplay loop
 ├── instructions/         # Command implementations (play-game, prepare-game, etc.)
-├── references/           # Chapter content (THE-INVESTIGATION, THE-HANDS-ON, etc.)
+├── references/           # Chapter content (THE-INVESTIGATION, THE-DEEP-DIVE, etc.)
 └── scripts/              # State and knowledge manager utilities
 ```
 
@@ -66,7 +66,7 @@ During long gameplay sessions, Cursor compacts conversation context — summariz
 
 ### The Solution
 
-**`SKILL.md` is loaded as a persistent skill file and survives compaction.** Everything that must be followed across all 5 chapters — regardless of conversation length — lives in `SKILL.md`.
+**`SKILL.md` is loaded as a persistent skill file and survives compaction.** Everything that must be followed across all 4 chapters — regardless of conversation length — lives in `SKILL.md`.
 
 ### What Goes Where
 

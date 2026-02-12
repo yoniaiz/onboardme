@@ -34,7 +34,7 @@ interface OnboardMeState {
   progress: {
     currentChapter:
       | "investigation"
-      | "hands-on"
+      // "hands-on" removed — merged into deep-dive
       | "deep-dive"
       | "hunt"
       | "boss";
@@ -128,7 +128,7 @@ Game progression tracking.
 **Chapter Progression:**
 
 ```
-investigation → hands-on → deep-dive → hunt → boss
+investigation → deep-dive → hunt → boss
 ```
 
 ### `monster`

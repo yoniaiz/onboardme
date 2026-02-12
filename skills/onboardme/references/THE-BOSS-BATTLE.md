@@ -1,4 +1,4 @@
-# Chapter 5: The Boss Battle — The Contribution
+# Chapter 4: The Boss Battle — The Contribution
 
 _Duration: ~30-45 minutes_
 _Artifact: `.onboardme/artifacts/CERTIFICATE.md`_
@@ -107,6 +107,8 @@ Rejected = `incorrect`, Needs Work = `partial`, Acceptable = `correct`, Impressi
 
 ### Phase 1: The Assignment (~5 min)
 
+**Before assigning a challenge, verify the feature does NOT already exist in the codebase (even partially).** Search for related code, endpoints, or tests. If it partially exists, either pick a different feature OR acknowledge the existing work and make the challenge about extending/completing it.
+
 **Analyze the codebase** and create a specific, achievable challenge:
 
 - What patterns exist that they could extend?
@@ -164,6 +166,11 @@ Save state after presenting the challenge:
 node <state-manager> add-question '{"question":"Boss Battle: [challenge description]","answer":"challenge-issued","tier":"partial","chapter":"boss","commits":0}'
 ```
 
+**Advance to planning phase:**
+```bash
+node <state-manager> advance-phase planning
+```
+
 ---
 
 ### Phase 1.5: The Planning Interview (~5 min)
@@ -195,7 +202,7 @@ node <state-manager> add-question '{"question":"Boss Battle: [challenge descript
 
 **Evaluate their plan:**
 - Do they know the right files/directories?
-- Do they reference patterns they traced in Ch3?
+- Do they reference patterns they traced in Ch2?
 - Do they understand the integration points?
 
 **If the plan is wrong, reject it BEFORE they code:**
@@ -218,7 +225,10 @@ node <state-manager> add-question '{"question":"Boss Battle: [challenge descript
 *[PLAN REJECTED]*
 ```
 
-**Only when the plan passes, let them build.**
+**Only when the plan passes, advance to build phase and let them build:**
+```bash
+node <state-manager> advance-phase build
+```
 
 ---
 
@@ -342,7 +352,10 @@ node <state-manager> add-question '{"question":"Boss Battle: [challenge descript
 
 ### Phase 3: The Review (~5-10 min)
 
-When they say they're done:
+**When they say they're done, advance to review phase:**
+```bash
+node <state-manager> advance-phase review
+```
 
 ```
 *LOUD STATIC*
@@ -412,6 +425,11 @@ When they say they're done:
 
 **The player fixes and resubmits — repeat until clean.**
 
+**When review passes, advance to defense phase:**
+```bash
+node <state-manager> advance-phase defense
+```
+
 ---
 
 ### Phase 4: The Defense (~5-10 min)
@@ -445,7 +463,7 @@ Ask 3-5 pointed questions:
 2. **Edge case question:** "What happens if [input] is null/empty/malformed?"
 3. **Integration question:** "If I changed [existing service], would your code still work?"
 4. **Testing question:** "How would you test [specific edge case]?"
-5. **Callback question:** "In Chapter 3 you traced [flow]. How does your code fit into that flow?"
+5. **Callback question:** "In Chapter 2 you traced [flow]. How does your code fit into that flow?"
 
 **The player must answer from memory — not by reading their code.**
 
@@ -468,6 +486,11 @@ Ask 3-5 pointed questions:
 ```
 
 **Score: Defense answers count toward final evaluation. A player who can't defend their code gets "Acceptable" at best, never "Impressive".**
+
+**When defense is satisfied, advance to victory phase:**
+```bash
+node <state-manager> advance-phase victory
+```
 
 ---
 
@@ -568,7 +591,7 @@ node <state-manager> add-exchange 'Victory — player completed the Boss Battle 
 
 ### Certificate Generation (end of Phase 5)
 
-**CERTIFICATE.md is the ONLY Chapter 5 artifact.** Generate it here:
+**CERTIFICATE.md is the ONLY Chapter 4 artifact.** Generate it here:
 
 1. Run: `node <state-manager> generate-certificate`
 2. Create `.onboardme/artifacts/CERTIFICATE.md` using the returned JSON data

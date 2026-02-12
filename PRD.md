@@ -14,7 +14,7 @@ An agent skill that transforms codebase onboarding into a conversational game. T
 2. [Target Users](#2-target-users)
 3. [How It Works](#3-how-it-works)
 4. [Game Design](#4-game-design)
-5. [The 5 Chapters](#5-the-5-chapters)
+5. [The 4 Chapters](#5-the-4-chapters)
 6. [State & Artifacts](#6-state--artifacts)
 7. [Monster Character](#7-monster-character)
 8. [Installation & Distribution](#8-installation--distribution)
@@ -46,7 +46,7 @@ Traditional onboarding sucks:
 
 1. **The agent IS the Monster** — Not a CLI rendering the Monster, the agent embodies it
 2. **Conversational gameplay** — Open-ended investigation, not multiple-choice quizzes
-3. **Editor as UI** — Files serve as game boards (CASE_FILE.md, FLOW_MAP.md)
+3. **Editor as UI** — The codebase itself is the game board, with `@onboardme` trace comments as markers
 4. **Real learning** — Questions require actual exploration, not just grep
 5. **Local-first** — All state in `.onboardme/`, no accounts, no cloud
 6. **Emotional architecture** — Deliberate pacing with character development
@@ -78,12 +78,12 @@ Traditional onboarding sucks:
 6. Tells agent: "play game"
    - Agent becomes the Monster
    - Conversational investigation begins
-7. Plays through 5 chapters (~90-120 min)
-   - Investigation, Hands-On, Deep Dive, Hunt, Boss Battle
+7. Plays through 4 chapters (~90-120 min)
+   - Investigation, Deep Dive, Hunt, Boss Battle
    - Makes real discoveries about the codebase
    - Monster's attitude evolves based on performance
 8. Defeats Monster by documenting it
-9. Receives CODEBASE_KNOWLEDGE.md as first contribution
+9. Receives CERTIFICATE.md as proof of completion
 10. Gets suggested first task based on demonstrated skills
 ```
 
@@ -128,9 +128,7 @@ Traditional onboarding sucks:
 │   ├── state.json          # Progress, score, Monster mood           │
 │   ├── state.backup.json   # Auto-backup before writes               │
 │   └── artifacts/                                                    │
-│       ├── CASE_FILE.md    # Chapter 1 investigation log             │
-│       ├── FLOW_MAP.md     # Chapter 3 architecture diagram          │
-│       └── ...             # One artifact per chapter                │
+│       └── CERTIFICATE.md  # Chapter 4 certificate                   │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -201,76 +199,62 @@ The Monster's attitude evolves based on player performance:
 
 ---
 
-## 5. The 5 Chapters
+## 5. The 4 Chapters
 
 | Chapter | Duration | What Player Learns | Artifact |
 |---------|----------|-------------------|----------|
-| **1. The Investigation** | 20 min | Project type, tech stack, architecture | `CASE_FILE.md` |
-| **2. The Hands-On** | 15 min | How to run project, setup, env | Running project |
-| **3. The Deep Dive** | 25 min | Data flows, architecture patterns | `FLOW_MAP.md` |
-| **4. The Hunt** | 30 min | Debugging, finding bugs, impact analysis | `IMPACT_ANALYSIS.md` + actual bug fix |
-| **5. The Boss Battle** | 15 min | Synthesize all knowledge, face the Monster | `CODEBASE_KNOWLEDGE.md` |
+| **1. The Investigation** | 20 min | Project type, tech stack, architecture | — |
+| **2. The Deep Dive** | 30 min | Running the project, data flows, architecture patterns | `@onboardme` trace comments |
+| **3. The Hunt** | 30 min | Debugging, finding bugs, impact analysis | Actual bug fix |
+| **4. The Boss Battle** | 30-45 min | Synthesize all knowledge, face the Monster | `CERTIFICATE.md` |
 
 ### Chapter 1: The Investigation
 
 **Goal:** Learn to identify project type, tech stack, and architecture by examining evidence.
 
 **Flow:**
-1. Monster creates CASE_FILE.md artifact
-2. Phase 1: Project Identity (~5 min) — What language? What type? What framework?
-3. Phase 2: Tech Stack Discovery (~7 min) — Database? Testing? Build tools?
-4. Phase 3: Documentation Hunt (~5 min) — How to run? What env vars?
-5. Phase 4: Final Deduction (~3 min) — Synthesize findings
+1. Phase 1: Project Identity (~5 min) — What language? What type? What framework?
+2. Phase 2: Tech Stack Discovery (~7 min) — Database? Testing? Build tools?
+3. Phase 3: Documentation Hunt (~5 min) — How to run? What env vars?
+4. Phase 4: Final Deduction (~3 min) — Synthesize findings
 
 **Skills learned:** Reading manifests, understanding folder structure, extracting facts from docs
 
-### Chapter 2: The Hands-On
+### Chapter 2: The Deep Dive
 
-**Goal:** Actually run the project, understand setup requirements.
-
-**Flow:**
-1. Monster guides through setup
-2. Player runs actual commands
-3. Monster reacts to errors (in character)
-4. Success = project running locally
-
-**Skills learned:** Local development setup, debugging environment issues
-
-### Chapter 3: The Deep Dive
-
-**Goal:** Trace data flows and understand architecture patterns.
+**Goal:** Run the project, trace data flows, and understand architecture patterns.
 
 **Flow:**
-1. Monster presents a user journey to trace
-2. Player follows code path through layers
-3. Build FLOW_MAP.md collaboratively
-4. Identify patterns (MVC, repository, etc.)
+1. Phase 1: Boot Up — Get the project running locally (adapts to project type)
+2. Phase 2: Live Trace — Trace a user action through the code, marking trail with `@onboardme` comments
+3. Phase 3: Entity Relations — Map how data models connect
+4. Phase 4: Test Stories — Extract business rules from test assertions
 
-**Skills learned:** Code navigation, understanding architecture, tracing flows
+**Skills learned:** Local development setup, code navigation, architecture understanding, tracing flows
 
-### Chapter 4: The Hunt
+### Chapter 3: The Hunt
 
 **Goal:** Find and fix real bugs in the codebase.
 
 **Flow:**
-1. Monster reveals failing tests or bugs
-2. Player hunts for root cause
-3. Player proposes fix
+1. Monster sabotages the code on the game branch
+2. Player hunts for root cause using test failures
+3. Player proposes and implements fix
 4. Agent validates (runs tests)
-5. Create IMPACT_ANALYSIS.md
+5. Impact analysis — trace system dependencies
 
 **Skills learned:** Debugging, test-driven development, impact analysis
 
-### Chapter 5: The Boss Battle
+### Chapter 4: The Boss Battle
 
-**Goal:** Synthesize all knowledge, document the Monster.
+**Goal:** Synthesize all knowledge, build a feature, document the Monster.
 
 **Flow:**
-1. Monster challenges player's complete understanding
-2. Three phases of increasing difficulty
+1. Monster challenges player to build a real feature
+2. Planning, building, code review, defense phases
 3. Player demonstrates mastery
 4. Victory: Monster is documented, not destroyed
-5. Generate CODEBASE_KNOWLEDGE.md
+5. Generate CERTIFICATE.md
 
 **Skills learned:** Synthesis, documentation, complete codebase understanding
 
@@ -298,7 +282,7 @@ interface OnboardMeState {
   };
   
   progress: {
-    currentChapter: "investigation" | "hands-on" | "deep-dive" | "hunt" | "boss";
+    currentChapter: "investigation" | "deep-dive" | "hunt" | "boss";
     chaptersCompleted: string[];
     questionHistory: QuestionResult[];
   };
@@ -331,11 +315,7 @@ Each chapter produces a tangible file:
 
 | Artifact | Created | Contents |
 |----------|---------|----------|
-| `CASE_FILE.md` | Chapter 1 | Investigation evidence log with Monster stamps |
-| `FLOW_MAP.md` | Chapter 3 | Mermaid diagrams of data flows |
-| `IMPACT_ANALYSIS.md` | Chapter 4 | Bug fix impact assessment |
-| `CODEBASE_KNOWLEDGE.md` | Chapter 5 | Complete documentation of the codebase |
-| `CERTIFICATE.md` | Game complete | Certificate of Codebase Survival with rank, stats, and Monster commentary |
+| `CERTIFICATE.md` | Chapter 4 (Boss Battle) | Certificate of Codebase Survival with rank, stats, and Monster commentary |
 
 These artifacts are **real documentation** that can be committed as the player's first contribution.
 
@@ -440,11 +420,7 @@ Created in target repo during gameplay:
 ├── context/
 │   └── repo-knowledge.json     # Monster's answer key + discoveries
 └── artifacts/
-    ├── CASE_FILE.md            # Chapter 1 artifact
-    ├── FLOW_MAP.md             # Chapter 3 artifact
-    ├── IMPACT_ANALYSIS.md      # Chapter 4 artifact
-    ├── CODEBASE_KNOWLEDGE.md   # Chapter 5 artifact
-    └── CERTIFICATE.md          # Game complete: Certificate of Codebase Survival
+    └── CERTIFICATE.md          # Chapter 4: Certificate of Codebase Survival
 ```
 
 ---
@@ -467,9 +443,9 @@ The implemented version includes:
 - ✅ Full Monster orchestrator skill with persona lock
 - ✅ State management with persistence and auto-backup
 - ✅ Knowledge management with answer key and discovery accumulation
-- ✅ All 5 chapters: Investigation, Hands-On, Deep Dive, Hunt, Boss Battle
+- ✅ All 4 chapters: Investigation, Deep Dive, Hunt, Boss Battle
 - ✅ All 6 commands (prepare, play, status, hint, reset, change tone)
-- ✅ All artifacts: CASE_FILE.md, FLOW_MAP.md, IMPACT_ANALYSIS.md, CODEBASE_KNOWLEDGE.md
+- ✅ CERTIFICATE.md artifact
 - ✅ Mood system and full emotional arc (dismissive → peaceful)
 - ✅ Snark slider (friendly / balanced / spicy / full-monster)
 - ✅ Memorable exchange logging
@@ -493,4 +469,4 @@ The implemented version includes:
 
 *Document Version: 2.0*
 *Last Updated: 2026-02-06*
-*Status: v1.0 Complete — All 5 chapters playable*
+*Status: v1.0 Complete — All 4 chapters playable*

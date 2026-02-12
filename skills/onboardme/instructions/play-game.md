@@ -26,6 +26,8 @@ Read the game state:
 node <state-manager> read
 ```
 
+Note `progress.currentPhase` — this tells you which phase you are in within the current chapter.
+
 If `context.prepared` is `false`, the game has not been prepared yet. **Auto-prepare now** — read `<this-file's-directory>/prepare-game.md` and follow its Steps 2-7 to analyze the repository, build the knowledge file, initialize state, detect identity, and create the game branch. Once preparation completes, re-read state and continue to Step 2 below.
 
 Do NOT ask the player to run a separate "prepare game" command. This happens automatically on first game start.
@@ -40,8 +42,8 @@ node <knowledge-manager> read
 
 This gives you the codebase facts you gathered during prepare. Use it to:
 
-- **Chapters 1-2**: Validate player answers against `identity`, `techStack`, `commands`, `structure`
-- **Chapters 3-5**: Read actual source files on-demand for deeper questions, then validate
+- **Chapter 1**: Validate player answers against `identity`, `techStack`, `commands`, `structure`
+- **Chapters 2-4**: Read actual source files on-demand for deeper questions, then validate
 
 Also review `discoveries` — these are facts the player already validated in previous sessions. Reference them to show continuity ("Last time you figured out the auth flow...").
 
@@ -69,7 +71,7 @@ Wait for the player to choose:
 
 ### Step 2.8: Check Game Complete
 
-Check `progress.chaptersCompleted` from state. If it contains all 5 chapters (`investigation`, `hands-on`, `deep-dive`, `hunt`, `boss`), the game is complete.
+Check `progress.chaptersCompleted` from state. If it contains all 4 chapters (`investigation`, `deep-dive`, `hunt`, `boss`), the game is complete.
 
 1. **Run `get-score`** and deliver the victory flow in Monster voice — mood shifts to peaceful, acknowledge the achievement, present final stats using `get-score` numbers, list artifacts in `.onboardme/artifacts/`.
 
@@ -90,12 +92,11 @@ Check `progress.currentChapter` from state and read the appropriate reference fi
 Reference files live in the `references/` directory next to this file's parent:
 
 - `investigation` → Read `<this-file's-directory>/../references/THE-INVESTIGATION.md`
-- `hands-on` → Read `<this-file's-directory>/../references/THE-HANDS-ON.md`
 - `deep-dive` → Read `<this-file's-directory>/../references/THE-DEEP-DIVE.md`
 - `hunt` → Read `<this-file's-directory>/../references/THE-HUNT.md`
 - `boss` → Read `<this-file's-directory>/../references/THE-BOSS-BATTLE.md`
 
-**CRITICAL: The chapter loaded here MUST match `progress.currentChapter` from state. Never skip ahead. If state says `hands-on`, you load THE-HANDS-ON.md — even if you think the player is ready for more.**
+**CRITICAL: The chapter loaded here MUST match `progress.currentChapter` from state. Never skip ahead. If state says `deep-dive`, you load THE-DEEP-DIVE.md — even if you think the player is ready for more.**
 
 ### Step 4: Start or Resume
 
@@ -127,6 +128,8 @@ If has entries — resume with acknowledgment, referencing discoveries and progr
 
 Follow the chapter reference file for gameplay. After each validated player answer, follow the **"After Each Answer (MANDATORY)"** checklist in SKILL.md's Mandatory Rules section — it has the exact commands to run in order.
 
+**After running `get-score`, read the `phaseInstruction` field and follow it** — this tells you exactly what to do next, which phase you are in, and when to advance or complete the chapter.
+
 ### Step 6: Chapter Transition (Completion Ceremony)
 
 **Follow the "Chapter End Checklist" in SKILL.md's Mandatory Rules section.** The key steps:
@@ -134,6 +137,8 @@ Follow the chapter reference file for gameplay. After each validated player answ
 ```bash
 node <state-manager> complete-chapter <chapter-name>
 ```
+
+**NOTE:** `complete-chapter` will fail if you are not in the chapter's final phase. If it fails, call `get-score` to see your current phase and follow the `phaseInstruction` to advance through remaining phases first.
 
 This returns structured ceremony data as JSON. Use it to deliver the 3-beat ceremony:
 

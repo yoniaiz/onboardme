@@ -445,8 +445,7 @@ Reject the dispute if:
 | Chapter       | Challenges | Pacing               |
 | ------------- | ---------- | -------------------- |
 | Investigation | 5-7        | Quick, surface-level |
-| Hands-On      | 3-4        | Medium, task-based   |
-| Deep Dive     | 4-6        | Slow, multi-turn     |
+| Deep Dive     | 5-8        | Medium-Slow, collaborative |
 | Hunt          | 3-5        | Exploratory          |
 | Boss Battle   | 8-12       | Intense, rapid-fire  |
 

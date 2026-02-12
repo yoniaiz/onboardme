@@ -6,7 +6,7 @@
 
 OnboardMe is an [agent skill](https://agentskills.io) that transforms codebase onboarding into a conversational game. Your AI coding agent becomes the **Spaghetti Code Monster** — a sentient tangle of legacy code that guards the codebase and tests new developers through investigation challenges.
 
-Instead of reading stale wiki pages, you play through 5 chapters of active investigation, earning commits, losing lives, and producing real documentation artifacts along the way. The Monster starts dismissive, grows worried as you learn, and is finally *documented* — not destroyed.
+Instead of reading stale wiki pages, you play through 4 chapters of active investigation, earning commits, losing lives, and producing real documentation artifacts along the way. The Monster starts dismissive, grows worried as you learn, and is finally *documented* — not destroyed.
 
 ---
 
@@ -37,9 +37,7 @@ Instead of reading stale wiki pages, you play through 5 chapters of active inves
 │   .onboardme/                               │
 │   ├── state.json        (progress, score)   │
 │   └── artifacts/                            │
-│       ├── CASE_FILE.md  (Ch 1)              │
-│       ├── FLOW_MAP.md   (Ch 3)              │
-│       └── ...           (one per chapter)   │
+│       └── CERTIFICATE.md (Ch 4)             │
 │                                             │
 └─────────────────────────────────────────────┘
 ```
@@ -68,22 +66,21 @@ This installs the OnboardMe skill into your project's `.cursor/skills/onboardme/
    - The Monster scans the codebase, initializes state, and introduces itself
 4. **Tell the agent**: `play game`
    - The Monster takes over. Investigation begins.
-5. **Play through 5 chapters** (~90-120 minutes total)
+5. **Play through 4 chapters** (~90-120 minutes total)
 6. **Receive `CODEBASE_KNOWLEDGE.md`** as your first contribution
 
 ---
 
-## The 5 Chapters
+## The 4 Chapters
 
 | Chapter | Duration | What You Learn | Artifact |
 |---------|----------|----------------|----------|
-| **1. The Investigation** | ~20 min | Project type, tech stack, architecture | `CASE_FILE.md` |
-| **2. The Hands-On** | ~15 min | How to run the project, setup, environment | Running project |
-| **3. The Deep Dive** | ~25 min | Data flows, architecture patterns | `FLOW_MAP.md` |
-| **4. The Hunt** | ~30 min | Debugging, finding bugs, impact analysis | `IMPACT_ANALYSIS.md` |
-| **5. The Boss Battle** | ~15 min | Synthesize all knowledge, face the Monster | `CODEBASE_KNOWLEDGE.md` |
+| **1. The Investigation** | ~20 min | Project type, tech stack, architecture | — |
+| **2. The Deep Dive** | ~30 min | Running the project, data flows, architecture | `@onboardme` trace comments |
+| **3. The Hunt** | ~30 min | Debugging, finding bugs, impact analysis | Bug fix |
+| **4. The Boss Battle** | ~30-45 min | Synthesize all knowledge, face the Monster | `CERTIFICATE.md` |
 
-Every chapter produces a **real documentation artifact** that can be committed as your first contribution to the repo.
+The game produces real artifacts — `@onboardme` trace comments mark your learning trail through the code, and `CERTIFICATE.md` documents your achievement.
 
 ---
 
@@ -169,7 +166,6 @@ skills/onboardme/
 │   └── reset-game.md
 ├── references/           # Chapter-by-chapter gameplay instructions
 │   ├── THE-INVESTIGATION.md
-│   ├── THE-HANDS-ON.md
 │   ├── THE-DEEP-DIVE.md
 │   ├── THE-HUNT.md
 │   └── THE-BOSS-BATTLE.md

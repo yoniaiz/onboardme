@@ -18,8 +18,8 @@ Each game creates and uses files as tangible gameplay elements.
 
 | Game              | Primary Artifact     | Purpose                                    |
 | ----------------- | -------------------- | ------------------------------------------ |
-| **Investigation** | `CASE_FILE.md`       | Evidence collection, Monster stamps SOLVED |
-| **Flow Trace**    | `FLOW_MAP.md`        | Mermaid diagrams built collaboratively     |
+| **Deep Dive**     | `@onboardme` comments | Player marks trace trail in source code    |
+| **Boss Battle**   | `CERTIFICATE.md`      | Certificate of Codebase Survival           |
 | **Code Review**   | `REVIEW_NOTES.md`    | Player comments, Monster responds          |
 | **Hunt**          | `IMPACT_ANALYSIS.md` | Bug analysis, fix verification             |
 | **Boss Battle**   | `BOSS_BATTLE.md`     | Task list, progress, Monster state         |
@@ -32,8 +32,7 @@ All game artifacts live in the `.onboardme/` folder:
 .onboardme/
 ├── state.json          # Game state
 ├── artifacts/
-│   ├── CASE_FILE.md    # Investigation artifact
-│   ├── FLOW_MAP.md     # Deep dive artifact
+│   └── CERTIFICATE.md  # Boss battle artifact
 │   └── BOSS_BATTLE.md  # Boss battle artifact
 └── context/
     └── prepared.json   # Prepared questions/context
@@ -275,8 +274,8 @@ No game ends without a tangible artifact:
 
 | Game Type     | Artifact                | Contains                                    |
 | ------------- | ----------------------- | ------------------------------------------- |
-| Investigation | `CASE_FILE.md`          | Evidence, verdicts, Monster notes           |
-| Flow Trace    | `FLOW_MAP.md`           | Mermaid diagrams, player annotations        |
+| Deep Dive     | `@onboardme` comments   | Trace trail markers in source code          |
+| Boss Battle   | `CERTIFICATE.md`        | Certificate of Codebase Survival            |
 | Hunt          | `IMPACT_ANALYSIS.md`    | Bug location, fix description, verification |
 | Boss Battle   | `BOSS_BATTLE.md`        | Battle log, final score, Monster farewell   |
 | Any game      | `CODEBASE_KNOWLEDGE.md` | Consolidated learnings (final artifact)     |

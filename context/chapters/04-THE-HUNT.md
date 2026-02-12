@@ -17,7 +17,7 @@ Unlike Chapters 1-3 (investigation, execution, tracing), Chapter 4 is where the 
 
 1. Read the test failure output
 2. Form a hypothesis
-3. Trace the code to the root cause (using skills from Ch3)
+3. Trace the code to the root cause (using skills from Ch2)
 4. EXPLAIN to the Monster what's wrong (understanding, not just finding)
 5. Fix the code
 6. Verify the fix passes tests
@@ -147,7 +147,7 @@ Agent runs tests and shows failure output.
 Player-driven investigation:
 
 - Player reads test failure, forms hypothesis
-- Player traces code to root cause (using Ch3 skills)
+- Player traces code to root cause (using Ch2 skills)
 - Player EXPLAINS to the Monster what's wrong (Monster evaluates understanding)
 - Player fixes the code
 - Agent re-runs tests to validate
@@ -160,7 +160,7 @@ Breathing room after debugging. Different skill: architectural planning.
 
 - Agent presents a realistic feature request for this codebase
 - Player identifies where new code should live (files, layers, patterns)
-- Tests architectural understanding from Ch3
+- Tests architectural understanding from Ch2
 - "You fixed my mess. Now show me where NEW code goes."
 
 ### Phase 4: Impact Reflection (~2 min)

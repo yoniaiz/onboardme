@@ -76,8 +76,7 @@ OnboardMe uses an **agent-as-game-engine** architecture where the AI agent reads
 │   ├── context/                                                      │
 │   │   └── repo-knowledge.json  # Monster's codebase answer key      │
 │   └── artifacts/                                                    │
-│       ├── CASE_FILE.md     # Investigation evidence log             │
-│       ├── FLOW_MAP.md      # Architecture diagram (Chapter 3)       │
+│       └── CERTIFICATE.md   # Chapter 4 certificate                  │
 │       └── ...              # One artifact per chapter               │
 │                                                                     │
 │   [Rest of codebase - read by agent during gameplay]                │
@@ -444,9 +443,7 @@ Created in target repo during gameplay:
 ├── context/
 │   └── repo-knowledge.json # Monster's answer key + discoveries
 └── artifacts/
-    ├── CASE_FILE.md        # Chapter 1: Investigation log
-    ├── FLOW_MAP.md         # Chapter 3: Architecture diagram
-    ├── IMPACT_ANALYSIS.md  # Chapter 4: Bug fix analysis
+    └── CERTIFICATE.md      # Chapter 4: Certificate of Codebase Survival
     ├── CODEBASE_KNOWLEDGE.md # Chapter 5: Final documentation
     └── CERTIFICATE.md      # Game complete: Certificate of Codebase Survival
 ```
@@ -591,7 +588,7 @@ When user says "onboardme", "prepare game", or "/onboardme":
 | Document | Purpose |
 |----------|---------|
 | [context/chapters/01-THE-INVESTIGATION.md](./chapters/01-THE-INVESTIGATION.md) | Chapter 1 design |
-| [context/chapters/02-THE-HANDS-ON.md](./chapters/02-THE-HANDS-ON.md) | Chapter 2 design |
+| _(02-THE-HANDS-ON.md removed — merged into Deep Dive)_ | — |
 | [context/chapters/03-THE-DEEP-DIVE.md](./chapters/03-THE-DEEP-DIVE.md) | Chapter 3 design |
 | [context/chapters/04-THE-HUNT.md](./chapters/04-THE-HUNT.md) | Chapter 4 design |
 | [context/chapters/05-THE-BOSS-BATTLE.md](./chapters/05-THE-BOSS-BATTLE.md) | Chapter 5 design |
@@ -611,4 +608,4 @@ When user says "onboardme", "prepare game", or "/onboardme":
 
 *Document Version: 1.2*
 *Last Updated: 2026-02-06*
-*Status: All 5 chapters implemented, full game integration complete*
+*Status: All 4 chapters implemented, full game integration complete*

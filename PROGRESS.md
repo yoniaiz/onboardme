@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 10 Complete  
-> **Current Focus**: Playtest #2 fixes shipped
+> **Status**: Milestone 11 In Progress  
+> **Current Focus**: Phase Tracking & Instruction Hooks
 
 ---
 
@@ -808,6 +808,120 @@ Ran `bash scripts/install-skill.sh` — skill files deployed.
 
 ---
 
+## Milestone 11: Phase Tracking & Instruction Hooks
+
+**Goal**: Make the game survive context compaction by embedding phase-specific instructions in `get-score` output. Add a phase tracking system so the agent always knows what to do next, even after Cursor summarizes earlier messages.
+
+**Success Criteria**:
+- [x] `CHAPTER_PHASES` and `PHASE_INSTRUCTIONS` constants in state-manager.cjs
+- [x] `progress.currentPhase` in state schema
+- [x] `get-score` returns `phase`, `phaseInstruction`, `nextPhase`, `referenceFile`
+- [x] `advance-phase` command with validation (next phase only)
+- [x] `complete-chapter` validates agent is in final phase before completing
+- [x] `sabotage` command (file change + git commit in one call)
+- [x] Backup file creation removed (prevents agent from restoring stale state)
+- [x] SKILL.md: Phase System section, auto-start, evaluation guidance, new commands in Script Identity Rule
+- [x] play-game.md: Phase-aware steps, phaseInstruction usage
+- [x] THE-HUNT.md: `sabotage` command, `advance-phase` calls, creativity guidance
+- [x] THE-BOSS-BATTLE.md: `advance-phase` calls at each transition, feature validation
+- [x] THE-DEEP-DIVE.md: `advance-phase` calls between phases
+- [x] Skill deployed via install-skill.sh
+
+---
+
+### Tasks
+
+#### 11.1 Phase Constants and Instructions
+`completed`
+
+Added `CHAPTER_PHASES` (phase sequences per chapter) and `PHASE_INSTRUCTIONS` (actionable text per phase) constants to state-manager.cjs. These drive the self-correcting loop: `get-score` returns the current phase instruction, which the agent follows even after compaction.
+
+---
+
+#### 11.2 State Schema Update
+`completed`
+
+Added `progress.currentPhase` to default state and `initializeState()`. Starts at `"questions"` for investigation chapter.
+
+---
+
+#### 11.3 Enhanced get-score
+`completed`
+
+`get-score` now returns 4 new fields: `phase` (current phase name), `phaseInstruction` (what to do now), `nextPhase` (what comes next), `referenceFile` (chapter reference file path). These appear in every `get-score` call, creating a self-correcting instruction loop.
+
+---
+
+#### 11.4 advance-phase Command
+`completed`
+
+New `advancePhase()` function validates the requested phase is the next valid phase in sequence. Returns the new phase + instructions. Prevents skipping phases.
+
+---
+
+#### 11.5 complete-chapter Phase Validation
+`completed`
+
+`completeChapter()` now validates that `currentPhase` is the FINAL phase for that chapter before allowing completion. Also sets `currentPhase` to the first phase of the next chapter after completing.
+
+---
+
+#### 11.6 Sabotage Command
+`completed`
+
+New `sabotage` command reads a file, applies string replacement, writes it back, and runs `git add + git commit` — all in one tool call. Returns `{ success, file, testsToRun }`. Eliminates fragile `node -e` scripts.
+
+---
+
+#### 11.7 Remove Backup Mechanism
+`completed`
+
+Removed `state.backup.json` creation from `writeState()`. The backup was discovered by the agent during gameplay and used to accidentally destroy all game data via `cp state.backup.json state.json`.
+
+---
+
+#### 11.8 SKILL.md Updates
+`completed`
+
+Added Phase System section to Mandatory Rules, auto-start game flow, evaluation guidance for "deep" tier, `advance-phase` and `sabotage` to Script Identity Rule, `phaseInstruction` step to After Each Answer checklist.
+
+---
+
+#### 11.9 play-game.md Updates
+`completed`
+
+Step 1 notes `currentPhase`, Step 5 adds phaseInstruction guidance, Step 6 notes `complete-chapter` phase validation with recovery path.
+
+---
+
+#### 11.10 THE-HUNT.md Updates
+`completed`
+
+Replaced `node -e` sabotage with `sabotage` command, added `advance-phase diagnosis` and `advance-phase impact` calls, added creativity guidance against comparison-operator patterns.
+
+---
+
+#### 11.11 THE-BOSS-BATTLE.md Updates
+`completed`
+
+Added `advance-phase` calls at all 5 transitions (planning, build, review, defense, victory), added feature validation to Phase 1 (verify feature doesn't already exist).
+
+---
+
+#### 11.12 THE-DEEP-DIVE.md Updates
+`completed`
+
+Added `advance-phase entities` and `advance-phase tests` calls at phase transitions.
+
+---
+
+#### 11.13 Deploy
+`completed`
+
+Ran `bash scripts/install-skill.sh` — skill files deployed to `.cursor/skills/onboardme/`.
+
+---
+
 ## Completed Milestones
 
 ### Milestone 5: Full Game Integration ✓
@@ -903,4 +1017,4 @@ Ran `bash scripts/install-skill.sh` — skill files deployed.
 
 ---
 
-*Last Updated: 2026-02-11 (Milestone 10 complete — Playtest #2 Fixes)*
+*Last Updated: 2026-02-11 (Milestone 11 complete — Phase Tracking & Instruction Hooks)*

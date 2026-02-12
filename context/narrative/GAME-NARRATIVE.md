@@ -134,7 +134,7 @@ interface MonsterOrigin {
 |---------|--------------------------|---------------------|
 | **Cold Open** | Mysterious, curious | First encounter |
 | **Investigation** | Dismissive, mocking | "Another noob" |
-| **Hands-On** | Condescending | "Lucky guesses" |
+| _(Hands-On merged into Deep Dive)_ | — | — |
 | **Deep Dive** | Worried, backstory revealed | Respects player |
 | **Hunt** | Existential crisis | Fears player |
 | **Boss Battle** | Full power, then defeat | Final confrontation |
@@ -142,7 +142,7 @@ interface MonsterOrigin {
 
 ### The Emotional Journey
 
-**Act 1: Mystery (Investigation + Hands-On)**
+**Act 1: Mystery (Investigation)**
 - Monster is distant, taunting
 - Player doesn't know what they're facing
 - Building dread and curiosity
@@ -189,7 +189,7 @@ OnboardMe organizes gameplay into five progressive chapters, each building on th
 | Chapter | Focus | Duration | Artifact |
 |---------|-------|----------|----------|
 | **The Investigation** | File structure, tech stack, project identity | 20 min | `CASE_FILE.md` |
-| **The Hands-On** | Get the project running, understand the dev environment | 15 min | Running project |
+| _(Hands-On merged into Deep Dive)_ | — | — | — |
 | **The Deep Dive** | Data flows, relationships, architecture | 25 min | `FLOW_MAP.md` |
 | **The Hunt** | Find and fix bugs, trace problems | 30 min | Bug fix + `IMPACT_ANALYSIS.md` |
 | **The Boss Battle** | Prove mastery, final confrontation | 15 min | `CODEBASE_KNOWLEDGE.md` |
@@ -204,7 +204,7 @@ OnboardMe organizes gameplay into five progressive chapters, each building on th
 - Monster is dismissive: "Groundbreaking. Even the interns get that far."
 - **Artifact:** `CASE_FILE.md` with evidence and verdicts
 
-#### Chapter 2: The Hands-On
+#### Chapter 2: The Deep Dive (formerly Hands-On + Deep Dive)
 ```
 "Talk is cheap. Can you actually RUN it?"
 ```
@@ -812,7 +812,7 @@ Instead of telling the Monster's backstory directly, players unlock "Corrupted M
 | Trigger | Memory | Theme |
 |---------|--------|-------|
 | Complete Investigation | Log #1 | The Beginning (clean architecture) |
-| Complete Hands-On | Log #2 | First Shortcut (good intentions) |
+| Complete Deep Dive | Log #2 | First Shortcut + Accumulation |
 | Complete Deep Dive | Log #3 | Accumulation (debt grows) |
 | Complete Hunt | Log #4 | Abandonment (dev leaves) |
 | Defeat Boss | Log #5 | The Awakening (self-awareness) |

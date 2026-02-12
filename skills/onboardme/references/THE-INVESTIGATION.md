@@ -420,7 +420,7 @@ node <state-manager> add-exchange 'Investigation complete'
 
 *slrrrrp*
 
-"Chapter 2: The Hands-On."
+"Chapter 2: The Deep Dive."
 
 *heh*
 

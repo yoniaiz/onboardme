@@ -25,7 +25,7 @@ PREPARE PHASE              GAMEPLAY PHASE
 ┌──────────────────┐      ┌──────────────────────────────┐
 │ Read manifests   │      │ Load repo-knowledge.json     │
 │ Read README      │      │ Validate against answer key  │
-│ Scan structure   │ ──►  │ Read live files for Ch 3-5   │
+│ Scan structure   │ ──►  │ Read live files for Ch 2-4   │
 │ Save answer key  │      │ Append validated discoveries  │
 └──────────────────┘      └──────────────────────────────┘
      ~30 seconds                   During gameplay
@@ -131,12 +131,12 @@ This is the Monster's brain — the answer key for validation and the accumulato
 | Section | Source | When Populated | Used By |
 |---------|--------|----------------|---------|
 | `identity` | Package manifest, folder name | Prepare | Ch 1, Ch 5 |
-| `techStack` | Dependencies, config files | Prepare | Ch 1, Ch 3 |
+| `techStack` | Dependencies, config files | Prepare | Ch 1, Ch 2 |
 | `commands` | Package manifest scripts | Prepare | Ch 1, Ch 2 |
-| `structure` | Directory listing, entry points | Prepare | Ch 1, Ch 3 |
+| `structure` | Directory listing, entry points | Prepare | Ch 1, Ch 2 |
 | `envVars` | `.env.example`, docs | Prepare | Ch 2 |
 | `readme` | `README.md` | Prepare | Ch 1, Ch 2 |
-| `discoveries` | Player answers (validated) | Gameplay | Ch 3, Ch 4, Ch 5 |
+| `discoveries` | Player answers (validated) | Gameplay | Ch 2, Ch 3, Ch 4 |
 
 ### Token Budget
 
@@ -281,7 +281,7 @@ Add to the existing play instructions:
 At session start:
 1. Read .onboardme/context/repo-knowledge.json
 2. Use identity/techStack/commands for Ch 1-2 validation
-3. For Ch 3-5, read actual source files on-demand
+3. For Ch 2-4, read actual source files on-demand
 4. After each validated answer, append to discoveries[]
 5. Periodically save updated repo-knowledge.json
 ```
@@ -318,7 +318,7 @@ node state-manager.cjs add-discovery '...'    # Append to discoveries[]
 | Omitted | Rationale |
 |---------|-----------|
 | Markdown narrative files | Agent generates narrative on-the-fly |
-| Deep code analysis during prepare | That's gameplay for Ch 3-5 |
+| Deep code analysis during prepare | That's gameplay for Ch 2-4 |
 | Tree-sitter parsing | Reading manifests and structure suffices |
 | Architecture pre-detection | Players discover this; Monster validates on-demand |
 | Vector embeddings | Requires infrastructure; file-based approach is simpler |
@@ -346,7 +346,7 @@ node state-manager.cjs add-discovery '...'    # Append to discoveries[]
 
 - [ ] Update play command to load repo-knowledge.json
 - [ ] Use knowledge for Ch 1-2 answer validation
-- [ ] Implement on-demand file reading for Ch 3-5
+- [ ] Implement on-demand file reading for Ch 2-4
 - [ ] Implement discovery accumulation after validated answers
 
 ### Step 4: Cross-Session Continuity

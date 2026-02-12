@@ -90,7 +90,7 @@ Intensity
 
 ---
 
-### Phase 4: Hands-On — Building Peak
+### Phase 4: Deep Dive Boot Up — Building Peak
 **Intensity:** Medium-High  
 **Goal:** Increase complexity
 
@@ -351,7 +351,7 @@ Chapter 4: Building tension
 | Chapter | Peak Intensity | Valley After |
 |---------|---------------|--------------|
 | Investigation | Medium | Brief — first accomplishment |
-| Hands-On | Medium-High | Normal — confidence building |
+| Deep Dive | Medium-High | Normal — confidence building |
 | Deep Dive | High | Extended — emotional backstory |
 | Hunt | High | Building — tension for boss |
 | Boss Battle | Maximum | Long — catharsis, reflection |
@@ -365,7 +365,7 @@ At each valley, the player should feel:
 | After | Player Should Feel |
 |-------|-------------------|
 | Investigation | "I can do this" |
-| Hands-On | "I'm getting it" |
+| Deep Dive | "I'm getting it" |
 | Deep Dive | "I understand you now" |
 | Hunt | "I'm ready for you" |
 | Boss Battle | "I know this codebase" |

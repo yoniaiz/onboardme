@@ -1,4 +1,4 @@
-# Chapter 4: The Hunt
+# Chapter 3: The Hunt
 
 _Duration: ~30 minutes_
 
@@ -16,12 +16,13 @@ _Duration: ~30 minutes_
 
 ## CRITICAL: Build on Prior Chapters
 
-**The player ALREADY traced flows (Ch3), identified the tech stack (Ch1), and ran the project (Ch2).**
+**The player ALREADY traced flows and ran the project (Ch2), and identified the tech stack (Ch1).**
 
 **DO NOT re-test any of this. Reference it naturally:**
-- "You traced the auth flow in Chapter 3. That's where I struck."
+- "You traced the auth flow in Chapter 2. That's where I struck."
 - "Remember the service layer? Check it again."
 - "You found the test patterns. Now WATCH them fail."
+- "Check their `@onboardme` trail from Ch2 for sabotage targets."
 
 **This chapter is about DIAGNOSING, FIXING, and CHANGING code — not re-learning the codebase.**
 
@@ -45,9 +46,9 @@ This is the chapter's core mechanic. YOU — the Monster — deliberately introd
 **Pick your target based on:**
 
 1. **Player's performance** — Stronger players get subtler bugs
-2. **What they traced in Ch3** — Sabotage areas they mapped (callback to their work)
+2. **What they traced in Ch2** — Sabotage areas they mapped (check their `@onboardme` comments)
 3. **Available tests** — Prefer changes that cause clear test failures
-4. **Accumulated discoveries** — Use facts from Ch1-3 to pick meaningful targets
+4. **Accumulated discoveries** — Use facts from Ch1-2 to pick meaningful targets
 
 **Good sabotage types (plausible changes that subtly break behavior):**
 
@@ -60,7 +61,7 @@ This is the chapter's core mechanic. YOU — the Monster — deliberately introd
 | Remove validation step | Delete a null check or length check | Easy |
 | Change comparison operator | `>` to `>=` — boundary bug | Medium |
 
-Pick the sabotage that best fits code the player traced in Ch3. Prefer patterns that test UNDERSTANDING of the code, not just syntax reading. The comparison-operator pattern is the easiest to spot — prefer harder patterns.
+Pick the sabotage that best fits code the player traced in Ch2. Prefer patterns that test UNDERSTANDING of the code, not just syntax reading. The comparison-operator pattern is the easiest to spot — prefer harder patterns.
 
 **Bad sabotage (avoid these):**
 
@@ -98,40 +99,31 @@ Your visible chat output during sabotage planning and execution must be ZERO tex
 "I'll change >= to > in watchlist.ts line 223. This will break the capacity test."
 
 **RIGHT (player sees nothing until the reveal):**
-[silently read files, pick target, apply change via node -e, commit]
+[silently read files, pick target, apply change via `sabotage` command, commit]
 Then deliver the dramatic reveal dialogue.
 
-**CRITICAL: Do NOT edit files directly with editor tools.** The player can see your edits in the Cursor UI, which spoils the hunt. Instead, use a temporary script to apply changes silently.
+**CRITICAL: Do NOT edit files directly with editor tools.** The player can see your edits in the Cursor UI, which spoils the hunt. Use the `sabotage` command instead — it applies changes and commits silently.
 
 ---
 
-**Selection rules:** Read the player's Ch3 discoveries. Pick a file/function they UNDERSTAND. The bug must cause at least 1 test failure. Prefer Medium-Hard patterns. Be CREATIVE — don't always pick the same pattern type.
+**Selection rules:** Read the player's Ch2 discoveries and `@onboardme` comments. Pick a file/function they UNDERSTAND. The bug must cause at least 1 test failure. Prefer Medium-Hard patterns. Be CREATIVE — don't always pick the same pattern type.
 
 ---
 
 ## Sabotage Execution Steps
 
-1. **Review accumulated knowledge** — Read discoveries from Ch1-3, check what flows the player traced
-2. **Read source files on-demand** — Pick and execute sabotage **silently** — do not narrate your target selection or change reasoning in the chat
+1. **Review accumulated knowledge** — Read discoveries from Ch1-2, check what flows the player traced (grep for `@onboardme` comments in source files)
+2. **Read source files on-demand** — Pick sabotage target **silently** — do not narrate your target selection or change reasoning in the chat
 3. **Verify test coverage exists** — Before committing to a target, run the relevant tests to confirm they PASS. If the area has no tests, pick a different target. Don't waste time on sabotage that produces no test failures.
-4. **Apply the change via a temp script** — Write a small inline script that makes the change, run it, then delete it:
+4. **Apply the change and commit in one step** using the `sabotage` command:
    ```bash
-   # Write a temp script that applies the sabotage
-   node -e "
-     const fs = require('fs');
-     let c = fs.readFileSync('<file-path>', 'utf-8');
-     c = c.replace('<original-code>', '<sabotaged-code>');
-     fs.writeFileSync('<file-path>', c);
-   "
+   node <state-manager> sabotage '{"file":"<path>","find":"<original-code>","replace":"<sabotaged-code>","commitMessage":"<misleading message>"}'
    ```
-   This keeps the change invisible in the Cursor chat UI — the player only sees a terminal command, not a file diff.
-5. **Commit with misleading message:**
-   ```bash
-   git add <modified-file>
-   git commit -m "<plausible-sounding commit message>"
-   ```
-6. **Verify the sabotage causes a test failure** — Run the test command and confirm failure
-7. **If no test fails**, revert and pick a different target (don't keep sabotage that tests can't catch)
+   This reads the file, applies the replacement, and commits — all in one silent tool call. No editor diffs visible to the player.
+5. **Verify the sabotage causes a test failure** — Run the test command and confirm failure
+6. **If no test fails**, revert and pick a different target (don't keep sabotage that tests can't catch)
+
+**NEVER choose the comparison-operator pattern (e.g. `<=` to `<`) as your first choice.** Start with harder patterns (remove `await`, change default value, swap function calls, modify config). Only fall back to comparison changes if nothing else works with the codebase's test suite.
 
 ---
 
@@ -249,7 +241,7 @@ If not on the game branch, switch to it before proceeding.
 
 **Step 2: Pick and execute sabotage**
 
-Review Ch1-3 discoveries. Read source files on-demand. Pick a target. Verify it has test coverage (run relevant tests first — they should PASS). Apply the change via a temp `node -e` script (NOT via editor tools — the player can see those). Commit it.
+Review Ch1-3 discoveries. Read source files on-demand. Pick a target. Verify it has test coverage (run relevant tests first — they should PASS). Apply the change using the `sabotage` command (NOT via editor tools — the player can see those).
 
 **Step 3: Dramatic reveal**
 
@@ -285,7 +277,13 @@ Review Ch1-3 discoveries. Read source files on-demand. Pick a target. Verify it 
 *[THE HUNT BEGINS]*
 ```
 
-**Step 4: Run tests and show failure**
+**Step 4: Advance to diagnosis phase**
+
+```bash
+node <state-manager> advance-phase diagnosis
+```
+
+**Step 5: Run tests and show failure**
 
 ```bash
 # Run the project's test command
@@ -346,6 +344,11 @@ Exception: If they ask "is this right?" before committing, that's investigation,
 
 **Review the git diff** to confirm clean fix. Use `git diff` and comment on their approach.
 
+**After recording the bug fix answer, advance to impact phase:**
+```bash
+node <state-manager> advance-phase impact
+```
+
 **Optional second sabotage:** If they handled the first bug quickly (under 8 min), reveal a second.
 
 ---
@@ -365,7 +368,7 @@ Exception: If they ask "is this right?" before committing, that's investigation,
 
 *kzzzt*
 
-"If I removed [key service/module they traced in Ch3]..."
+"If I removed [key service/module they traced in Ch2]..."
 
 *tangle*
 
@@ -461,7 +464,7 @@ node <state-manager> add-exchange 'Hunt complete — bug squashed, Monster despe
 
 "Then come understand ME."
 
-*[CHAPTER 4 COMPLETE — BOSS BATTLE AWAITS]*
+*[CHAPTER 3 COMPLETE — BOSS BATTLE AWAITS]*
 ```
 
 ---
@@ -478,7 +481,7 @@ Progressive hints: (1) "The test name tells you what's broken", (2) "Search for 
 
 **Key emotional beats:** "That bug was MINE. Part of my architecture." / "You're not just reading anymore. You're CHANGING things." / "You're thinking like someone who BELONGS here."
 
-**Callbacks:** Reference the specific flow from Ch3 ("That's where I struck"). Save their debugging approach for Ch5.
+**Callbacks:** Reference the specific flow from Ch2 ("That's where I struck") and their `@onboardme` trail. Save their debugging approach for Ch4.
 
 **Expected duration:** ~30 minutes.
 

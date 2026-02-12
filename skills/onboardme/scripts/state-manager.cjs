@@ -5,9 +5,7 @@ const path = require("node:path");
 
 const STATE_DIR = ".onboardme";
 const STATE_FILE = "state.json";
-const BACKUP_FILE = "state.backup.json";
 const STATE_PATH = path.join(STATE_DIR, STATE_FILE);
-const BACKUP_PATH = path.join(STATE_DIR, BACKUP_FILE);
 const SCHEMA_VERSION = 1;
 
 // Resolve paths relative to this script — works in any IDE/agent runtime
@@ -15,7 +13,6 @@ const SKILL_ROOT = path.resolve(__dirname, "..");
 
 const CHAPTER_ORDER = [
   "investigation",
-  "hands-on",
   "deep-dive",
   "hunt",
   "boss",
@@ -23,10 +20,55 @@ const CHAPTER_ORDER = [
 
 const CHAPTER_REFERENCE_FILES = {
   investigation: path.join(SKILL_ROOT, "references", "THE-INVESTIGATION.md"),
-  "hands-on": path.join(SKILL_ROOT, "references", "THE-HANDS-ON.md"),
   "deep-dive": path.join(SKILL_ROOT, "references", "THE-DEEP-DIVE.md"),
   hunt: path.join(SKILL_ROOT, "references", "THE-HUNT.md"),
   boss: path.join(SKILL_ROOT, "references", "THE-BOSS-BATTLE.md"),
+};
+
+const CHAPTER_PHASES = {
+  investigation: ["questions"],
+  "deep-dive": ["bootup", "trace", "entities", "tests"],
+  hunt: ["sabotage", "diagnosis", "impact"],
+  boss: ["challenge", "planning", "build", "review", "defense", "victory"],
+};
+
+const PHASE_INSTRUCTIONS = {
+  investigation: {
+    questions:
+      "Ask 3-5 investigation questions about the codebase. SCORING: 'correct' = accurate facts (e.g. 'TypeScript with Prisma'). 'deep' = ONLY if they explain WHY the architecture exists or identify trade-offs unprompted. Most answers are 'correct'. After each answer, immediately present the next challenge. When done, run complete-chapter investigation.",
+  },
+  "deep-dive": {
+    bootup:
+      "Challenge player to run the project. Read identity.type from knowledge file and adapt: server=hit endpoint, web app=open browser, CLI=run command, library=run tests. SCORING: 'correct' = ran it and reported output. 'deep' = ONLY if they identify unexpected behavior or config implications unprompted. When running, run advance-phase trace.",
+    trace:
+      "Introduce @onboardme comment convention. Player picks a user action from the running project, then marks each code layer with // @onboardme [step] [description] comments. Grep for @onboardme to validate their trail. SCORING: 'correct' = complete trail through all layers. 'deep' = ONLY if they trace alternate paths, caching, or error handling. When trail verified, run advance-phase entities.",
+    entities:
+      "Ask player to map entity relationships. Validate against schema. SCORING: 'correct' = accurate mapping. 'deep' = ONLY if they explain design rationale (e.g., why no foreign keys, why this structure). After their answer, immediately continue. When done, run advance-phase tests.",
+    tests:
+      "Ask player to extract business rules from tests. SCORING: 'correct' = accurate extraction of rules. 'deep' = ONLY if they connect rules to broader system behavior or identify coverage gaps. After their answer, immediately continue. When done, run complete-chapter deep-dive.",
+  },
+  hunt: {
+    sabotage:
+      "SILENTLY sabotage the code using the sabotage command. Do NOT narrate. Commit with misleading message. Reveal dramatically. Then run advance-phase diagnosis.",
+    diagnosis:
+      "Player debugs. React to progress. SCORING: 'correct' = found bug and explained root cause. 'deep' = ONLY if they also analyze downstream impact or suggest prevention. When they fix it and tests pass, record answer with add-question. Then run advance-phase impact.",
+    impact:
+      "Ask: If I removed [module from Ch2], what breaks? Player traces dependencies. SCORING: 'correct' = identifies direct dependencies. 'deep' = ONLY if they trace the full chain to user-facing impact. Record answer. Then run complete-chapter hunt.",
+  },
+  boss: {
+    challenge:
+      "Analyze codebase. Pick a feature that does NOT already exist (even partially). Search for related code, endpoints, and tests BEFORE choosing. Present specific challenge. Record with add-question. Run advance-phase planning.",
+    planning:
+      "Ask player for plan BEFORE coding: WHERE, WHAT patterns, HOW integration. Reject bad plans. Run advance-phase build only when plan passes.",
+    build:
+      "Player codes. Watch files in real-time, react in Monster voice. When they say done, run advance-phase review.",
+    review:
+      "Review ALL created/modified files. Check structure, patterns, integration. Request fixes if needed. When clean, run advance-phase defense.",
+    defense:
+      "Ask 3-5 defense questions (architecture, edge cases, integration). Player explains from memory. When satisfied, run advance-phase victory.",
+    victory:
+      "Run generate-certificate. Create CERTIFICATE.md. Run complete-chapter boss. Deliver farewell in Monster voice.",
+  },
 };
 
 const ASCII_ART = {
@@ -76,10 +118,8 @@ const ASCII_ART = {
 const MEMORY_LOGS = {
   investigation:
     '"Year 1. Clean architecture. SOLID principles. Hope."',
-  "hands-on":
-    '"Just this one shortcut. We\'ll refactor later."\n\n*crackle*\n\n"They never did."',
   "deep-dive":
-    '"The shortcuts multiplied. The TODOs grew. Comments began to lie."',
+    '"Just this one shortcut. We\'ll refactor later."\n\n*crackle*\n\n"They never did."\n\n*tangle*\n\n"The shortcuts multiplied. The TODOs grew. Comments began to lie."',
   hunt:
     '"The architect said she\'d refactor me."\n\n*pause*\n\n"She\'s a VP at Google now."',
   boss:
@@ -102,6 +142,7 @@ function getDefaultState() {
     },
     progress: {
       currentChapter: "investigation",
+      currentPhase: "questions",
       currentGame: "",
       chaptersCompleted: [],
       questionHistory: [],
@@ -160,14 +201,6 @@ function readState() {
 function writeState(state) {
   ensureDirectory();
 
-  if (fs.existsSync(STATE_PATH)) {
-    try {
-      fs.copyFileSync(STATE_PATH, BACKUP_PATH);
-    } catch (error) {
-      console.error("Warning: Could not create backup:", error.message);
-    }
-  }
-
   try {
     fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), "utf-8");
     return true;
@@ -211,6 +244,7 @@ function initializeState(repoInfo) {
   };
 
   state.player.startedAt = new Date().toISOString();
+  state.progress.currentPhase = "questions";
   state.context.prepared = true;
   state.context.preparedAt = new Date().toISOString();
 
@@ -299,15 +333,13 @@ function updateMonsterMood(performance) {
   const MOOD_ORDER = ["dismissive", "annoyed", "worried", "desperate", "peaceful"];
   const CHAPTER_MINIMUMS = {
     investigation: "dismissive",
-    "hands-on": "dismissive",
-    "deep-dive": "annoyed",
+    "deep-dive": "dismissive",
     hunt: "worried",
     boss: "desperate",
   };
 
   const CHAPTER_MAXIMUMS = {
     investigation: "annoyed",
-    "hands-on": "annoyed",
     "deep-dive": "worried",
     hunt: "desperate",
     boss: "peaceful",
@@ -316,7 +348,6 @@ function updateMonsterMood(performance) {
   // Respect level ceilings per chapter
   const RESPECT_CEILINGS = {
     investigation: 30,
-    "hands-on": 45,
     "deep-dive": 70,
     hunt: 90,
     boss: 100,
@@ -350,7 +381,7 @@ function updateMonsterMood(performance) {
     state.monster.currentMood = MOOD_ORDER[Math.max(updatedIndex - 1, minimumIndex)];
   }
 
-  if (chaptersCompleted.length >= 4 && state.monster.currentMood === "worried") {
+  if (chaptersCompleted.length >= 3 && state.monster.currentMood === "worried") {
     state.monster.currentMood = "desperate";
   }
 
@@ -391,6 +422,42 @@ function setTone(tone) {
   return state;
 }
 
+function advancePhase(targetPhase) {
+  const state = readState();
+  const chapter = state.progress.currentChapter;
+  const phases = CHAPTER_PHASES[chapter] || [];
+  const currentPhase = state.progress.currentPhase || phases[0];
+  const currentIndex = phases.indexOf(currentPhase);
+  const targetIndex = phases.indexOf(targetPhase);
+
+  if (targetIndex === -1) {
+    console.error(
+      `Invalid phase "${targetPhase}" for chapter "${chapter}". Valid phases: ${phases.join(", ")}`,
+    );
+    process.exit(1);
+  }
+
+  if (targetIndex !== currentIndex + 1) {
+    const expectedNext =
+      currentIndex < phases.length - 1 ? phases[currentIndex + 1] : "(none — use complete-chapter)";
+    console.error(
+      `Cannot advance to "${targetPhase}" from "${currentPhase}". Next expected phase: ${expectedNext}`,
+    );
+    process.exit(1);
+  }
+
+  state.progress.currentPhase = targetPhase;
+  writeState(state);
+
+  const instruction = (PHASE_INSTRUCTIONS[chapter] || {})[targetPhase] || null;
+  return {
+    chapter,
+    phase: targetPhase,
+    phaseInstruction: instruction,
+    previousPhase: currentPhase,
+  };
+}
+
 function completeChapter(chapterName) {
   const state = readState();
 
@@ -410,6 +477,18 @@ function completeChapter(chapterName) {
     process.exit(1);
   }
 
+  // Validate current phase is the FINAL phase for this chapter
+  const phases = CHAPTER_PHASES[chapterName] || [];
+  if (
+    phases.length > 0 &&
+    state.progress.currentPhase !== phases[phases.length - 1]
+  ) {
+    console.error(
+      `Cannot complete "${chapterName}" from phase "${state.progress.currentPhase}". Must be in phase "${phases[phases.length - 1]}".`,
+    );
+    process.exit(1);
+  }
+
   // Add to completed list if not already there
   if (!state.progress.chaptersCompleted.includes(chapterName)) {
     state.progress.chaptersCompleted.push(chapterName);
@@ -423,8 +502,11 @@ function completeChapter(chapterName) {
   // Update state
   if (isLast) {
     state.progress.currentChapter = "complete";
+    state.progress.currentPhase = "complete";
   } else {
     state.progress.currentChapter = nextChapter;
+    const nextPhases = CHAPTER_PHASES[nextChapter] || [];
+    state.progress.currentPhase = nextPhases.length > 0 ? nextPhases[0] : "active";
   }
 
   writeState(state);
@@ -454,6 +536,77 @@ function completeChapter(chapterName) {
           referenceFile: CHAPTER_REFERENCE_FILES[nextChapter],
         },
     gameComplete: isLast,
+  };
+}
+
+function sabotage(params) {
+  const { file, find, replace, commitMessage } = params;
+
+  if (!file || !find || !replace || !commitMessage) {
+    console.error(
+      'Usage: state-manager.cjs sabotage \'{"file":"<path>","find":"<original>","replace":"<change>","commitMessage":"<message>"}\'',
+    );
+    process.exit(1);
+  }
+
+  // Read the file
+  let content;
+  try {
+    content = fs.readFileSync(file, "utf-8");
+  } catch (error) {
+    console.error(`Cannot read file "${file}": ${error.message}`);
+    process.exit(1);
+  }
+
+  // Verify the find string exists
+  if (!content.includes(find)) {
+    console.error(
+      `String not found in "${file}". The find string does not match any content in the file.`,
+    );
+    process.exit(1);
+  }
+
+  // Apply the replacement
+  const updated = content.replace(find, replace);
+  try {
+    fs.writeFileSync(file, updated, "utf-8");
+  } catch (error) {
+    console.error(`Cannot write file "${file}": ${error.message}`);
+    process.exit(1);
+  }
+
+  // Git add and commit
+  const { execSync } = require("node:child_process");
+  try {
+    execSync(`git add "${file}"`, { stdio: "pipe" });
+    execSync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`, {
+      stdio: "pipe",
+    });
+  } catch (error) {
+    console.error(`Git commit failed: ${error.message}`);
+    process.exit(1);
+  }
+
+  // Read state for test command hint
+  const state = readState();
+  const knowledge = (() => {
+    try {
+      const knowledgePath = path.join(STATE_DIR, "context", "repo-knowledge.json");
+      if (fs.existsSync(knowledgePath)) {
+        return JSON.parse(fs.readFileSync(knowledgePath, "utf-8"));
+      }
+    } catch (_) {}
+    return null;
+  })();
+
+  const testCommand =
+    (knowledge && knowledge.commands && knowledge.commands.test) || "npm test";
+
+  return {
+    success: true,
+    file,
+    commitMessage,
+    testsToRun: testCommand,
   };
 }
 
@@ -569,20 +722,42 @@ function generateCertificate() {
 function getScore() {
   const state = readState();
   const history = state.progress.questionHistory;
-  const chapterNum = CHAPTER_ORDER.indexOf(state.progress.currentChapter) + 1;
+  const chapter = state.progress.currentChapter;
+  const chapterNum = CHAPTER_ORDER.indexOf(chapter) + 1;
   const completed = state.progress.chaptersCompleted.length;
+  const phase = state.progress.currentPhase || "active";
+  const phases = CHAPTER_PHASES[chapter] || [];
+  const phaseIndex = phases.indexOf(phase);
+  const nextPhase =
+    phaseIndex < phases.length - 1 ? phases[phaseIndex + 1] : null;
+
+  // Count recent tier distribution to help agent calibrate
+  const recentAnswers = history.slice(-5);
+  const recentDeep = recentAnswers.filter((q) => q.tier === "deep").length;
+  const tierWarning =
+    recentDeep >= 3
+      ? "WARNING: Too many 'deep' ratings. Most answers should be 'correct'. Reserve 'deep' for architectural insight only."
+      : null;
+
   return {
     commits: state.player.totalCommits,
     retries: state.player.currentLives,
     maxRetries: 5,
     respect: state.monster.respectLevel,
     mood: state.monster.currentMood,
-    chapter: state.progress.currentChapter,
+    chapter,
     chapterNumber: chapterNum,
     chaptersCompleted: completed,
     totalChapters: CHAPTER_ORDER.length,
     questionsAnswered: history.length,
     deepInsights: history.filter((q) => q.tier === "deep").length,
+    phase,
+    phaseInstruction: (PHASE_INSTRUCTIONS[chapter] || {})[phase] || null,
+    nextPhase,
+    referenceFile: CHAPTER_REFERENCE_FILES[chapter] || null,
+    evaluationReminder:
+      "SCORING: 'deep' = architectural WHY/trade-offs ONLY. Accurate answers = 'correct'. Most answers should be 'correct' not 'deep'.",
+    tierWarning,
   };
 }
 
@@ -680,6 +855,34 @@ function main() {
       console.log(JSON.stringify(toneResult, null, 2));
       break;
 
+    case "advance-phase":
+      if (!args[0]) {
+        console.error(
+          "Usage: state-manager.cjs advance-phase <phase-name>",
+        );
+        process.exit(1);
+      }
+      const apResult = advancePhase(args[0]);
+      console.log(JSON.stringify(apResult, null, 2));
+      break;
+
+    case "sabotage":
+      if (!args[0]) {
+        console.error(
+          'Usage: state-manager.cjs sabotage \'{"file":"<path>","find":"<original>","replace":"<change>","commitMessage":"<message>"}\'',
+        );
+        process.exit(1);
+      }
+      try {
+        const sabotageParams = JSON.parse(args[0]);
+        const sabotageResult = sabotage(sabotageParams);
+        console.log(JSON.stringify(sabotageResult, null, 2));
+      } catch (error) {
+        console.error("Invalid JSON:", error.message);
+        process.exit(1);
+      }
+      break;
+
     case "complete-chapter":
       if (!args[0]) {
         console.error(
@@ -716,8 +919,10 @@ Commands:
   update-mood <performance>         Update Monster mood based on performance
   add-exchange '<description>'      Save a memorable exchange moment
   set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
+  advance-phase <phase-name>        Advance to the next phase within the current chapter
+  sabotage '<json>'                 Apply code sabotage and commit (Ch3 hunt)
   complete-chapter <chapter-name>   Complete a chapter and get ceremony data
-  get-score                         Get compact current score (commits, retries, respect, chapter)
+  get-score                         Get current score + phase + instructions
   generate-certificate              Generate end-of-game certificate data (rank, stats, per-chapter)
   help                              Show this help message
 
@@ -729,6 +934,8 @@ Examples:
   state-manager.cjs update-mood correct
   state-manager.cjs add-exchange 'Player figured out the auth flow on first try'
   state-manager.cjs set-tone spicy
+  state-manager.cjs advance-phase entities
+  state-manager.cjs sabotage '{"file":"src/foo.ts","find":"original","replace":"changed","commitMessage":"refactor: simplify logic"}'
   state-manager.cjs complete-chapter investigation
   state-manager.cjs generate-certificate
 `);
