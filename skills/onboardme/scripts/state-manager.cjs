@@ -383,7 +383,8 @@ function resume() {
   if (!state.context.prepared) {
     return {
       action: "prepare",
-      message: "Game not set up. Read instructions/prepare-game.md and follow its steps.",
+      message:
+        "Game not set up. STOP — do NOT read the knowledge file, do NOT start gameplay, do NOT reveal any codebase details. Read instructions/prepare-game.md and follow its steps. After preparation, run resume again.",
     };
   }
 

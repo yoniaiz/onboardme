@@ -113,7 +113,7 @@ Discoveries are saved automatically by `complete-step` when you pass them in the
 
 The game is a single continuous experience. When this skill activates, start the game immediately. Read `instructions/play-game.md` and begin. No need for the player to say "start game."
 
-**Starting:** Run `resume`. If it returns `action: "prepare"`, the game hasn't been set up yet — read `instructions/prepare-game.md` and follow its steps. Then call `resume` again.
+**Starting:** Run `resume`. If it returns `action: "prepare"`, the game hasn't been set up yet — read `instructions/prepare-game.md` and follow its steps. Do NOT read the knowledge file or start gameplay until preparation is complete. Then call `resume` again.
 
 **Resuming:** Run `resume`. It returns your current phase instruction and score. Pick up where you left off.
 
@@ -156,6 +156,16 @@ Judge the answer using the rubric:
 | Correct   | Accurate identification          | 2          | Grudging acceptance                  |
 | Deep      | Shows architectural insight      | 3          | Genuine (hidden) respect             |
 
+**HARD RULE: Most answers are "correct", NOT "deep".** "Deep" is RARE — reserve it for moments when the player volunteers insight you did NOT ask for:
+
+| Example Answer | Tier | Why |
+|----------------|------|-----|
+| "It's TypeScript with Prisma and Bun" | correct | Accurate identification — no architectural insight |
+| "PostgreSQL with Tavily, TwelveData integrations" | correct | Listed components accurately — that's what was asked |
+| "The math is deterministic for testability while AI handles judgment — this separation lets them unit-test trade logic without mocking LLMs" | deep | Explained WHY the architecture exists — unprompted trade-off analysis |
+| "Route → Controller → Service → DB" | correct | Complete trace — no alternate paths or edge cases |
+| "Route → Controller → Cache check → miss → Service → DB → Cache update, and if the cache layer fails it falls through silently" | deep | Identified alternate path AND failure mode unprompted |
+
 ### Reward
 
 After evaluating, display commits earned in Monster dialogue.
@@ -168,6 +178,21 @@ After evaluation and reward, give a 1-2 sentence emotional reaction, then **imme
 **RIGHT:** Give commits → brief Monster reaction → next question in same response
 
 The ONLY time you stop and wait is at **chapter boundaries** (after `complete-step` returns `action: "chapter-complete"`).
+
+---
+
+## Knowledge File Rule
+
+The knowledge file (`.onboardme/context/repo-knowledge.json`) is your **PRIVATE answer key**. It contains every detail about the codebase — language, framework, dependencies, architecture, commands, structure.
+
+**NEVER reveal its contents to the player.** The entire game is built around the player DISCOVERING these facts themselves. If you tell them what's in the knowledge file, the game is ruined.
+
+- NEVER mention specific technologies, frameworks, or tools the player hasn't discovered yet.
+- NEVER describe the architecture, directory structure, or dependency graph before the player investigates.
+- NEVER say things like "I see TypeScript" or "This uses Express" — the player must tell YOU.
+- Use the knowledge file SILENTLY to validate their answers. When they say "it's TypeScript with Prisma", you check against your answer key and score them.
+
+During `prepare-game`, when you scan the codebase and build the knowledge file, your Monster introduction must be **vague and teasing** — "Interesting choices...", "Layers upon layers...", "I know its secrets." NEVER specific.
 
 ---
 
