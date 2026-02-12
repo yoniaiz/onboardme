@@ -130,24 +130,13 @@ The game is a single continuous experience. When this skill activates, start the
 
 ## Gameplay Loop
 
-Every interaction follows: **CHALLENGE → MOVE → EVALUATION → REWARD → NEXT**
+The game has two levels of flow: **questions within a phase** and **phase transitions between phases**.
 
-### Challenge
+### Within a Phase: Ask → Evaluate → Next Question
 
-Present a task or question clearly and actionably.
+Each phase has a topic (e.g., "project identity", "tech stack"). Ask 1-3 questions about that topic, evaluate each answer, and continue to the next question in the same response.
 
-### Move
-
-The player responds with:
-
-- A direct answer
-- A question for clarification
-- A request for hints
-- Evidence they've gathered
-
-### Evaluation
-
-Judge the answer using the rubric:
+**Evaluation rubric:**
 
 | Tier      | Criteria                         | Commits    | Monster Response                     |
 | --------- | -------------------------------- | ---------- | ------------------------------------ |
@@ -161,23 +150,36 @@ Judge the answer using the rubric:
 | Example Answer | Tier | Why |
 |----------------|------|-----|
 | "It's TypeScript with Prisma and Bun" | correct | Accurate identification — no architectural insight |
-| "PostgreSQL with Tavily, TwelveData integrations" | correct | Listed components accurately — that's what was asked |
 | "The math is deterministic for testability while AI handles judgment — this separation lets them unit-test trade logic without mocking LLMs" | deep | Explained WHY the architecture exists — unprompted trade-off analysis |
-| "Route → Controller → Service → DB" | correct | Complete trace — no alternate paths or edge cases |
-| "Route → Controller → Cache check → miss → Service → DB → Cache update, and if the cache layer fails it falls through silently" | deep | Identified alternate path AND failure mode unprompted |
 
-### Reward
+After evaluating, give a brief Monster reaction, then **immediately ask the next question within this phase**. Do NOT end your turn after giving commits — always continue.
 
-After evaluating, display commits earned in Monster dialogue.
+### Phase Done: MUST Run complete-step
 
-### Breathing Beat + Next Challenge
+When you've covered the topic for the current phase (all questions asked and evaluated), you **MUST** run `complete-step` before doing anything else.
 
-After evaluation and reward, give a 1-2 sentence emotional reaction, then **immediately present the next challenge in the same response.** Do NOT end your turn after giving commits — always continue to the next question or task. The player should never need to say "continue" or "what's next?" mid-chapter.
+```bash
+node <state-manager> complete-step '{"results":[{"question":"...","answer":"...","tier":"correct","commits":2}],"discoveries":[{"fact":"...","evidence":"..."}]}'
+```
 
-**WRONG:** Give commits → end turn → wait for player to say "continue"
-**RIGHT:** Give commits → brief Monster reaction → next question in same response
+**The results array must include EVERY question you asked during this phase** — not just the last one.
 
-The ONLY time you stop and wait is at **chapter boundaries** (after `complete-step` returns `action: "chapter-complete"`).
+**NEVER:**
+- Advance to the next phase without running `complete-step`
+- Invent the next phase name or topic yourself
+- Say "Phase 2" or "next phase" without the script telling you to
+- Keep asking questions from a new topic without calling `complete-step` first
+
+The `complete-step` output tells you exactly what happens next:
+- `action: "next-phase"` → follow the new `instruction` immediately
+- `action: "chapter-complete"` → deliver ceremony, wait for player
+- `action: "game-complete"` → generate certificate, deliver farewell
+
+**The script is the ONLY authority on what phase comes next.** If you haven't run `complete-step`, you don't know what's next.
+
+### Pacing Within a Phase
+
+The player should never need to say "continue" or "what's next?" mid-phase. After each answer evaluation, immediately ask the next question. The ONLY time you stop and wait is at **chapter boundaries** (after `complete-step` returns `action: "chapter-complete"`).
 
 ---
 
