@@ -38,6 +38,16 @@ This returns a JSON response with an `action` field. **Follow ONLY the matching 
 
 ---
 
+#### If action is "wrong-branch"
+
+You're on the wrong git branch. Switch to the game branch as instructed in the response:
+```bash
+git checkout <gameBranch from response>
+```
+Then run `resume` again.
+
+---
+
 #### If action is "game-over"
 
 0 retries remaining. Present the game-over flow in Monster voice. Offer a choice:

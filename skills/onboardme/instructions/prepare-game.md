@@ -133,7 +133,7 @@ node <state-manager> setup-branch
 
 This automatically:
 - Detects the current branch
-- Discards any game-only file changes (`.onboardme/`, `.cursor/skills/`, etc.)
+- Commits game files (`.onboardme/`, `.cursor/skills/`, etc.) on the new branch
 - Creates and switches to `onboardme/game`
 - Saves git state
 
@@ -152,7 +152,13 @@ Check the returned `action`:
   *[BRANCH READY]*
   ```
 
-- **`"user-changes"`** — Uncommitted changes in user code files. Inform the player in Monster voice and let them choose: commit, stash, or discard. After they decide, run `setup-branch` again.
+- **`"branch-exists"`** — Game branch exists from a previous game. Ask the player in Monster voice: reuse (keep previous game history) or start fresh? Then run:
+  ```bash
+  node <state-manager> setup-branch --reuse   # keep existing branch
+  node <state-manager> setup-branch --fresh   # delete and recreate
+  ```
+
+- **`"user-changes"`** — Uncommitted changes in non-game files. Inform the player in Monster voice and let them choose: commit, stash, or discard. After they decide, run `setup-branch` again.
 
 - **`"skip"`** — Not a git repo. Continue without a branch (Chapters 1-3 work without git).
 

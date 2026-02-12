@@ -383,8 +383,38 @@ function updateMoodForTier(state, tier) {
  *
  * Returns one of: prepare, play, game-over, game-complete
  */
+function getCurrentBranch() {
+  try {
+    const { execSync } = require("node:child_process");
+    return execSync("git branch --show-current", {
+      stdio: "pipe",
+      encoding: "utf-8",
+    }).trim();
+  } catch (_) {
+    return null;
+  }
+}
+
 function resume() {
   const state = readState();
+
+  // Check if game branch exists and we're not on it
+  const currentBranch = getCurrentBranch();
+  if (currentBranch && currentBranch !== "onboardme/game") {
+    try {
+      const { execSync } = require("node:child_process");
+      execSync("git rev-parse --verify onboardme/game", { stdio: "pipe" });
+      // Game branch exists but we're not on it
+      return {
+        action: "wrong-branch",
+        message: `You are on '${currentBranch}' but the game runs on 'onboardme/game'. Run: git checkout onboardme/game`,
+        currentBranch,
+        gameBranch: "onboardme/game",
+      };
+    } catch (_) {
+      // Game branch doesn't exist — that's fine, might be first time or no-git setup
+    }
+  }
 
   // Not prepared yet
   if (!state.context.prepared) {
@@ -674,7 +704,7 @@ function isGameFile(filePath) {
   return GAME_FILE_PATTERNS.some((pattern) => pattern.test(filePath));
 }
 
-function setupBranch() {
+function setupBranch(options = {}) {
   const { execSync } = require("node:child_process");
 
   const run = (cmd) =>
@@ -747,11 +777,35 @@ function setupBranch() {
   }
 
   // 4. Create or switch to game branch (game file changes carry over)
+  let branchExisted = false;
   try {
+    // Check if game branch already exists
     try {
       run("git rev-parse --verify onboardme/game");
-      run("git checkout onboardme/game");
+      branchExisted = true;
     } catch (_) {
+      // Branch doesn't exist
+    }
+
+    if (branchExisted) {
+      if (options.fresh) {
+        // Player chose fresh start — delete old branch and recreate
+        run("git branch -D onboardme/game");
+        run("git checkout -b onboardme/game");
+        branchExisted = false;
+      } else if (options.reuse) {
+        // Player chose to reuse existing branch
+        run("git checkout onboardme/game");
+      } else {
+        // Branch exists and no choice made — ask the player
+        return {
+          action: "branch-exists",
+          message:
+            "Game branch 'onboardme/game' already exists from a previous game. Ask the player: reuse it (keep previous game commits) or start fresh (delete and recreate). Then run setup-branch with the choice.",
+          originalBranch: originalBranch,
+        };
+      }
+    } else {
       run("git checkout -b onboardme/game");
     }
   } catch (error) {
@@ -1056,9 +1110,13 @@ function main() {
       }
       break;
 
-    case "setup-branch":
-      console.log(JSON.stringify(setupBranch(), null, 2));
+    case "setup-branch": {
+      const branchOpts = {};
+      if (args.includes("--fresh")) branchOpts.fresh = true;
+      if (args.includes("--reuse")) branchOpts.reuse = true;
+      console.log(JSON.stringify(setupBranch(branchOpts), null, 2));
       break;
+    }
 
     case "sabotage":
       if (!args[0]) {
@@ -1097,7 +1155,7 @@ Utility Commands:
   write '<json-updates>'            Deep merge updates into state
   init '<repo-info-json>'           Initialize new game state
   reset                             Delete all state (start over)
-  setup-branch                      Create game branch (auto-discards game file changes)
+  setup-branch [--reuse|--fresh]     Create game branch (commits game files, checks user files)
   sabotage '<json>'                 Apply code sabotage and commit (Ch3)
   generate-certificate              Generate end-of-game certificate data
   help                              Show this help message

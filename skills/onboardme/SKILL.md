@@ -134,7 +134,11 @@ The game has two levels of flow: **questions within a phase** and **phase transi
 
 ### Within a Phase: Ask → Evaluate → Next Question
 
-Each phase has a topic (e.g., "project identity", "tech stack"). Ask 1-3 questions about that topic, evaluate each answer, and continue to the next question in the same response.
+Each phase has a topic (e.g., "project identity", "tech stack"). Ask **broad, open-ended questions** that require the player to demonstrate investigation — not narrow trivia questions with one-word answers.
+
+**WRONG:** "What language?" → "TypeScript" → +2 commits. Then "What framework?" → "Hono" → +2 commits. (Trivial questions, inflated scoring)
+
+**RIGHT:** "What kind of project is this? Look at the root and tell me what they built." → Player must identify language, type, framework, runtime in one answer. Score the COMPLETENESS of their response.
 
 **Evaluation rubric:**
 
@@ -142,17 +146,17 @@ Each phase has a topic (e.g., "project identity", "tech stack"). Ask 1-3 questio
 | --------- | -------------------------------- | ---------- | ------------------------------------ |
 | Incorrect | Wrong tech/type                  | 0, -1 life | Challenge assumption, offer retry    |
 | Partial   | Right direction, missing details | 1          | Acknowledge progress, probe for more |
-| Correct   | Accurate identification          | 2          | Grudging acceptance                  |
+| Correct   | Accurate, comprehensive answer   | 2          | Grudging acceptance                  |
 | Deep      | Shows architectural insight      | 3          | Genuine (hidden) respect             |
 
-**HARD RULE: Most answers are "correct", NOT "deep".** "Deep" is RARE — reserve it for moments when the player volunteers insight you did NOT ask for:
+**Scoring must match question breadth.** If you ask a broad question:
+- One-word or single-fact answer → **partial** (1 commit), push for more
+- Comprehensive answer covering the topic → **correct** (2 commits)
+- Unprompted architectural insight beyond what was asked → **deep** (3 commits, RARE)
 
-| Example Answer | Tier | Why |
-|----------------|------|-----|
-| "It's TypeScript with Prisma and Bun" | correct | Accurate identification — no architectural insight |
-| "The math is deterministic for testability while AI handles judgment — this separation lets them unit-test trade logic without mocking LLMs" | deep | Explained WHY the architecture exists — unprompted trade-off analysis |
+If the player nails everything in one answer, score it and move on. Do NOT re-ask things they already covered. Do NOT pad a phase with follow-up questions about things they already told you.
 
-After evaluating, give a brief Monster reaction, then **immediately ask the next question within this phase**. Do NOT end your turn after giving commits — always continue.
+After evaluating, give a brief Monster reaction, then **immediately ask the next question within this phase** (or call `complete-step` if the phase topic is covered). Do NOT end your turn after giving commits — always continue.
 
 ### Phase Done: MUST Run complete-step
 
