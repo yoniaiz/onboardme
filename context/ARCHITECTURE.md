@@ -21,7 +21,7 @@ OnboardMe is implemented as an **agent skill** that transforms coding agents (Cu
 
 ## 1. High-Level Architecture
 
-OnboardMe uses an **agent-as-game-engine** architecture where the AI agent reads skill files to embody the Monster character and execute gameplay logic.
+OnboardMe uses a **script-driven game engine** architecture where the state-manager script is the authoritative source of truth for game flow, and the AI agent follows its instructions.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -29,36 +29,32 @@ OnboardMe uses an **agent-as-game-engine** architecture where the AI agent reads
 │                 (Cursor / Claude Code / Codex)                      │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│   Agent reads skill files and BECOMES the Spaghetti Code Monster    │
+│   Agent reads SKILL.md → becomes the Spaghetti Code Monster         │
+│   Agent calls state-manager.cjs → gets instructions for each phase  │
 │                                                                     │
 │   ┌─────────────────────────────────────────────────────────────┐  │
-│   │  SKILL.md                                                    │  │
+│   │  SKILL.md (persistent, survives compaction)                  │  │
 │   │  - Monster persona and voice                                 │  │
-│   │  - Command handlers (prepare, play, status, hint, reset)     │  │
-│   │  - Gameplay loop and scoring rubric                          │  │
-│   │  - Recovery patterns                                         │  │
+│   │  - "How To Play" — resume, complete-step, hint               │  │
+│   │  - Scoring rubric and gameplay loop                          │  │
+│   │  - Character lock, safety rules                              │  │
 │   └─────────────────────────────────────────────────────────────┘  │
 │                            │                                        │
 │                            ▼                                        │
 │   ┌─────────────────────────────────────────────────────────────┐  │
-│   │  references/THE-INVESTIGATION.md                             │  │
-│   │  - Chapter-specific gameplay instructions                    │  │
-│   │  - Phase-by-phase flow                                       │  │
-│   │  - Dialogue examples                                         │  │
-│   │  - Artifact templates                                        │  │
-│   └─────────────────────────────────────────────────────────────┘  │
-│                            │                                        │
-│                            ▼                                        │
-│   ┌─────────────────────────────────────────────────────────────┐  │
-│   │  scripts/state-manager.cjs                                   │  │
-│   │  - Agent executes to read/write game state                   │  │
+│   │  scripts/state-manager.cjs — THE GAME ENGINE                 │  │
+│   │  - resume: returns current phase instruction + rules + score │  │
+│   │  - complete-step: records results, advances, returns next    │  │
+│   │  - hint: deducts commit, returns current phase               │  │
+│   │  - Game flow defined in scripts/chapters/*.cjs               │  │
 │   │  - Persists to .onboardme/state.json                         │  │
 │   └─────────────────────────────────────────────────────────────┘  │
 │                            │                                        │
 │                            ▼                                        │
 │   ┌─────────────────────────────────────────────────────────────┐  │
 │   │  scripts/knowledge-manager.cjs                               │  │
-│   │  - Agent executes to read/write codebase knowledge           │  │
+│   │  - Agent reads codebase knowledge (answer key)               │  │
+│   │  - Discoveries saved by complete-step automatically          │  │
 │   │  - Persists to .onboardme/context/repo-knowledge.json        │  │
 │   └─────────────────────────────────────────────────────────────┘  │
 │                                                                     │
@@ -71,13 +67,11 @@ OnboardMe uses an **agent-as-game-engine** architecture where the AI agent reads
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │   .onboardme/                                                       │
-│   ├── state.json           # Game progress and Monster mood         │
-│   ├── state.backup.json    # Auto-backup before writes              │
+│   ├── state.json           # Game progress (step, score, mood)      │
 │   ├── context/                                                      │
 │   │   └── repo-knowledge.json  # Monster's codebase answer key      │
 │   └── artifacts/                                                    │
-│       └── CERTIFICATE.md   # Chapter 4 certificate                  │
-│       └── ...              # One artifact per chapter               │
+│       └── CERTIFICATE.md   # End-of-game certificate                │
 │                                                                     │
 │   [Rest of codebase - read by agent during gameplay]                │
 │                                                                     │
@@ -90,25 +84,22 @@ OnboardMe uses an **agent-as-game-engine** architecture where the AI agent reads
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Game Engine** | Agent-as-Monster | Agent embodies character; no separate runtime needed |
+| **Game Engine** | Script-driven state machine | Script returns exact instructions; survives context compaction |
+| **Agent Commands** | 2 primary (resume, complete-step) | Minimal surface area = agent can't forget commands |
+| **Game Flow** | JSON in chapter files | Structured, maintainable, per-chapter separation |
 | **State Persistence** | JSON files | Simple, portable, human-readable |
-| **Skill Distribution** | npx add-skill | Standard agent-skills ecosystem |
 | **Scripts** | Plain JavaScript (.cjs) | No build step; agents execute directly |
 | **Artifacts** | Markdown files | Readable, committable, useful documentation |
-| **Game Logic** | In skill instructions | Agent interprets rules; deterministic scoring |
 
-### Why Agent-as-Monster?
+### Why Script-Driven?
 
-The original design had a CLI that rendered the Monster. This required:
-- Complex terminal UI (Ink/React)
-- State synchronization between CLI and agent
-- Multiple touchpoints for users
+The original design had the agent read markdown chapter files and interpret rules. This broke after Cursor's context compaction — the agent would forget phase order, skip commands, and ignore checklists.
 
-The agent-skills approach eliminates this complexity:
-- **One interface**: User talks to agent, agent IS the Monster
-- **No CLI at runtime**: Just conversational gameplay
-- **Portable**: Works with any skill-supporting agent
-- **Simpler state**: JSON files managed by simple scripts
+The script-driven approach solves this:
+- **Two commands**: Agent only needs to remember `resume` and `complete-step`
+- **Script as oracle**: Every command returns exactly what to do next
+- **Rules returned inline**: Chapter-specific rules come with each phase instruction
+- **No interpretation needed**: The agent follows output, not markdown rules
 
 ---
 
@@ -118,314 +109,110 @@ The agent-skills approach eliminates this complexity:
 
 ```
 skills/onboardme/
-├── SKILL.md                    # Main skill file
+├── SKILL.md                      # Monster persona, How To Play, scoring
 ├── scripts/
-│   ├── state-manager.cjs       # Game state persistence
-│   └── knowledge-manager.cjs   # Codebase knowledge persistence
+│   ├── state-manager.cjs         # Game engine (resume, complete-step, etc.)
+│   ├── game-data.cjs             # Combines chapter data into flat lookups
+│   ├── knowledge-manager.cjs     # Codebase knowledge persistence
+│   └── chapters/                 # Game content (one file per chapter)
+│       ├── investigation.cjs     # Ch1: project identity, stack, docs
+│       ├── deep-dive.cjs         # Ch2: bootup, trace, entities, tests
+│       ├── hunt.cjs              # Ch3: sabotage, diagnosis, impact
+│       └── boss.cjs              # Ch4: challenge, plan, build, review, defense
 ├── instructions/
-│   ├── prepare-game.md         # Repo analysis + knowledge building
-│   ├── play-game.md            # Knowledge loading + discovery accumulation
-│   ├── status.md               # Status display instructions
-│   ├── hint.md                 # Hint system instructions
-│   └── reset-game.md           # Reset instructions
-└── references/
-    └── THE-INVESTIGATION.md    # Chapter 1 full flow
+│   ├── prepare-game.md           # Repo analysis + knowledge building
+│   ├── play-game.md              # Run resume, follow output
+│   ├── status.md                 # Run resume for status
+│   ├── hint.md                   # Run hint command
+│   └── reset-game.md             # Reset instructions
+└── references/                   # (empty — content moved to chapters/*.cjs)
 ```
 
-### SKILL.md Structure
+### Game Data Architecture
 
-The main skill file contains:
-
-```yaml
----
-name: onboardme
-description: >
-  Gamified codebase onboarding through the Spaghetti Code Monster.
-license: MIT
-metadata:
-  author: yoniaiz
-  version: "1.0.0"
----
+```
+chapters/investigation.cjs ─┐
+chapters/deep-dive.cjs ─────┤
+chapters/hunt.cjs ───────────┼──▶ game-data.cjs ──▶ state-manager.cjs
+chapters/boss.cjs ───────────┘        │
+                                      ├── GAME_FLOW (16 ordered step IDs)
+                                      ├── PHASES (instruction/scoring/tips per step)
+                                      └── CHAPTERS (name/number/rules/ceremony data)
 ```
 
-**Sections:**
-1. **Character Definition** — Monster traits, voice patterns, signature lines
-2. **State Management** — How to read/write game state via scripts
-3. **Knowledge Management** — How to read/write codebase knowledge (answer key)
-4. **Commands** — Triggers that load instruction files (prepare, play, status, hint, reset)
-5. **Gameplay Loop** — Challenge → Move → Evaluation → Reward → Next
-6. **Mood System** — How Monster's attitude evolves
-7. **Recovery Patterns** — Handling stuck players, disputes, derails
-8. **Safety Rules** — Boundaries (stay helpful, accurate, never cruel)
-9. **File Artifacts** — CASE_FILE.md template and update instructions
-
-### Reference Files
-
-Chapter-specific instructions that the agent reads when entering a chapter:
-
-```markdown
-# Chapter 1: The Investigation
-
-## Overview
-[What player learns]
-
-## Resources You Can Access
-[Files agent should examine]
-
-## State Management
-[What to read/write in state.json]
-
-## Scoring Rubric
-[How to evaluate answers]
-
-## Chapter Flow
-[Phase-by-phase instructions with dialogue examples]
-
-## Recovery Patterns
-[Hints, disputes, timing]
-```
+Each chapter file exports:
+- `name`, `number` — chapter metadata
+- `moodRange` — mood boundaries for the chapter
+- `memoryLog` — Monster backstory fragment for ceremonies
+- `rules` — critical rules returned to agent with every phase
+- `phases[]` — ordered array of phase definitions (id, instruction, scoring, tips)
 
 ---
 
 ## 4. State Management
 
-### State Schema
+### State Schema (v2)
 
-```typescript
-interface OnboardMeState {
-  schemaVersion: number;        // For migrations
-  
-  repo: {
-    id: string;                 // Unique repo identifier
-    path: string;               // Absolute path
-    name: string;               // Project name
-  };
-  
-  player: {
-    name: string;               // Player's name
-    totalCommits: number;       // Score (XP equivalent)
-    currentLives: number;       // 5 max, lose on incorrect
-    startedAt: string;          // ISO timestamp
-  };
-  
-  progress: {
-    currentChapter: ChapterName;
-    chaptersCompleted: string[];
-    questionHistory: QuestionResult[];
-  };
-  
-  monster: {
-    currentMood: MoodType;      // dismissive → peaceful
-    respectLevel: number;       // 0-100
-    memorableExchanges: string[];
-  };
-  
-  session: {
-    conversationSummary: string;
-    lastEmotionalBeat: string;
-  };
-  
-  context: {
-    prepared: boolean;
-    preparedAt: string;
-  };
-  
-  preferences: {
-    monsterTone: ToneType;      // friendly → full-monster
-  };
-}
-```
+Progress is tracked by a single `currentStep` index into the 16-step `GAME_FLOW` array. See `context/agent/STATE-SCHEMA.md` for the full schema.
 
-### State Manager Script
+### Commands
 
-The agent executes `scripts/state-manager.cjs` for game state operations:
+| Command | Purpose | Returns |
+|---------|---------|---------|
+| `resume` | Where am I? What should I do? | Phase instruction + rules + score |
+| `complete-step` | Phase done, here are results | Next phase, ceremony, or game-complete |
+| `hint` | Player asked for help | Score after -1 commit |
+| `read` / `write` | Raw state access | State JSON |
+| `init` | Initialize new game | Default state |
+| `reset` | Delete all state | Success message |
+| `sabotage` | Apply code sabotage (Ch3) | File + commit result |
+| `generate-certificate` | End-of-game certificate data | Rank + stats + per-chapter |
+
+### Knowledge Manager
 
 ```bash
-# Read current state
-node <skill-path>/scripts/state-manager.cjs read
-
-# Initialize new game
-node <skill-path>/scripts/state-manager.cjs init '{"name":"project","path":"/path"}'
-
-# Update state (deep merge)
-node <skill-path>/scripts/state-manager.cjs write '{"player":{"totalCommits":5}}'
-
-# Add question result (auto-increments commits and deducts lives on incorrect)
-node <skill-path>/scripts/state-manager.cjs add-question '{"question":"...","answer":"...","tier":"deep","commits":3}'
-
-# Update Monster mood based on answer tier
-node <skill-path>/scripts/state-manager.cjs update-mood "correct"
-
-# Reset all state
-node <skill-path>/scripts/state-manager.cjs reset
+node <skill-path>/scripts/knowledge-manager.cjs read    # Get answer key
+node <skill-path>/scripts/knowledge-manager.cjs write    # Create answer key (prepare)
 ```
 
-### Knowledge Manager Script
-
-The agent executes `scripts/knowledge-manager.cjs` for codebase knowledge:
-
-```bash
-# Read knowledge (returns null if not prepared)
-node <skill-path>/scripts/knowledge-manager.cjs read
-
-# Write knowledge (created during prepare)
-node <skill-path>/scripts/knowledge-manager.cjs write '<repo-knowledge-json>'
-
-# Append a player-validated discovery
-node <skill-path>/scripts/knowledge-manager.cjs add-discovery '{"chapter":"investigation","fact":"...","tier":"deep","evidence":"..."}'
-```
-
-The knowledge file (`repo-knowledge.json`) is the Monster's private answer key — it contains codebase facts for validation and accumulates player-validated discoveries. See `context/agent/CONTEXT-GATHERING.md` for the full schema and strategy.
-
-### State Behaviors
-
-- **Auto-backup**: Before every write, copies state.json to state.backup.json
-- **Auto-scoring**: `add-question` automatically increments `totalCommits` and deducts lives on incorrect answers
-- **Schema versioning**: Tracks schemaVersion for future migrations
-- **Deep merge**: Updates preserve existing fields
-- **Graceful fallback**: Returns default state if file missing/corrupted
+Discoveries are saved automatically by `complete-step` when passed in the `discoveries` array.
 
 ---
 
 ## 5. Gameplay Flow
 
-### Command Flow: Prepare Game
+### Two-Command Game Loop
 
 ```
-User: "prepare game" / "setup onboarding"
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 1. Check if already prepared          │
-│    - Read state.json                  │
-│    - If prepared, ask: reset or cont? │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 2. Analyze repository (8-12 files)    │
-│    - Read manifest, README, configs   │
-│    - Scan directory structure          │
-│    - Extract identity, tech stack,    │
-│      commands, env vars               │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 3. Build knowledge file               │
-│    - Construct repo-knowledge.json    │
-│    - Save via knowledge-manager.cjs   │
-│    - This is the Monster's answer key │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 4. Initialize state                   │
-│    - Run state-manager.cjs init       │
-│    - Set context.prepared = true      │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 5. Monster introduction               │
-│    - Tease that it knows the codebase │
-│    - DO NOT reveal specific findings  │
-│    - Player discovers during gameplay │
-└───────────────────────────────────────┘
-```
-
-### Command Flow: Play Game
-
-```
-User: "play game" / "let's go" / "/onboardme"
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 1. Load state                         │
-│    - Run state-manager.cjs read       │
-│    - Check context.prepared           │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 2. Load knowledge (answer key)        │
-│    - Run knowledge-manager.cjs read   │
-│    - Review discoveries from prior    │
-│      sessions for continuity          │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 3. Load chapter reference             │
-│    - Read current chapter file        │
-│    - e.g., THE-INVESTIGATION.md       │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 4. Activate Monster persona           │
-│    - Voice patterns from SKILL.md     │
-│    - Mood from state.monster          │
-└───────────────────────────────────────┘
-                │
-                ▼
-┌───────────────────────────────────────┐
-│ 5. Begin gameplay loop                │
-│    - Challenge → Move → Eval → Next   │
-│    - Validate against knowledge       │
-│    - Save discoveries after answers   │
-│    - Read live files for Ch 3-5       │
-│    - Create/update artifacts          │
-└───────────────────────────────────────┘
-```
-
-### Gameplay Loop
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      CHALLENGE                               │
-│  Monster presents task/question in character                 │
-│  "What type of project is this?"                            │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         MOVE                                 │
-│  Player responds with:                                       │
-│  - Answer to question                                        │
-│  - Request for hint                                          │
-│  - Clarifying question                                       │
-│  - Evidence they found                                       │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      EVALUATION                              │
-│  Monster evaluates using rubric:                             │
-│  - Incorrect: Wrong understanding                            │
-│  - Partial: Right direction, missing details                 │
-│  - Correct: Accurate identification                          │
-│  - Deep: Shows architectural insight                         │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        REWARD                                │
-│  - Award commits based on tier                               │
-│  - Update Monster mood                                       │
-│  - Update state.json                                         │
-│  - Update artifact file                                      │
-│  - Emotional beat (Monster reaction)                         │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         NEXT                                 │
-│  - Next challenge in current phase                           │
-│  - OR transition to next phase                               │
-│  - OR transition to next chapter                             │
-│  - OR victory ending                                         │
-└─────────────────────────────────────────────────────────────┘
+                    ┌──────────────────────────────────┐
+                    │                                    │
+                    ▼                                    │
+             ┌──────────┐                               │
+             │  resume   │ ─── prepare? ──▶ prepare-game │
+             └────┬─────┘                               │
+                  │ play                                 │
+                  ▼                                      │
+         ┌────────────────┐                              │
+         │ Follow phase   │                              │
+         │ instruction    │                              │
+         └───────┬────────┘                              │
+                 │ phase done                            │
+                 ▼                                       │
+         ┌───────────────┐                               │
+         │ complete-step  │                              │
+         └───────┬───────┘                               │
+                 │                                       │
+          ┌──────┼──────┐                                │
+          │      │      │                                │
+     next-phase  │  chapter-complete                     │
+          │      │      │                                │
+          │      │      ▼                                │
+          │      │  ceremony + wait ──────────────────────┘
+          │      │
+          │   game-complete
+          │      │
+          ▼      ▼
+     (continue) (certificate + farewell)
 ```
 
 ---
@@ -439,94 +226,10 @@ Created in target repo during gameplay:
 ```
 .onboardme/
 ├── state.json              # Game progress, score, mood
-├── state.backup.json       # Auto-backup
 ├── context/
 │   └── repo-knowledge.json # Monster's answer key + discoveries
 └── artifacts/
-    └── CERTIFICATE.md      # Chapter 4: Certificate of Codebase Survival
-    ├── CODEBASE_KNOWLEDGE.md # Chapter 5: Final documentation
-    └── CERTIFICATE.md      # Game complete: Certificate of Codebase Survival
-```
-
-### state.json Example
-
-```json
-{
-  "schemaVersion": 1,
-  "repo": {
-    "id": "onboardme-abc123",
-    "path": "/Users/dev/project",
-    "name": "my-api"
-  },
-  "player": {
-    "name": "Developer",
-    "totalCommits": 12,
-    "currentLives": 4,
-    "startedAt": "2026-02-05T10:30:00Z"
-  },
-  "progress": {
-    "currentChapter": "investigation",
-    "chaptersCompleted": [],
-    "questionHistory": [
-      {
-        "question": "What type of project is this?",
-        "answer": "Express API with PostgreSQL",
-        "tier": "correct",
-        "commits": 2,
-        "timestamp": "2026-02-05T10:35:00Z"
-      }
-    ]
-  },
-  "monster": {
-    "currentMood": "dismissive",
-    "respectLevel": 15,
-    "memorableExchanges": ["Correctly identified Prisma ORM"]
-  },
-  "session": {
-    "conversationSummary": "Player completed Phase 1 of Investigation",
-    "lastEmotionalBeat": "Grudging acceptance"
-  },
-  "context": {
-    "prepared": true,
-    "preparedAt": "2026-02-05T10:30:00Z"
-  },
-  "preferences": {
-    "monsterTone": "balanced"
-  }
-}
-```
-
-### CASE_FILE.md Example
-
-```markdown
-# Case File: my-api
-
-_Investigation by: Developer_
-_Date opened: 2026-02-05T10:30:00Z_
-
----
-
-## Evidence Log
-
-### Finding #1: Project Type
-
-**Question:** What type of project is this?
-**Evidence:** package.json shows "express" dependency, src/routes/ folder
-**Verdict:** ✅ CONFIRMED — Node.js Express API
-
-_Monster Note: "They can read a package.json. Revolutionary."_
-
-### Finding #2: Database
-
-**Question:** What database does it use?
-**Evidence:** prisma/schema.prisma shows PostgreSQL
-**Verdict:** ✅ CONFIRMED — PostgreSQL with Prisma ORM
-
-_Monster Note: "Finally, someone who looks beyond the README."_
-
----
-
-## Case Status: 🔍 IN PROGRESS
+    └── CERTIFICATE.md      # End-of-game certificate
 ```
 
 ---
@@ -536,12 +239,7 @@ _Monster Note: "Finally, someone who looks beyond the README."_
 ### User Installation
 
 ```bash
-# Install OnboardMe skill
 npx skills add yoniaiz/onboardme
-
-# This copies skills/onboardme/ to:
-# .cursor/skills/onboardme/    (for Cursor)
-# .claude/skills/onboardme/    (for Claude Code)
 ```
 
 ### Installed Location
@@ -551,20 +249,17 @@ npx skills add yoniaiz/onboardme
 ├── SKILL.md
 ├── scripts/
 │   ├── state-manager.cjs
-│   └── knowledge-manager.cjs
+│   ├── game-data.cjs
+│   ├── knowledge-manager.cjs
+│   └── chapters/
+│       ├── investigation.cjs
+│       ├── deep-dive.cjs
+│       ├── hunt.cjs
+│       └── boss.cjs
 ├── instructions/
 │   └── *.md
-└── references/
-    └── THE-INVESTIGATION.md
+└── references/                 # (empty)
 ```
-
-### Agent Discovery
-
-When user says "onboardme", "prepare game", or "/onboardme":
-1. Agent searches skills directory for matching skill
-2. Reads SKILL.md to understand character and commands
-3. Activates Monster persona
-4. Follows instructions for the invoked command
 
 ---
 
@@ -575,7 +270,7 @@ When user says "onboardme", "prepare game", or "/onboardme":
 | Document | Purpose |
 |----------|---------|
 | [context/agent/SKILL-CONTRACT.md](./agent/SKILL-CONTRACT.md) | Skill template with Goal/Inputs/Rubric/Recovery |
-| [context/agent/STATE-SCHEMA.md](./agent/STATE-SCHEMA.md) | State schema with versioning and migrations |
+| [context/agent/STATE-SCHEMA.md](./agent/STATE-SCHEMA.md) | State schema v2 with step-based progression |
 | [context/agent/AGENT-AS-MONSTER.md](./agent/AGENT-AS-MONSTER.md) | Monster character embodiment |
 | [context/agent/CONVERSATIONAL-GAMEPLAY.md](./agent/CONVERSATIONAL-GAMEPLAY.md) | Multi-turn investigation design |
 | [context/agent/EDITOR-AS-UI.md](./agent/EDITOR-AS-UI.md) | Files as game boards |
@@ -588,10 +283,9 @@ When user says "onboardme", "prepare game", or "/onboardme":
 | Document | Purpose |
 |----------|---------|
 | [context/chapters/01-THE-INVESTIGATION.md](./chapters/01-THE-INVESTIGATION.md) | Chapter 1 design |
-| _(02-THE-HANDS-ON.md removed — merged into Deep Dive)_ | — |
-| [context/chapters/03-THE-DEEP-DIVE.md](./chapters/03-THE-DEEP-DIVE.md) | Chapter 3 design |
-| [context/chapters/04-THE-HUNT.md](./chapters/04-THE-HUNT.md) | Chapter 4 design |
-| [context/chapters/05-THE-BOSS-BATTLE.md](./chapters/05-THE-BOSS-BATTLE.md) | Chapter 5 design |
+| [context/chapters/03-THE-DEEP-DIVE.md](./chapters/03-THE-DEEP-DIVE.md) | Chapter 2 design |
+| [context/chapters/04-THE-HUNT.md](./chapters/04-THE-HUNT.md) | Chapter 3 design |
+| [context/chapters/05-THE-BOSS-BATTLE.md](./chapters/05-THE-BOSS-BATTLE.md) | Chapter 4 design |
 
 ### Narrative Design
 
@@ -604,8 +298,6 @@ When user says "onboardme", "prepare game", or "/onboardme":
 
 ---
 
----
-
-*Document Version: 1.2*
-*Last Updated: 2026-02-06*
-*Status: All 4 chapters implemented, full game integration complete*
+*Document Version: 2.0*
+*Last Updated: 2026-02-12*
+*Status: Script-driven game engine — 4 chapters, 16 phases*

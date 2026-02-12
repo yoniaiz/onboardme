@@ -1,76 +1,30 @@
 #!/usr/bin/env node
 
+/**
+ * OnboardMe State Manager — Script-Driven Game Engine (v2)
+ *
+ * Two commands drive the entire game:
+ *   resume        — "Where am I? What should I do?"
+ *   complete-step — "Phase done, here are the results, what's next?"
+ *
+ * The script is the state machine. The agent follows its output.
+ */
+
 const fs = require("node:fs");
 const path = require("node:path");
 
+// --- Game data (imported from chapter files) ---
+const { GAME_FLOW, PHASES, CHAPTERS, CHAPTER_ORDER } = require("./game-data.cjs");
+
+// --- Constants ---
 const STATE_DIR = ".onboardme";
 const STATE_FILE = "state.json";
 const STATE_PATH = path.join(STATE_DIR, STATE_FILE);
-const SCHEMA_VERSION = 1;
-
-// Resolve paths relative to this script — works in any IDE/agent runtime
+const SCHEMA_VERSION = 2;
 const SKILL_ROOT = path.resolve(__dirname, "..");
+const KNOWLEDGE_PATH = path.join(STATE_DIR, "context", "repo-knowledge.json");
 
-const CHAPTER_ORDER = [
-  "investigation",
-  "deep-dive",
-  "hunt",
-  "boss",
-];
-
-const CHAPTER_REFERENCE_FILES = {
-  investigation: path.join(SKILL_ROOT, "references", "THE-INVESTIGATION.md"),
-  "deep-dive": path.join(SKILL_ROOT, "references", "THE-DEEP-DIVE.md"),
-  hunt: path.join(SKILL_ROOT, "references", "THE-HUNT.md"),
-  boss: path.join(SKILL_ROOT, "references", "THE-BOSS-BATTLE.md"),
-};
-
-const CHAPTER_PHASES = {
-  investigation: ["questions"],
-  "deep-dive": ["bootup", "trace", "entities", "tests"],
-  hunt: ["sabotage", "diagnosis", "impact"],
-  boss: ["challenge", "planning", "build", "review", "defense", "victory"],
-};
-
-const PHASE_INSTRUCTIONS = {
-  investigation: {
-    questions:
-      "Ask 3-5 investigation questions about the codebase. SCORING: 'correct' = accurate facts (e.g. 'TypeScript with Prisma'). 'deep' = ONLY if they explain WHY the architecture exists or identify trade-offs unprompted. Most answers are 'correct'. After each answer, immediately present the next challenge. When done, run complete-chapter investigation.",
-  },
-  "deep-dive": {
-    bootup:
-      "Challenge player to run the project. Read identity.type from knowledge file and adapt: server=hit endpoint, web app=open browser, CLI=run command, library=run tests. SCORING: 'correct' = ran it and reported output. 'deep' = ONLY if they identify unexpected behavior or config implications unprompted. When running, run advance-phase trace.",
-    trace:
-      "Introduce @onboardme comment convention. Player picks a user action from the running project, then marks each code layer with // @onboardme [step] [description] comments. Grep for @onboardme to validate their trail. SCORING: 'correct' = complete trail through all layers. 'deep' = ONLY if they trace alternate paths, caching, or error handling. When trail verified, run advance-phase entities.",
-    entities:
-      "Ask player to map entity relationships. Validate against schema. SCORING: 'correct' = accurate mapping. 'deep' = ONLY if they explain design rationale (e.g., why no foreign keys, why this structure). After their answer, immediately continue. When done, run advance-phase tests.",
-    tests:
-      "Ask player to extract business rules from tests. SCORING: 'correct' = accurate extraction of rules. 'deep' = ONLY if they connect rules to broader system behavior or identify coverage gaps. After their answer, immediately continue. When done, run complete-chapter deep-dive.",
-  },
-  hunt: {
-    sabotage:
-      "SILENTLY sabotage the code using the sabotage command. Do NOT narrate. Commit with misleading message. Reveal dramatically. Then run advance-phase diagnosis.",
-    diagnosis:
-      "Player debugs. React to progress. SCORING: 'correct' = found bug and explained root cause. 'deep' = ONLY if they also analyze downstream impact or suggest prevention. When they fix it and tests pass, record answer with add-question. Then run advance-phase impact.",
-    impact:
-      "Ask: If I removed [module from Ch2], what breaks? Player traces dependencies. SCORING: 'correct' = identifies direct dependencies. 'deep' = ONLY if they trace the full chain to user-facing impact. Record answer. Then run complete-chapter hunt.",
-  },
-  boss: {
-    challenge:
-      "Analyze codebase. Pick a feature that does NOT already exist (even partially). Search for related code, endpoints, and tests BEFORE choosing. Present specific challenge. Record with add-question. Run advance-phase planning.",
-    planning:
-      "Ask player for plan BEFORE coding: WHERE, WHAT patterns, HOW integration. Reject bad plans. Run advance-phase build only when plan passes.",
-    build:
-      "Player codes. Watch files in real-time, react in Monster voice. When they say done, run advance-phase review.",
-    review:
-      "Review ALL created/modified files. Check structure, patterns, integration. Request fixes if needed. When clean, run advance-phase defense.",
-    defense:
-      "Ask 3-5 defense questions (architecture, edge cases, integration). Player explains from memory. When satisfied, run advance-phase victory.",
-    victory:
-      "Run generate-certificate. Create CERTIFICATE.md. Run complete-chapter boss. Deliver farewell in Monster voice.",
-  },
-};
-
+// --- ASCII Art (keyed by mood, used in ceremonies) ---
 const ASCII_ART = {
   dismissive: [
     "            ╭───────────╮",
@@ -115,16 +69,9 @@ const ASCII_ART = {
   ].join("\n"),
 };
 
-const MEMORY_LOGS = {
-  investigation:
-    '"Year 1. Clean architecture. SOLID principles. Hope."',
-  "deep-dive":
-    '"Just this one shortcut. We\'ll refactor later."\n\n*crackle*\n\n"They never did."\n\n*tangle*\n\n"The shortcuts multiplied. The TODOs grew. Comments began to lie."',
-  hunt:
-    '"The architect said she\'d refactor me."\n\n*pause*\n\n"She\'s a VP at Google now."',
-  boss:
-    '"Something stirred in the deepest module. It was me."',
-};
+// ============================================================
+// State Helpers
+// ============================================================
 
 function getDefaultState() {
   return {
@@ -141,26 +88,16 @@ function getDefaultState() {
       startedAt: "",
     },
     progress: {
-      currentChapter: "investigation",
-      currentPhase: "questions",
-      currentGame: "",
-      chaptersCompleted: [],
+      currentStep: 0,
       questionHistory: [],
     },
     monster: {
       currentMood: "dismissive",
       respectLevel: 0,
       memorableExchanges: [],
-      lastMockery: "",
     },
     session: {
       conversationSummary: "",
-      lastEmotionalBeat: "",
-      pendingCallbacks: [],
-    },
-    behavior: {
-      averageResponseTime: 0,
-      accuracyByTopic: {},
     },
     git: {
       gameBranch: "",
@@ -170,7 +107,6 @@ function getDefaultState() {
     context: {
       prepared: false,
       preparedAt: "",
-      contextFiles: [],
     },
     preferences: {
       monsterTone: "spicy",
@@ -200,7 +136,6 @@ function readState() {
 
 function writeState(state) {
   ensureDirectory();
-
   try {
     fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), "utf-8");
     return true;
@@ -210,13 +145,16 @@ function writeState(state) {
   }
 }
 
+// ============================================================
+// State Migration (v1 → v2)
+// ============================================================
+
 function migrateState(state) {
   if (!state.schemaVersion) {
     state.schemaVersion = 1;
   }
 
   let current = state;
-
   while (current.schemaVersion < SCHEMA_VERSION) {
     const nextVersion = current.schemaVersion + 1;
     const migration = migrations[nextVersion];
@@ -230,7 +168,423 @@ function migrateState(state) {
   return current;
 }
 
-const migrations = {};
+const migrations = {
+  // v1 → v2: Replace currentChapter/currentPhase/chaptersCompleted with currentStep
+  2: (state) => {
+    const oldChapter = state.progress?.currentChapter || "investigation";
+    const oldPhase = state.progress?.currentPhase || "questions";
+
+    // Map v1 chapter:phase to v2 step index
+    let newStep = 0;
+
+    if (oldChapter === "complete") {
+      newStep = GAME_FLOW.length; // Game finished
+    } else {
+      // Map old phase names to new ones
+      const phaseMapping = {
+        "investigation:questions": "investigation:identity",
+        "deep-dive:bootup": "deep-dive:trace",
+      };
+
+      const stepId = `${oldChapter}:${oldPhase}`;
+      const mappedId = phaseMapping[stepId] || stepId;
+      const idx = GAME_FLOW.indexOf(mappedId);
+
+      if (idx !== -1) {
+        newStep = idx;
+      } else {
+        // If we can't find the exact phase, find the first phase of the chapter
+        const chapterPrefix = `${oldChapter}:`;
+        const chapterStart = GAME_FLOW.findIndex((s) => s.startsWith(chapterPrefix));
+        newStep = chapterStart !== -1 ? chapterStart : 0;
+      }
+    }
+
+    // Build v2 progress
+    const progress = {
+      currentStep: newStep,
+      questionHistory: state.progress?.questionHistory || [],
+    };
+
+    // Clean up removed fields
+    const migrated = { ...state, schemaVersion: 2, progress };
+
+    // Remove stale v1 fields from monster
+    if (migrated.monster) {
+      delete migrated.monster.lastMockery;
+    }
+
+    // Remove stale session fields
+    if (migrated.session) {
+      delete migrated.session.lastEmotionalBeat;
+      delete migrated.session.pendingCallbacks;
+    }
+
+    // Remove behavior section (unused)
+    delete migrated.behavior;
+
+    // Remove context.contextFiles (unused)
+    if (migrated.context) {
+      delete migrated.context.contextFiles;
+    }
+
+    return migrated;
+  },
+};
+
+// ============================================================
+// Step / Chapter Helpers
+// ============================================================
+
+/** Parse a step ID like "investigation:identity" into { chapter, phase } */
+function parseStepId(stepId) {
+  const colonIdx = stepId.indexOf(":");
+  return {
+    chapter: stepId.substring(0, colonIdx),
+    phase: stepId.substring(colonIdx + 1),
+  };
+}
+
+/** Get the chapter ID for a given step index */
+function getChapterForStep(stepIndex) {
+  if (stepIndex >= GAME_FLOW.length) return null;
+  return parseStepId(GAME_FLOW[stepIndex]).chapter;
+}
+
+/** Check if advancing from one step to the next crosses a chapter boundary */
+function isChapterBoundary(currentStep, nextStep) {
+  if (currentStep >= GAME_FLOW.length || nextStep >= GAME_FLOW.length) return true;
+  return getChapterForStep(currentStep) !== getChapterForStep(nextStep);
+}
+
+/** Build the score summary from state */
+function buildScore(state) {
+  return {
+    commits: state.player.totalCommits,
+    retries: state.player.currentLives,
+    mood: state.monster.currentMood,
+    respect: state.monster.respectLevel,
+  };
+}
+
+/** Build the phase info for a given step index */
+function buildPhaseInfo(stepIndex) {
+  if (stepIndex >= GAME_FLOW.length) return null;
+  const stepId = GAME_FLOW[stepIndex];
+  const { chapter, phase } = parseStepId(stepId);
+  const chapterData = CHAPTERS[chapter];
+  const phaseData = PHASES[stepId];
+
+  return {
+    chapter,
+    chapterName: chapterData.name,
+    chapterNumber: chapterData.number,
+    phase,
+    step: stepIndex,
+    totalSteps: GAME_FLOW.length,
+    instruction: phaseData.instruction,
+    scoring: phaseData.scoring,
+    tips: phaseData.tips,
+    rules: chapterData.rules,
+  };
+}
+
+// ============================================================
+// Mood System
+// ============================================================
+
+const MOOD_ORDER = ["dismissive", "annoyed", "worried", "desperate", "peaceful"];
+
+const CHAPTER_MOOD_MIN = {
+  investigation: "dismissive",
+  "deep-dive": "dismissive",
+  hunt: "worried",
+  boss: "desperate",
+};
+
+const CHAPTER_MOOD_MAX = {
+  investigation: "annoyed",
+  "deep-dive": "worried",
+  hunt: "desperate",
+  boss: "peaceful",
+};
+
+const CHAPTER_RESPECT_CEILING = {
+  investigation: 30,
+  "deep-dive": 70,
+  hunt: 90,
+  boss: 100,
+};
+
+/** Update mood based on a single answer tier. Mutates state in place. */
+function updateMoodForTier(state, tier) {
+  const chapter = getChapterForStep(state.progress.currentStep);
+  if (!chapter) return;
+
+  // Adjust respect
+  if (tier === "deep") {
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 15);
+  } else if (tier === "correct") {
+    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 5);
+  } else if (tier === "incorrect") {
+    state.monster.respectLevel = Math.max(0, state.monster.respectLevel - 5);
+  }
+
+  // Enforce respect ceiling
+  const ceiling = CHAPTER_RESPECT_CEILING[chapter] || 100;
+  state.monster.respectLevel = Math.min(state.monster.respectLevel, ceiling);
+
+  // Calculate mood from recent history
+  const minMood = CHAPTER_MOOD_MIN[chapter] || "dismissive";
+  const maxMood = CHAPTER_MOOD_MAX[chapter] || "desperate";
+  const minIdx = MOOD_ORDER.indexOf(minMood);
+  const maxIdx = MOOD_ORDER.indexOf(maxMood);
+
+  let currentIdx = MOOD_ORDER.indexOf(state.monster.currentMood);
+
+  // Enforce minimum
+  if (currentIdx < minIdx) {
+    currentIdx = minIdx;
+  }
+
+  // Check recent history for streaks
+  const recent = state.progress.questionHistory.slice(-5);
+  const correctCount = recent.filter((q) => q.tier === "correct" || q.tier === "deep").length;
+  const incorrectCount = recent.filter((q) => q.tier === "incorrect").length;
+
+  if (correctCount >= 3 && currentIdx < maxIdx) {
+    currentIdx = Math.min(currentIdx + 1, maxIdx);
+  }
+  if (incorrectCount >= 3 && currentIdx > minIdx) {
+    currentIdx = Math.max(currentIdx - 1, minIdx);
+  }
+
+  // Enforce maximum
+  if (currentIdx > maxIdx) {
+    currentIdx = maxIdx;
+  }
+
+  state.monster.currentMood = MOOD_ORDER[currentIdx];
+}
+
+// ============================================================
+// Core Commands
+// ============================================================
+
+/**
+ * resume — "Where am I? What should I do?"
+ *
+ * Returns one of: prepare, play, game-over, game-complete
+ */
+function resume() {
+  const state = readState();
+
+  // Not prepared yet
+  if (!state.context.prepared) {
+    return {
+      action: "prepare",
+      message: "Game not set up. Read instructions/prepare-game.md and follow its steps.",
+    };
+  }
+
+  // Game over (0 lives)
+  if (state.player.currentLives <= 0) {
+    return {
+      action: "game-over",
+      message: "0 retries remaining. Offer the player: continue (costs 5 commits, restores 3 retries) or start over (full reset).",
+      score: buildScore(state),
+    };
+  }
+
+  // Game complete
+  if (state.progress.currentStep >= GAME_FLOW.length) {
+    return {
+      action: "game-complete",
+      message: "All chapters complete. Deliver victory sequence and present certificate.",
+      score: buildScore(state),
+    };
+  }
+
+  // Normal gameplay
+  const phaseInfo = buildPhaseInfo(state.progress.currentStep);
+  const isResuming = state.progress.questionHistory.length > 0;
+
+  return {
+    action: "play",
+    ...phaseInfo,
+    score: buildScore(state),
+    isResuming,
+    previousSession: state.session.conversationSummary || null,
+    evaluationReminder:
+      "SCORING: 'deep' = architectural WHY/trade-offs ONLY. Accurate answers = 'correct'. Most answers should be 'correct' not 'deep'.",
+  };
+}
+
+/**
+ * complete-step — "Phase done, here are the results, what's next?"
+ *
+ * Input JSON:
+ * {
+ *   "results": [{ "question": "...", "answer": "...", "tier": "correct", "commits": 2 }],
+ *   "discoveries": [{ "fact": "...", "evidence": "..." }],
+ *   "exchange": "brief description of notable moment"
+ * }
+ */
+function completeStep(input) {
+  const state = readState();
+  const currentStep = state.progress.currentStep;
+
+  if (currentStep >= GAME_FLOW.length) {
+    console.error("Game is already complete. No more steps to advance.");
+    process.exit(1);
+  }
+
+  const currentStepId = GAME_FLOW[currentStep];
+  const { chapter } = parseStepId(currentStepId);
+
+  // 1. Process results (questions answered during this phase)
+  if (input.results && Array.isArray(input.results)) {
+    for (const result of input.results) {
+      state.progress.questionHistory.push({
+        ...result,
+        chapter,
+        phase: parseStepId(currentStepId).phase,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Update commits
+      if (result.commits && typeof result.commits === "number") {
+        state.player.totalCommits += result.commits;
+      }
+
+      // Deduct life on incorrect
+      if (result.tier === "incorrect") {
+        state.player.currentLives = Math.max(0, state.player.currentLives - 1);
+      }
+
+      // Update mood per answer
+      updateMoodForTier(state, result.tier);
+    }
+  }
+
+  // 2. Save discoveries to knowledge file
+  if (input.discoveries && Array.isArray(input.discoveries) && input.discoveries.length > 0) {
+    try {
+      if (fs.existsSync(KNOWLEDGE_PATH)) {
+        const knowledge = JSON.parse(fs.readFileSync(KNOWLEDGE_PATH, "utf-8"));
+        if (!knowledge.discoveries) knowledge.discoveries = [];
+        for (const disc of input.discoveries) {
+          knowledge.discoveries.push({
+            ...disc,
+            chapter,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        fs.writeFileSync(KNOWLEDGE_PATH, JSON.stringify(knowledge, null, 2), "utf-8");
+      }
+    } catch (_) {
+      // Knowledge file errors are non-fatal
+    }
+  }
+
+  // 3. Save memorable exchange
+  if (input.exchange && typeof input.exchange === "string") {
+    state.monster.memorableExchanges.push({
+      description: input.exchange,
+      chapter,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // 4. Advance step
+  const nextStep = currentStep + 1;
+  state.progress.currentStep = nextStep;
+
+  // 5. Write state
+  writeState(state);
+
+  // 6. Determine what to return
+  const score = buildScore(state);
+
+  // Game complete?
+  if (nextStep >= GAME_FLOW.length) {
+    return {
+      action: "game-complete",
+      completedStep: currentStepId,
+      message: "All chapters complete! Run generate-certificate, create CERTIFICATE.md, deliver farewell in Monster voice.",
+      score,
+    };
+  }
+
+  // Chapter boundary?
+  if (isChapterBoundary(currentStep, nextStep)) {
+    const completedChapter = chapter;
+    const chapterData = CHAPTERS[completedChapter];
+    const mood = state.monster.currentMood;
+    const ascii = ASCII_ART[mood] || ASCII_ART.dismissive;
+
+    const nextPhaseInfo = buildPhaseInfo(nextStep);
+
+    return {
+      action: "chapter-complete",
+      completedStep: currentStepId,
+      completedChapter,
+      ceremony: {
+        ascii,
+        chapterName: chapterData.name,
+        chapterNumber: chapterData.number,
+        memoryLog: chapterData.memoryLog,
+        stats: {
+          commits: state.player.totalCommits,
+          retriesRemaining: state.player.currentLives,
+          chaptersCompleted: chapterData.number,
+          chaptersRemaining: CHAPTER_ORDER.length - chapterData.number,
+          respectLevel: state.monster.respectLevel,
+          mood: state.monster.currentMood,
+        },
+      },
+      message: "Deliver the ceremony (ASCII art, stats in Monster dialogue, memory log). Wait for player to say 'continue', then call resume.",
+      nextChapter: nextPhaseInfo ? nextPhaseInfo.chapterName : null,
+      score,
+    };
+  }
+
+  // Same chapter, next phase
+  const nextPhaseInfo = buildPhaseInfo(nextStep);
+  return {
+    action: "next-phase",
+    completedStep: currentStepId,
+    ...nextPhaseInfo,
+    score,
+    evaluationReminder:
+      "SCORING: 'deep' = architectural WHY/trade-offs ONLY. Accurate answers = 'correct'. Most answers should be 'correct' not 'deep'.",
+  };
+}
+
+/**
+ * hint — Player asks for help. Deducts 1 commit.
+ */
+function hint() {
+  const state = readState();
+  state.player.totalCommits = Math.max(0, state.player.totalCommits - 1);
+  writeState(state);
+
+  const phaseInfo = state.progress.currentStep < GAME_FLOW.length
+    ? buildPhaseInfo(state.progress.currentStep)
+    : null;
+
+  return {
+    action: "hint",
+    message: "Give a contextual hint in Monster voice. Use 'consulting Stack Overflow' framing.",
+    commitDeducted: 1,
+    score: buildScore(state),
+    currentPhase: phaseInfo ? `${phaseInfo.chapter}:${phaseInfo.phase}` : null,
+  };
+}
+
+// ============================================================
+// Utility Commands (kept from v1)
+// ============================================================
 
 function initializeState(repoInfo) {
   ensureDirectory();
@@ -244,13 +598,8 @@ function initializeState(repoInfo) {
   };
 
   state.player.startedAt = new Date().toISOString();
-  state.progress.currentPhase = "questions";
   state.context.prepared = true;
   state.context.preparedAt = new Date().toISOString();
-
-  if (repoInfo.contextFiles) {
-    state.context.contextFiles = repoInfo.contextFiles;
-  }
 
   writeState(state);
   return state;
@@ -265,7 +614,6 @@ function updateState(updates) {
 
 function deepMerge(target, source) {
   const result = { ...target };
-
   for (const key of Object.keys(source)) {
     if (
       source[key] !== null &&
@@ -280,7 +628,6 @@ function deepMerge(target, source) {
       result[key] = source[key];
     }
   }
-
   return result;
 }
 
@@ -295,250 +642,6 @@ function generateRepoId(repoPath) {
   return Math.abs(hash).toString(36);
 }
 
-function addQuestionResult(result) {
-  const state = readState();
-  state.progress.questionHistory.push({
-    ...result,
-    timestamp: new Date().toISOString(),
-  });
-  if (result.commits && typeof result.commits === "number") {
-    state.player.totalCommits += result.commits;
-  }
-  if (result.tier === "incorrect") {
-    state.player.currentLives = Math.max(0, state.player.currentLives - 1);
-  }
-  writeState(state);
-  return state;
-}
-
-function updateMonsterMood(performance) {
-  const state = readState();
-  const mood = state.monster.currentMood;
-  const chaptersCompleted = state.progress.chaptersCompleted;
-
-  if (performance === "deep") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 15);
-  } else if (performance === "correct") {
-    state.monster.respectLevel = Math.min(100, state.monster.respectLevel + 5);
-  } else if (performance === "incorrect") {
-    state.monster.respectLevel = Math.max(0, state.monster.respectLevel - 5);
-  }
-
-  if (chaptersCompleted.includes("boss")) {
-    state.monster.currentMood = "peaceful";
-    writeState(state);
-    return state;
-  }
-
-  const MOOD_ORDER = ["dismissive", "annoyed", "worried", "desperate", "peaceful"];
-  const CHAPTER_MINIMUMS = {
-    investigation: "dismissive",
-    "deep-dive": "dismissive",
-    hunt: "worried",
-    boss: "desperate",
-  };
-
-  const CHAPTER_MAXIMUMS = {
-    investigation: "annoyed",
-    "deep-dive": "worried",
-    hunt: "desperate",
-    boss: "peaceful",
-  };
-
-  // Respect level ceilings per chapter
-  const RESPECT_CEILINGS = {
-    investigation: 30,
-    "deep-dive": 70,
-    hunt: 90,
-    boss: 100,
-  };
-
-  const chapterMinimum = CHAPTER_MINIMUMS[state.progress.currentChapter] || "dismissive";
-  const minimumIndex = MOOD_ORDER.indexOf(chapterMinimum);
-  const chapterMaximum = CHAPTER_MAXIMUMS[state.progress.currentChapter] || "desperate";
-  const maximumIndex = MOOD_ORDER.indexOf(chapterMaximum);
-  const currentIndex = MOOD_ORDER.indexOf(mood);
-
-  if (currentIndex < minimumIndex) {
-    state.monster.currentMood = chapterMinimum;
-  }
-
-  const recentHistory = state.progress.questionHistory.slice(-5);
-  const correctCount = recentHistory.filter(
-    (q) => q.tier === "correct" || q.tier === "deep",
-  ).length;
-  const incorrectCount = recentHistory.filter(
-    (q) => q.tier === "incorrect",
-  ).length;
-
-  const updatedIndex = MOOD_ORDER.indexOf(state.monster.currentMood);
-
-  if (correctCount >= 3 && updatedIndex < 3) {
-    state.monster.currentMood = MOOD_ORDER[Math.min(updatedIndex + 1, 3)];
-  }
-
-  if (incorrectCount >= 3 && updatedIndex > minimumIndex) {
-    state.monster.currentMood = MOOD_ORDER[Math.max(updatedIndex - 1, minimumIndex)];
-  }
-
-  if (chaptersCompleted.length >= 3 && state.monster.currentMood === "worried") {
-    state.monster.currentMood = "desperate";
-  }
-
-  // Enforce chapter mood ceiling
-  const finalIndex = MOOD_ORDER.indexOf(state.monster.currentMood);
-  if (finalIndex > maximumIndex) {
-    state.monster.currentMood = MOOD_ORDER[maximumIndex];
-  }
-
-  // Enforce chapter respect ceiling
-  const respectCeiling = RESPECT_CEILINGS[state.progress.currentChapter] || 100;
-  state.monster.respectLevel = Math.min(state.monster.respectLevel, respectCeiling);
-
-  writeState(state);
-  return state;
-}
-
-function addExchange(description) {
-  const state = readState();
-  state.monster.memorableExchanges.push({
-    description,
-    chapter: state.progress.currentChapter,
-    timestamp: new Date().toISOString(),
-  });
-  writeState(state);
-  return state;
-}
-
-function setTone(tone) {
-  const validTones = ["friendly", "balanced", "spicy", "full-monster"];
-  if (!validTones.includes(tone)) {
-    console.error(`Invalid tone: ${tone}. Valid: ${validTones.join(", ")}`);
-    process.exit(1);
-  }
-  const state = readState();
-  state.preferences.monsterTone = tone;
-  writeState(state);
-  return state;
-}
-
-function advancePhase(targetPhase) {
-  const state = readState();
-  const chapter = state.progress.currentChapter;
-  const phases = CHAPTER_PHASES[chapter] || [];
-  const currentPhase = state.progress.currentPhase || phases[0];
-  const currentIndex = phases.indexOf(currentPhase);
-  const targetIndex = phases.indexOf(targetPhase);
-
-  if (targetIndex === -1) {
-    console.error(
-      `Invalid phase "${targetPhase}" for chapter "${chapter}". Valid phases: ${phases.join(", ")}`,
-    );
-    process.exit(1);
-  }
-
-  if (targetIndex !== currentIndex + 1) {
-    const expectedNext =
-      currentIndex < phases.length - 1 ? phases[currentIndex + 1] : "(none — use complete-chapter)";
-    console.error(
-      `Cannot advance to "${targetPhase}" from "${currentPhase}". Next expected phase: ${expectedNext}`,
-    );
-    process.exit(1);
-  }
-
-  state.progress.currentPhase = targetPhase;
-  writeState(state);
-
-  const instruction = (PHASE_INSTRUCTIONS[chapter] || {})[targetPhase] || null;
-  return {
-    chapter,
-    phase: targetPhase,
-    phaseInstruction: instruction,
-    previousPhase: currentPhase,
-  };
-}
-
-function completeChapter(chapterName) {
-  const state = readState();
-
-  // Validate chapter name
-  if (!CHAPTER_ORDER.includes(chapterName)) {
-    console.error(
-      `Invalid chapter: ${chapterName}. Valid: ${CHAPTER_ORDER.join(", ")}`,
-    );
-    process.exit(1);
-  }
-
-  // Validate it matches current chapter
-  if (state.progress.currentChapter !== chapterName) {
-    console.error(
-      `Cannot complete "${chapterName}" — current chapter is "${state.progress.currentChapter}"`,
-    );
-    process.exit(1);
-  }
-
-  // Validate current phase is the FINAL phase for this chapter
-  const phases = CHAPTER_PHASES[chapterName] || [];
-  if (
-    phases.length > 0 &&
-    state.progress.currentPhase !== phases[phases.length - 1]
-  ) {
-    console.error(
-      `Cannot complete "${chapterName}" from phase "${state.progress.currentPhase}". Must be in phase "${phases[phases.length - 1]}".`,
-    );
-    process.exit(1);
-  }
-
-  // Add to completed list if not already there
-  if (!state.progress.chaptersCompleted.includes(chapterName)) {
-    state.progress.chaptersCompleted.push(chapterName);
-  }
-
-  // Determine next chapter
-  const currentIndex = CHAPTER_ORDER.indexOf(chapterName);
-  const isLast = currentIndex === CHAPTER_ORDER.length - 1;
-  const nextChapter = isLast ? null : CHAPTER_ORDER[currentIndex + 1];
-
-  // Update state
-  if (isLast) {
-    state.progress.currentChapter = "complete";
-    state.progress.currentPhase = "complete";
-  } else {
-    state.progress.currentChapter = nextChapter;
-    const nextPhases = CHAPTER_PHASES[nextChapter] || [];
-    state.progress.currentPhase = nextPhases.length > 0 ? nextPhases[0] : "active";
-  }
-
-  writeState(state);
-
-  // Build ceremony data
-  const mood = state.monster.currentMood;
-  const ascii = ASCII_ART[mood] || ASCII_ART.dismissive;
-  const memoryLog = MEMORY_LOGS[chapterName] || "";
-
-  return {
-    completed: chapterName,
-    ceremony: {
-      ascii,
-      stats: {
-        commits: state.player.totalCommits,
-        retriesRemaining: state.player.currentLives,
-        chaptersCompleted: state.progress.chaptersCompleted.length,
-        chaptersRemaining: CHAPTER_ORDER.length - state.progress.chaptersCompleted.length,
-        respectLevel: state.monster.respectLevel,
-      },
-      memoryLog,
-    },
-    next: isLast
-      ? null
-      : {
-          chapter: nextChapter,
-          referenceFile: CHAPTER_REFERENCE_FILES[nextChapter],
-        },
-    gameComplete: isLast,
-  };
-}
-
 function sabotage(params) {
   const { file, find, replace, commitMessage } = params;
 
@@ -549,7 +652,6 @@ function sabotage(params) {
     process.exit(1);
   }
 
-  // Read the file
   let content;
   try {
     content = fs.readFileSync(file, "utf-8");
@@ -558,7 +660,6 @@ function sabotage(params) {
     process.exit(1);
   }
 
-  // Verify the find string exists
   if (!content.includes(find)) {
     console.error(
       `String not found in "${file}". The find string does not match any content in the file.`,
@@ -566,7 +667,6 @@ function sabotage(params) {
     process.exit(1);
   }
 
-  // Apply the replacement
   const updated = content.replace(find, replace);
   try {
     fs.writeFileSync(file, updated, "utf-8");
@@ -575,7 +675,6 @@ function sabotage(params) {
     process.exit(1);
   }
 
-  // Git add and commit
   const { execSync } = require("node:child_process");
   try {
     execSync(`git add "${file}"`, { stdio: "pipe" });
@@ -587,20 +686,16 @@ function sabotage(params) {
     process.exit(1);
   }
 
-  // Read state for test command hint
-  const state = readState();
-  const knowledge = (() => {
+  // Get test command from knowledge file
+  const testCommand = (() => {
     try {
-      const knowledgePath = path.join(STATE_DIR, "context", "repo-knowledge.json");
-      if (fs.existsSync(knowledgePath)) {
-        return JSON.parse(fs.readFileSync(knowledgePath, "utf-8"));
+      if (fs.existsSync(KNOWLEDGE_PATH)) {
+        const knowledge = JSON.parse(fs.readFileSync(KNOWLEDGE_PATH, "utf-8"));
+        return (knowledge.commands && knowledge.commands.test) || "npm test";
       }
     } catch (_) {}
-    return null;
+    return "npm test";
   })();
-
-  const testCommand =
-    (knowledge && knowledge.commands && knowledge.commands.test) || "npm test";
 
   return {
     success: true,
@@ -689,7 +784,6 @@ function generateCertificate() {
     };
   }
 
-  // Certificate ID
   const repoId = state.repo.id || "unknown";
   const timestamp = Date.now().toString(36);
 
@@ -719,52 +813,42 @@ function generateCertificate() {
   };
 }
 
-function getScore() {
-  const state = readState();
-  const history = state.progress.questionHistory;
-  const chapter = state.progress.currentChapter;
-  const chapterNum = CHAPTER_ORDER.indexOf(chapter) + 1;
-  const completed = state.progress.chaptersCompleted.length;
-  const phase = state.progress.currentPhase || "active";
-  const phases = CHAPTER_PHASES[chapter] || [];
-  const phaseIndex = phases.indexOf(phase);
-  const nextPhase =
-    phaseIndex < phases.length - 1 ? phases[phaseIndex + 1] : null;
-
-  // Count recent tier distribution to help agent calibrate
-  const recentAnswers = history.slice(-5);
-  const recentDeep = recentAnswers.filter((q) => q.tier === "deep").length;
-  const tierWarning =
-    recentDeep >= 3
-      ? "WARNING: Too many 'deep' ratings. Most answers should be 'correct'. Reserve 'deep' for architectural insight only."
-      : null;
-
-  return {
-    commits: state.player.totalCommits,
-    retries: state.player.currentLives,
-    maxRetries: 5,
-    respect: state.monster.respectLevel,
-    mood: state.monster.currentMood,
-    chapter,
-    chapterNumber: chapterNum,
-    chaptersCompleted: completed,
-    totalChapters: CHAPTER_ORDER.length,
-    questionsAnswered: history.length,
-    deepInsights: history.filter((q) => q.tier === "deep").length,
-    phase,
-    phaseInstruction: (PHASE_INSTRUCTIONS[chapter] || {})[phase] || null,
-    nextPhase,
-    referenceFile: CHAPTER_REFERENCE_FILES[chapter] || null,
-    evaluationReminder:
-      "SCORING: 'deep' = architectural WHY/trade-offs ONLY. Accurate answers = 'correct'. Most answers should be 'correct' not 'deep'.",
-    tierWarning,
-  };
-}
+// ============================================================
+// CLI
+// ============================================================
 
 function main() {
   const [, , command, ...args] = process.argv;
 
   switch (command) {
+    case "resume":
+      console.log(JSON.stringify(resume(), null, 2));
+      break;
+
+    case "complete-step":
+      if (!args[0]) {
+        console.error(
+          "Usage: state-manager.cjs complete-step '<json>'\n\n" +
+          "JSON format:\n" +
+          '  { "results": [{"question":"...","answer":"...","tier":"correct","commits":2}],\n' +
+          '    "discoveries": [{"fact":"...","evidence":"..."}],\n' +
+          '    "exchange": "brief notable moment" }',
+        );
+        process.exit(1);
+      }
+      try {
+        const input = JSON.parse(args[0]);
+        console.log(JSON.stringify(completeStep(input), null, 2));
+      } catch (error) {
+        console.error("Invalid JSON:", error.message);
+        process.exit(1);
+      }
+      break;
+
+    case "hint":
+      console.log(JSON.stringify(hint(), null, 2));
+      break;
+
     case "read":
       console.log(JSON.stringify(readState(), null, 2));
       break;
@@ -807,65 +891,6 @@ function main() {
       }
       break;
 
-    case "add-question":
-      if (!args[0]) {
-        console.error("Usage: state-manager.cjs add-question '<result-json>'");
-        process.exit(1);
-      }
-      try {
-        const questionResult = JSON.parse(args[0]);
-        const result = addQuestionResult(questionResult);
-        console.log(JSON.stringify(result, null, 2));
-      } catch (error) {
-        console.error("Invalid JSON:", error.message);
-        process.exit(1);
-      }
-      break;
-
-    case "update-mood":
-      if (!args[0]) {
-        console.error(
-          "Usage: state-manager.cjs update-mood <incorrect|partial|correct|deep>",
-        );
-        process.exit(1);
-      }
-      const result = updateMonsterMood(args[0]);
-      console.log(JSON.stringify(result, null, 2));
-      break;
-
-    case "add-exchange":
-      if (!args[0]) {
-        console.error(
-          "Usage: state-manager.cjs add-exchange '<description>'",
-        );
-        process.exit(1);
-      }
-      const exchangeResult = addExchange(args[0]);
-      console.log(JSON.stringify(exchangeResult, null, 2));
-      break;
-
-    case "set-tone":
-      if (!args[0]) {
-        console.error(
-          "Usage: state-manager.cjs set-tone <friendly|balanced|spicy|full-monster>",
-        );
-        process.exit(1);
-      }
-      const toneResult = setTone(args[0]);
-      console.log(JSON.stringify(toneResult, null, 2));
-      break;
-
-    case "advance-phase":
-      if (!args[0]) {
-        console.error(
-          "Usage: state-manager.cjs advance-phase <phase-name>",
-        );
-        process.exit(1);
-      }
-      const apResult = advancePhase(args[0]);
-      console.log(JSON.stringify(apResult, null, 2));
-      break;
-
     case "sabotage":
       if (!args[0]) {
         console.error(
@@ -883,61 +908,36 @@ function main() {
       }
       break;
 
-    case "complete-chapter":
-      if (!args[0]) {
-        console.error(
-          "Usage: state-manager.cjs complete-chapter <chapter-name>",
-        );
-        process.exit(1);
-      }
-      const ccResult = completeChapter(args[0]);
-      console.log(JSON.stringify(ccResult, null, 2));
-      break;
-
-    case "get-score":
-      const scoreResult = getScore();
-      console.log(JSON.stringify(scoreResult, null, 2));
-      break;
-
     case "generate-certificate":
-      const certResult = generateCertificate();
-      console.log(JSON.stringify(certResult, null, 2));
+      console.log(JSON.stringify(generateCertificate(), null, 2));
       break;
 
     case "help":
     default:
-      console.log(`OnboardMe State Manager
+      console.log(`OnboardMe State Manager v2 — Script-Driven Game Engine
 
 Usage: state-manager.cjs <command> [args]
 
-Commands:
-  read                              Read current state (or default if none)
+Game Commands:
+  resume                            Get current game state and what to do next
+  complete-step '<json>'            Complete current phase with results, advance game
+  hint                              Deduct 1 commit (player asked for help)
+
+Utility Commands:
+  read                              Read raw state
   write '<json-updates>'            Deep merge updates into state
   init '<repo-info-json>'           Initialize new game state
   reset                             Delete all state (start over)
-  add-question '<result-json>'      Add a question result to history
-  update-mood <performance>         Update Monster mood based on performance
-  add-exchange '<description>'      Save a memorable exchange moment
-  set-tone <tone>                   Set Monster tone (friendly|balanced|spicy|full-monster)
-  advance-phase <phase-name>        Advance to the next phase within the current chapter
-  sabotage '<json>'                 Apply code sabotage and commit (Ch3 hunt)
-  complete-chapter <chapter-name>   Complete a chapter and get ceremony data
-  get-score                         Get current score + phase + instructions
-  generate-certificate              Generate end-of-game certificate data (rank, stats, per-chapter)
+  sabotage '<json>'                 Apply code sabotage and commit (Ch3)
+  generate-certificate              Generate end-of-game certificate data
   help                              Show this help message
 
 Examples:
-  state-manager.cjs read
+  state-manager.cjs resume
+  state-manager.cjs complete-step '{"results":[{"question":"What language?","answer":"TypeScript","tier":"correct","commits":2}],"discoveries":[{"fact":"TypeScript project","evidence":"package.json"}],"exchange":"Identified the language immediately"}'
+  state-manager.cjs hint
   state-manager.cjs init '{"name":"my-project","path":"/path/to/repo"}'
-  state-manager.cjs write '{"player":{"totalCommits":5}}'
-  state-manager.cjs add-question '{"questionId":"q1","tier":"correct","chapter":"investigation"}'
-  state-manager.cjs update-mood correct
-  state-manager.cjs add-exchange 'Player figured out the auth flow on first try'
-  state-manager.cjs set-tone spicy
-  state-manager.cjs advance-phase entities
-  state-manager.cjs sabotage '{"file":"src/foo.ts","find":"original","replace":"changed","commitMessage":"refactor: simplify logic"}'
-  state-manager.cjs complete-chapter investigation
-  state-manager.cjs generate-certificate
+  state-manager.cjs sabotage '{"file":"src/foo.ts","find":"await","replace":"","commitMessage":"refactor: simplify async"}'
 `);
       break;
   }

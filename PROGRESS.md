@@ -1,7 +1,7 @@
 # OnboardMe — Progress Tracker
 
-> **Status**: Milestone 11 In Progress  
-> **Current Focus**: Phase Tracking & Instruction Hooks
+> **Status**: Milestone 12 Complete  
+> **Current Focus**: Script-Driven Game Engine
 
 ---
 
@@ -919,6 +919,86 @@ Added `advance-phase entities` and `advance-phase tests` calls at phase transiti
 `completed`
 
 Ran `bash scripts/install-skill.sh` — skill files deployed to `.cursor/skills/onboardme/`.
+
+---
+
+## Milestone 12: Script-Driven Game Engine
+
+**Goal**: Replace markdown-driven game flow with a script-driven state machine. The script becomes the single source of truth for game structure. Two commands (`resume` and `complete-step`) replace all flow-control commands. Chapter reference markdown files are deleted — content lives in structured JSON.
+
+**Success Criteria**:
+- [x] Game structure in JSON: GAME_FLOW (16 steps), PHASES (instruction/scoring/tips per step), CHAPTERS (metadata + rules)
+- [x] Per-chapter data files: `scripts/chapters/{investigation,deep-dive,hunt,boss}.cjs`
+- [x] `game-data.cjs` combiner: imports chapters, exports flat lookup structures
+- [x] `resume` command: returns current phase instruction + rules + score
+- [x] `complete-step` command: records results, updates mood, saves discoveries, advances game, returns next phase or ceremony
+- [x] `hint` command: deducts 1 commit, returns current phase
+- [x] State schema v2: `currentStep` replaces `currentChapter`/`currentPhase`/`chaptersCompleted`
+- [x] v1 → v2 migration: maps old chapter:phase to step index
+- [x] Old commands removed: `advance-phase`, `complete-chapter`, `get-score`, `add-question`, `update-mood`, `add-exchange`, `set-tone`
+- [x] SKILL.md simplified: "How To Play" section with 2 commands, checklists removed
+- [x] Instruction files simplified: `play-game.md` = "run resume, follow output"
+- [x] Chapter reference files deleted: THE-INVESTIGATION.md, THE-DEEP-DIVE.md, THE-HUNT.md, THE-BOSS-BATTLE.md
+- [x] Chapter rules returned inline: critical rules per chapter returned with every phase
+- [x] Documentation updated: STATE-SCHEMA.md (v2), ARCHITECTURE.md (script-driven), PROGRESS.md
+
+---
+
+### Tasks
+
+#### 12.1 Chapter Data Files
+`completed`
+
+Created `scripts/chapters/` with 4 chapter files (investigation.cjs, deep-dive.cjs, hunt.cjs, boss.cjs). Each exports: name, number, moodRange, memoryLog, rules[], and phases[]. Created `scripts/game-data.cjs` combiner that imports chapters and exports GAME_FLOW, PHASES, CHAPTERS.
+
+---
+
+#### 12.2 State Manager Rewrite
+`completed`
+
+Rewrote state-manager.cjs as script-driven game engine. New commands: `resume`, `complete-step`, `hint`. Removed: `advance-phase`, `complete-chapter`, `get-score`, `add-question`, `update-mood`, `add-exchange`, `set-tone`. State schema v2 with `currentStep` index. v1→v2 migration maps old chapter:phase to step index. Mood system internalized in `complete-step`.
+
+---
+
+#### 12.3 SKILL.md Simplification
+`completed`
+
+Replaced mandatory rules and checklists with "How To Play" section documenting 2 commands. Removed: After Each Answer checklist, Chapter End Checklist, Phase System, Array Safety Rule, State Write Restrictions. Updated to 4 chapters. Added Script Identity Rule for new data files.
+
+---
+
+#### 12.4 Instruction File Simplification
+`completed`
+
+Rewrote play-game.md to: "Run resume. Follow its output." Simplified hint.md to: "Run hint command." Simplified status.md to: "Run resume for status."
+
+---
+
+#### 12.5 Chapter Reference File Deletion
+`completed`
+
+Deleted: THE-INVESTIGATION.md, THE-DEEP-DIVE.md, THE-HUNT.md, THE-BOSS-BATTLE.md. Content extracted into JSON phase definitions in `scripts/chapters/*.cjs`.
+
+---
+
+#### 12.6 Content Audit and Enrichment
+`completed`
+
+Audited original chapter files against new JSON definitions. Added `rules` array to each chapter (critical rules returned to agent with every phase). Enriched instruction and tips fields with missing operational context: sabotage pattern table, commit message examples, no-tests fallback, certificate structure, project-type adaptation, avoid-repetition rules.
+
+---
+
+#### 12.7 Documentation Updates
+`completed`
+
+Updated STATE-SCHEMA.md to v2 (currentStep-based). Updated ARCHITECTURE.md to script-driven architecture. Updated PROGRESS.md with Milestone 12.
+
+---
+
+#### 12.8 Deploy and Verify
+`completed`
+
+Deployed via install-skill.sh. Verified: resume, complete-step, hint, v1→v2 migration, chapter boundary detection, ceremony data, game completion.
 
 ---
 

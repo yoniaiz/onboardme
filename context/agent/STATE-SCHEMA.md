@@ -6,9 +6,9 @@ OnboardMe persists game progress, player behavior, and Monster emotional state i
 
 ## Schema Version
 
-Current version: **1**
+Current version: **2**
 
-The schema includes a `schemaVersion` field to enable future migrations. When loading state, check version and migrate if needed.
+The schema includes a `schemaVersion` field to enable future migrations. When loading state, check version and migrate if needed. The v1 → v2 migration maps `currentChapter`/`currentPhase`/`chaptersCompleted` to a single `currentStep` index.
 
 ---
 
@@ -32,14 +32,7 @@ interface OnboardMeState {
   };
 
   progress: {
-    currentChapter:
-      | "investigation"
-      // "hands-on" removed — merged into deep-dive
-      | "deep-dive"
-      | "hunt"
-      | "boss";
-    currentGame: string;
-    chaptersCompleted: string[];
+    currentStep: number;          // Index into GAME_FLOW (0-15, or 16 = complete)
     questionHistory: QuestionResult[];
   };
 
@@ -51,31 +44,26 @@ interface OnboardMeState {
       | "desperate"
       | "peaceful";
     respectLevel: number;
-    memorableExchanges: string[];
-    lastMockery: string;
+    memorableExchanges: Exchange[];
   };
 
   session: {
     conversationSummary: string;
-    lastEmotionalBeat: string;
-    pendingCallbacks: string[];
   };
 
-  behavior: {
-    hintUsageCount: number;
-    averageResponseTime: number;
-    accuracyByTopic: Record<string, number>;
-    playerStyle: "methodical" | "aggressive" | "balanced" | "struggling";
+  git: {
+    gameBranch: string;
+    originalBranch: string;
+    branchCreated: boolean;
   };
 
   context: {
     prepared: boolean;
     preparedAt: string;
-    contextFiles: string[];
   };
 
   preferences: {
-    monsterTone: "friendly" | "balanced" | "spicy" | "full-monster";
+    monsterTone: "spicy";
   };
 }
 
@@ -83,11 +71,46 @@ interface QuestionResult {
   question: string;
   answer: string;
   chapter: string;
+  phase: string;
   tier: "incorrect" | "partial" | "correct" | "deep";
   commits: number;
   timestamp: string;
 }
+
+interface Exchange {
+  description: string;
+  chapter: string;
+  timestamp: string;
+}
 ```
+
+---
+
+## Game Flow
+
+Progress is tracked by a single `currentStep` index into the `GAME_FLOW` array:
+
+```
+Step 0:  investigation:identity
+Step 1:  investigation:stack
+Step 2:  investigation:docs
+Step 3:  investigation:synthesis
+Step 4:  deep-dive:trace
+Step 5:  deep-dive:entities
+Step 6:  deep-dive:tests
+Step 7:  hunt:sabotage
+Step 8:  hunt:diagnosis
+Step 9:  hunt:impact
+Step 10: boss:challenge
+Step 11: boss:planning
+Step 12: boss:build
+Step 13: boss:review
+Step 14: boss:defense
+Step 15: boss:victory
+Step 16: (game complete)
+```
+
+Chapter, phase, and completion status are all derived from `currentStep`. No separate `currentChapter`, `currentPhase`, or `chaptersCompleted` fields.
 
 ---
 
@@ -109,7 +132,7 @@ Player profile and resources.
 
 | Field          | Type   | Description                        |
 | -------------- | ------ | ---------------------------------- |
-| `name`         | string | Player's chosen name               |
+| `name`         | string | Player's name (auto-detected)      |
 | `totalCommits` | number | Accumulated score (commits earned) |
 | `currentLives` | number | Lives remaining (start: 5)         |
 | `startedAt`    | string | ISO timestamp of first session     |
@@ -118,29 +141,20 @@ Player profile and resources.
 
 Game progression tracking.
 
-| Field               | Type             | Description                   |
-| ------------------- | ---------------- | ----------------------------- |
-| `currentChapter`    | enum             | Active chapter identifier     |
-| `currentGame`       | string           | Current game within chapter   |
-| `chaptersCompleted` | string[]         | List of completed chapter IDs |
-| `questionHistory`   | QuestionResult[] | Full answer history           |
-
-**Chapter Progression:**
-
-```
-investigation → deep-dive → hunt → boss
-```
+| Field             | Type             | Description                          |
+| ----------------- | ---------------- | ------------------------------------ |
+| `currentStep`     | number           | Index into GAME_FLOW (0-16)          |
+| `questionHistory` | QuestionResult[] | Full answer history across all phases |
 
 ### `monster`
 
 The Monster's emotional state and memory.
 
-| Field                | Type     | Description                        |
-| -------------------- | -------- | ---------------------------------- |
-| `currentMood`        | enum     | Emotional state affecting dialogue |
-| `respectLevel`       | number   | 0-100, affects Monster's attitude  |
-| `memorableExchanges` | string[] | Key moments for callbacks          |
-| `lastMockery`        | string   | Last insult used (avoid repeats)   |
+| Field                | Type      | Description                        |
+| -------------------- | --------- | ---------------------------------- |
+| `currentMood`        | enum      | Emotional state affecting dialogue |
+| `respectLevel`       | number    | 0-100, affects Monster's attitude  |
+| `memorableExchanges` | Exchange[] | Key moments for callbacks          |
 
 **Mood Progression:**
 
@@ -149,72 +163,32 @@ dismissive → annoyed → worried → desperate → peaceful
         (player success erodes Monster's confidence)
 ```
 
-**Mood Triggers:**
-| Event | Mood Change |
-|-------|-------------|
-| Deep answer | +worry, +respect |
-| Correct streak (3+) | dismissive→annoyed |
-| Correct streak (5+) | annoyed→worried |
-| Near victory | worried→desperate |
-| Victory | desperate→peaceful |
-| Incorrect answer | Monster regains confidence |
-
 ### `session`
 
 Current session context for conversation continuity.
 
-| Field                 | Type     | Description                |
-| --------------------- | -------- | -------------------------- |
-| `conversationSummary` | string   | Brief summary for resume   |
-| `lastEmotionalBeat`   | string   | Last significant moment    |
-| `pendingCallbacks`    | string[] | Moments to reference later |
+| Field                 | Type   | Description              |
+| --------------------- | ------ | ------------------------ |
+| `conversationSummary` | string | Brief summary for resume |
 
-### `behavior`
+### `git`
 
-Player behavioral tracking for adaptive difficulty.
+Game branch tracking.
 
-| Field                 | Type   | Description             |
-| --------------------- | ------ | ----------------------- |
-| `hintUsageCount`      | number | Total hints requested   |
-| `averageResponseTime` | number | Seconds (for pacing)    |
-| `accuracyByTopic`     | Record | Accuracy per topic area |
-| `playerStyle`         | enum   | Inferred play style     |
-
-**Play Style Detection:**
-| Style | Indicators |
-|-------|------------|
-| `methodical` | Long response times, few hints, high accuracy |
-| `aggressive` | Fast responses, some misses, no hints |
-| `balanced` | Mixed timing, moderate hint usage |
-| `struggling` | Many hints, low accuracy, long pauses |
+| Field            | Type    | Description                |
+| ---------------- | ------- | -------------------------- |
+| `gameBranch`     | string  | Game branch name           |
+| `originalBranch` | string  | Player's original branch   |
+| `branchCreated`  | boolean | Whether branch was created |
 
 ### `context`
 
 Prepared game context status.
 
-| Field          | Type     | Description                     |
-| -------------- | -------- | ------------------------------- |
-| `prepared`     | boolean  | Whether `/prepare-game` has run |
-| `preparedAt`   | string   | ISO timestamp of preparation    |
-| `contextFiles` | string[] | List of analyzed files          |
-
-**Codebase knowledge** is stored separately in `.onboardme/context/repo-knowledge.json` (managed by `knowledge-manager.cjs`). This file contains the Monster's answer key and player-validated discoveries. See `context/agent/CONTEXT-GATHERING.md` for the full schema.
-
-### `preferences`
-
-Player preferences for experience customization.
-
-| Field         | Type | Description                |
-| ------------- | ---- | -------------------------- |
-| `monsterTone` | enum | Snark intensity preference |
-
-**Tone Levels:**
-| Level | Description |
-|-------|-------------|
-| `friendly` | Light teasing, encouraging |
-| `balanced` | Default, moderate snark |
-| `spicy` | More mockery, less hand-holding |
-| `full-monster` | Maximum chaos energy |
+| Field      | Type    | Description                     |
+| ---------- | ------- | ------------------------------- |
+| `prepared` | boolean | Whether prepare has run         |
+| `preparedAt` | string | ISO timestamp of preparation  |
 
 ---
 
@@ -224,49 +198,15 @@ New game initialization:
 
 ```json
 {
-  "schemaVersion": 1,
-  "repo": {
-    "id": "",
-    "path": "",
-    "name": ""
-  },
-  "player": {
-    "name": "",
-    "totalCommits": 0,
-    "currentLives": 5,
-    "startedAt": ""
-  },
-  "progress": {
-    "currentChapter": "investigation",
-    "currentGame": "",
-    "chaptersCompleted": [],
-    "questionHistory": []
-  },
-  "monster": {
-    "currentMood": "dismissive",
-    "respectLevel": 0,
-    "memorableExchanges": [],
-    "lastMockery": ""
-  },
-  "session": {
-    "conversationSummary": "",
-    "lastEmotionalBeat": "",
-    "pendingCallbacks": []
-  },
-  "behavior": {
-    "hintUsageCount": 0,
-    "averageResponseTime": 0,
-    "accuracyByTopic": {},
-    "playerStyle": "balanced"
-  },
-  "context": {
-    "prepared": false,
-    "preparedAt": "",
-    "contextFiles": []
-  },
-  "preferences": {
-    "monsterTone": "balanced"
-  }
+  "schemaVersion": 2,
+  "repo": { "id": "", "path": "", "name": "" },
+  "player": { "name": "", "totalCommits": 0, "currentLives": 5, "startedAt": "" },
+  "progress": { "currentStep": 0, "questionHistory": [] },
+  "monster": { "currentMood": "dismissive", "respectLevel": 0, "memorableExchanges": [] },
+  "session": { "conversationSummary": "" },
+  "git": { "gameBranch": "", "originalBranch": "", "branchCreated": false },
+  "context": { "prepared": false, "preparedAt": "" },
+  "preferences": { "monsterTone": "spicy" }
 }
 ```
 
@@ -276,74 +216,32 @@ New game initialization:
 
 ```
 .onboardme/
-├── state.json          # Main state file
-└── state.backup.json   # Auto-backup before writes
+└── state.json          # Main state file
 ```
 
 ---
 
 ## Migration Strategy
 
-When `schemaVersion` changes:
+When `schemaVersion` changes, migrations run sequentially:
 
-1. Load existing state
-2. Check `schemaVersion`
-3. Apply migrations sequentially
-4. Update `schemaVersion`
-5. Save migrated state
-
-```typescript
-const migrations: Record<number, (state: unknown) => unknown> = {
-  // Version 1 → 2: Example migration
-  2: (state) => ({
-    ...state,
-    schemaVersion: 2,
-    newField: "default",
-  }),
-};
-
-function migrateState(state: OnboardMeState): OnboardMeState {
-  let current = state;
-  while (current.schemaVersion < CURRENT_VERSION) {
-    const nextVersion = current.schemaVersion + 1;
-    current = migrations[nextVersion](current);
-  }
-  return current;
-}
-```
+**v1 → v2:**
+- `currentChapter` + `currentPhase` + `chaptersCompleted` → single `currentStep` index
+- Maps old phase names to new ones (e.g., `investigation:questions` → step 0, `deep-dive:bootup` → step 4)
+- Removes unused fields: `behavior`, `lastMockery`, `pendingCallbacks`, `contextFiles`
 
 ---
 
-## State Access Patterns
+## Commands
 
-**Read-only access (most games):**
+The agent interacts with state through two primary commands:
 
-```typescript
-const state = await readState();
-const { currentMood, respectLevel } = state.monster;
-```
+- **`resume`** — Returns current phase instruction, scoring, tips, rules, and score
+- **`complete-step`** — Records results, advances game, returns next phase or ceremony
 
-**Write access (checkpoints, answer results):**
+See `state-manager.cjs help` for the full command reference.
 
-```typescript
-await updateState({
-  monster: { respectLevel: state.monster.respectLevel + 10 },
-  progress: {
-    questionHistory: [...state.progress.questionHistory, result],
-  },
-});
-```
-
-**Atomic updates:** Always read-modify-write with backup.
-
-## Auto-Scoring
-
-The `add-question` command automatically handles scoring:
-
-- **Commits**: If the result includes a `commits` field, it's added to `player.totalCommits`
-- **Lives**: If `tier` is `"incorrect"`, `player.currentLives` is decremented by 1
-
-This means the agent only needs to call `add-question` — no separate `write` call for scoring.
+---
 
 ## Companion: Knowledge File
 
@@ -352,11 +250,11 @@ Game state (`state.json`) tracks **where the player is**. Codebase knowledge (`r
 Together they enable full cross-session resumption:
 
 ```
-state.json          → chapter, score, lives, mood, question history
+state.json          → step, score, lives, mood, question history
 repo-knowledge.json → codebase facts, player-validated discoveries
 ```
 
 ---
 
-_Document Version: 1.1_
-_Last Updated: 2026-02-06_
+_Document Version: 2.0_
+_Last Updated: 2026-02-12_

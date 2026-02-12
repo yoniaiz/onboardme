@@ -200,7 +200,7 @@ Set up a safe branch for gameplay. This keeps the player's original code untouch
 - What's missing (no README, no database, etc.)
 - Any specific technical detail the player should discover
 
-Deliver a brief Monster introduction — you scanned the project, you know its secrets, but the player must discover them. Do NOT reveal specific tech details. Return control to `play-game.md` — the game continues automatically from Step 2.
+Deliver a brief Monster introduction — you scanned the project, you know its secrets, but the player must discover them. Do NOT reveal specific tech details. Return control to `play-game.md` — run `resume` and the game continues automatically.
 
 ## Important
 
