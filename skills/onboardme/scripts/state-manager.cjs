@@ -643,6 +643,190 @@ function generateRepoId(repoPath) {
   return Math.abs(hash).toString(36);
 }
 
+// ============================================================
+// setup-branch — Automated game branch creation
+// ============================================================
+
+/**
+ * Patterns for files/directories that belong to the game (not user code).
+ * Changes to these files are automatically discarded during branch setup.
+ * Handles both expanded paths (.onboardme/state.json) and collapsed
+ * untracked directories (.onboardme/) from git status --porcelain.
+ */
+const GAME_FILE_PATTERNS = [
+  /^\.onboardme(\/|$)/,
+  /^\.cursor\/skills(\/|$)/,
+  /^\.cursor\/?$/,
+  /^\.agents\/skills(\/|$)/,
+  /^\.agents\/?$/,
+  /^\.claude\/skills(\/|$)/,
+  /^\.claude\/?$/,
+];
+
+function isGameFile(filePath) {
+  return GAME_FILE_PATTERNS.some((pattern) => pattern.test(filePath));
+}
+
+function setupBranch() {
+  const { execSync } = require("node:child_process");
+
+  const run = (cmd) =>
+    execSync(cmd, { stdio: "pipe", encoding: "utf-8" }).trim();
+
+  // 1. Check if inside a git repo
+  try {
+    run("git rev-parse --is-inside-work-tree");
+  } catch (_) {
+    return {
+      action: "skip",
+      message:
+        "Not a git repository. Skipping branch setup. Chapters 1-3 work without git.",
+    };
+  }
+
+  // 2. Get current branch
+  let originalBranch;
+  try {
+    originalBranch = run("git branch --show-current");
+    if (!originalBranch) originalBranch = "HEAD";
+  } catch (_) {
+    originalBranch = "HEAD";
+  }
+
+  // Already on game branch
+  if (originalBranch === "onboardme/game") {
+    return {
+      action: "ready",
+      message: "Already on the game branch.",
+      originalBranch: originalBranch,
+      gameBranch: "onboardme/game",
+    };
+  }
+
+  // 3. Check for uncommitted changes
+  let statusOutput;
+  try {
+    statusOutput = execSync("git status --porcelain", {
+      stdio: "pipe",
+      encoding: "utf-8",
+    });
+  } catch (_) {
+    statusOutput = "";
+  }
+
+  if (statusOutput.trim()) {
+    // Parse porcelain format: XY<space>path  (XY = 2-char status)
+    const changedFiles = statusOutput
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        // Handle rename lines: XY old -> new
+        const renameMatch = line.match(/^.{2} .+ -> (.+)$/);
+        if (renameMatch)
+          return renameMatch[1].replace(/^"(.*)"$/, "$1");
+        return line.substring(3).replace(/^"(.*)"$/, "$1");
+      });
+
+    const gameFiles = changedFiles.filter(isGameFile);
+    const userFiles = changedFiles.filter((f) => !isGameFile(f));
+
+    // Auto-discard game-only changes
+    if (gameFiles.length > 0) {
+      try {
+        // Parse status lines with proper format handling
+        const statusLines = statusOutput.split("\n").filter(Boolean);
+
+        // Discard tracked game files
+        const trackedGameFiles = statusLines
+          .filter((line) => {
+            const status = line.substring(0, 2);
+            const filePath = line.substring(3).replace(/^"(.*)"$/, "$1");
+            return isGameFile(filePath) && !status.includes("?");
+          })
+          .map((line) => line.substring(3).replace(/^"(.*)"$/, "$1"));
+
+        if (trackedGameFiles.length > 0) {
+          run(`git checkout -- ${trackedGameFiles.map((f) => `"${f}"`).join(" ")}`);
+        }
+
+        // Remove untracked game files/dirs
+        const untrackedGameFiles = statusLines
+          .filter((line) => {
+            const status = line.substring(0, 2);
+            const filePath = line.substring(3).replace(/^"(.*)"$/, "$1");
+            return isGameFile(filePath) && status.includes("?");
+          })
+          .map((line) => line.substring(3).replace(/^"(.*)"$/, "$1"));
+
+        for (const f of untrackedGameFiles) {
+          try {
+            const fullPath = path.resolve(f);
+            if (fs.existsSync(fullPath)) {
+              const stat = fs.statSync(fullPath);
+              if (stat.isDirectory()) {
+                fs.rmSync(fullPath, { recursive: true, force: true });
+              } else {
+                fs.unlinkSync(fullPath);
+              }
+            }
+          } catch (_) {
+            // best effort
+          }
+        }
+      } catch (_) {
+        // best effort — continue even if cleanup fails
+      }
+    }
+
+    // If user files have changes, return them so the agent can ask
+    if (userFiles.length > 0) {
+      return {
+        action: "user-changes",
+        message:
+          "Uncommitted changes found in user code files. Ask the player what to do: commit, stash, or discard.",
+        userFiles: userFiles,
+        originalBranch: originalBranch,
+      };
+    }
+  }
+
+  // 4. Create or switch to game branch
+  try {
+    // Check if game branch already exists
+    try {
+      run("git rev-parse --verify onboardme/game");
+      // Branch exists — switch to it
+      run("git checkout onboardme/game");
+    } catch (_) {
+      // Branch doesn't exist — create it
+      run("git checkout -b onboardme/game");
+    }
+  } catch (error) {
+    return {
+      action: "error",
+      message: `Failed to create game branch: ${error.message}`,
+    };
+  }
+
+  // 5. Save git state
+  const state = readState();
+  deepMerge(state, {
+    git: {
+      gameBranch: "onboardme/game",
+      originalBranch: originalBranch,
+      branchCreated: true,
+    },
+  });
+  writeState(state);
+
+  return {
+    action: "ready",
+    message: `Game branch created. Switched from '${originalBranch}' to 'onboardme/game'.`,
+    originalBranch: originalBranch,
+    gameBranch: "onboardme/game",
+  };
+}
+
 function sabotage(params) {
   const { file, find, replace, commitMessage } = params;
 
@@ -892,6 +1076,10 @@ function main() {
       }
       break;
 
+    case "setup-branch":
+      console.log(JSON.stringify(setupBranch(), null, 2));
+      break;
+
     case "sabotage":
       if (!args[0]) {
         console.error(
@@ -929,6 +1117,7 @@ Utility Commands:
   write '<json-updates>'            Deep merge updates into state
   init '<repo-info-json>'           Initialize new game state
   reset                             Delete all state (start over)
+  setup-branch                      Create game branch (auto-discards game file changes)
   sabotage '<json>'                 Apply code sabotage and commit (Ch3)
   generate-certificate              Generate end-of-game certificate data
   help                              Show this help message

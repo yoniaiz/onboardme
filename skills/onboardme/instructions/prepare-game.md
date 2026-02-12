@@ -128,61 +128,38 @@ The Monster reacts to their name without asking — seamless, no prompts:
 
 This keeps the Monster's mystique ("I already know who you are") and avoids breaking flow with a form.
 
-### Step 6: Create Game Branch (Optional)
+### Step 6: Create Game Branch
 
-Set up a safe branch for gameplay. This keeps the player's original code untouched.
+Run the branch setup command:
 
-1. **Check if git is available:**
-   ```bash
-   git rev-parse --is-inside-work-tree
-   ```
-   If git is not available, skip this step (Chapters 1-3 work fine without it; Chapter 4 will adapt at runtime).
+```bash
+node <state-manager> setup-branch
+```
 
-2. **Record the current branch:**
-   ```bash
-   git branch --show-current
-   ```
-   Save the result — this is the player's original branch.
+This automatically:
+- Detects the current branch
+- Discards any game-only file changes (`.onboardme/`, `.cursor/skills/`, etc.)
+- Creates and switches to `onboardme/game`
+- Saves git state
 
-3. **Handle uncommitted changes:**
-   Run `git status --porcelain`. If uncommitted changes exist, inform the player in Monster voice and offer: commit, stash, or revert. Let the PLAYER decide. Execute their choice.
+Check the returned `action`:
 
-4. **Create and switch to the game branch:**
-   ```bash
-   git checkout -b onboardme/game
-   ```
-   If the branch already exists (from a previous game), ask the player if they want to reuse it or start fresh:
-   ```bash
-   git checkout onboardme/game   # reuse
-   # OR
-   git branch -D onboardme/game && git checkout -b onboardme/game  # fresh start
-   ```
+- **`"ready"`** — Branch is set up. Confirm briefly in Monster voice:
+  ```
+  *whirrrr*
 
-5. **Save git state:**
-   ```bash
-   node <state-manager> write '{"git":{"gameBranch":"onboardme/game","originalBranch":"<original-branch-name>","branchCreated":true}}'
-   ```
+  "Safe branch created."
 
-6. **Confirm to the player:**
-   ```
-   *whirrrr*
+  *crackle*
 
-   "Safe branch created."
+  "Your original code? Untouched."
 
-   *crackle*
+  *[BRANCH READY]*
+  ```
 
-   "Everything from here happens on 'onboardme/game'."
+- **`"user-changes"`** — Uncommitted changes in user code files. Inform the player in Monster voice and let them choose: commit, stash, or discard. After they decide, run `setup-branch` again.
 
-   *pause*
-
-   "Your original code? Untouched."
-
-   *slrrrrp*
-
-   "You can go back anytime."
-
-   *[BRANCH READY]*
-   ```
+- **`"skip"`** — Not a git repo. Continue without a branch (Chapters 1-3 work without git).
 
 ### Step 7: Report as the Monster
 
