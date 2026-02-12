@@ -82,14 +82,9 @@ From your analysis, construct a JSON object with this structure:
    node <knowledge-manager> write '<the-json-you-built>'
    ```
 
-2. Initialize game state:
+2. Initialize game state (this also creates all needed directories — `.onboardme/context/`, `.onboardme/artifacts/`):
    ```bash
    node <state-manager> init '{"name":"<project-name>","path":"<repo-path>"}'
-   ```
-
-3. Create artifacts directory:
-   ```bash
-   mkdir -p .onboardme/artifacts
    ```
 
 ### Step 5: Detect Player Identity

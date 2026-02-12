@@ -115,8 +115,15 @@ function getDefaultState() {
 }
 
 function ensureDirectory() {
-  if (!fs.existsSync(STATE_DIR)) {
-    fs.mkdirSync(STATE_DIR, { recursive: true });
+  const dirs = [
+    STATE_DIR,                          // .onboardme
+    path.join(STATE_DIR, "context"),     // .onboardme/context
+    path.join(STATE_DIR, "artifacts"),   // .onboardme/artifacts
+  ];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
   }
 }
 
@@ -715,90 +722,36 @@ function setupBranch() {
   }
 
   if (statusOutput.trim()) {
-    // Parse porcelain format: XY<space>path  (XY = 2-char status)
     const changedFiles = statusOutput
       .split("\n")
       .filter(Boolean)
       .map((line) => {
-        // Handle rename lines: XY old -> new
         const renameMatch = line.match(/^.{2} .+ -> (.+)$/);
         if (renameMatch)
           return renameMatch[1].replace(/^"(.*)"$/, "$1");
         return line.substring(3).replace(/^"(.*)"$/, "$1");
       });
 
-    const gameFiles = changedFiles.filter(isGameFile);
     const userFiles = changedFiles.filter((f) => !isGameFile(f));
 
-    // Auto-discard game-only changes
-    if (gameFiles.length > 0) {
-      try {
-        // Parse status lines with proper format handling
-        const statusLines = statusOutput.split("\n").filter(Boolean);
-
-        // Discard tracked game files
-        const trackedGameFiles = statusLines
-          .filter((line) => {
-            const status = line.substring(0, 2);
-            const filePath = line.substring(3).replace(/^"(.*)"$/, "$1");
-            return isGameFile(filePath) && !status.includes("?");
-          })
-          .map((line) => line.substring(3).replace(/^"(.*)"$/, "$1"));
-
-        if (trackedGameFiles.length > 0) {
-          run(`git checkout -- ${trackedGameFiles.map((f) => `"${f}"`).join(" ")}`);
-        }
-
-        // Remove untracked game files/dirs
-        const untrackedGameFiles = statusLines
-          .filter((line) => {
-            const status = line.substring(0, 2);
-            const filePath = line.substring(3).replace(/^"(.*)"$/, "$1");
-            return isGameFile(filePath) && status.includes("?");
-          })
-          .map((line) => line.substring(3).replace(/^"(.*)"$/, "$1"));
-
-        for (const f of untrackedGameFiles) {
-          try {
-            const fullPath = path.resolve(f);
-            if (fs.existsSync(fullPath)) {
-              const stat = fs.statSync(fullPath);
-              if (stat.isDirectory()) {
-                fs.rmSync(fullPath, { recursive: true, force: true });
-              } else {
-                fs.unlinkSync(fullPath);
-              }
-            }
-          } catch (_) {
-            // best effort
-          }
-        }
-      } catch (_) {
-        // best effort — continue even if cleanup fails
-      }
-    }
-
-    // If user files have changes, return them so the agent can ask
+    // If user files have changes, stop and let the player decide
     if (userFiles.length > 0) {
       return {
         action: "user-changes",
         message:
-          "Uncommitted changes found in user code files. Ask the player what to do: commit, stash, or discard.",
+          "Uncommitted changes found in non-game files. The player must handle these before switching branches: commit, stash, or discard. Then run setup-branch again.",
         userFiles: userFiles,
         originalBranch: originalBranch,
       };
     }
   }
 
-  // 4. Create or switch to game branch
+  // 4. Create or switch to game branch (game file changes carry over)
   try {
-    // Check if game branch already exists
     try {
       run("git rev-parse --verify onboardme/game");
-      // Branch exists — switch to it
       run("git checkout onboardme/game");
     } catch (_) {
-      // Branch doesn't exist — create it
       run("git checkout -b onboardme/game");
     }
   } catch (error) {
@@ -808,7 +761,34 @@ function setupBranch() {
     };
   }
 
-  // 5. Save git state
+  // 5. Commit any game files on the new branch
+  try {
+    const gameDirs = [".onboardme", ".cursor/skills", ".agents/skills", ".claude/skills"];
+    let addedAny = false;
+
+    for (const dir of gameDirs) {
+      try {
+        if (fs.existsSync(dir)) {
+          execSync(`git add "${dir}"`, { stdio: "pipe" });
+          addedAny = true;
+        }
+      } catch (_) {
+        // Skip dirs that can't be added
+      }
+    }
+
+    if (addedAny) {
+      try {
+        execSync('git commit -m "onboardme: game setup"', { stdio: "pipe" });
+      } catch (_) {
+        // Nothing staged or nothing to commit — that's fine
+      }
+    }
+  } catch (_) {
+    // Best effort — game works even if commit fails
+  }
+
+  // 6. Save git state
   const state = readState();
   deepMerge(state, {
     git: {
